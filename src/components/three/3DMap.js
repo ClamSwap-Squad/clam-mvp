@@ -100,7 +100,11 @@ const Map3D = (props) => {
     composer.addPass( renderPass );
 
     outlinePass = new OutlinePass( new THREE.Vector2( window.innerWidth, window.innerHeight ), scene, camera );
-    outlinePass.edgeStrength = 30;
+    outlinePass.edgeStrength = 50;
+    outlinePass.edgeThickness = 2;
+    outlinePass.pulsePeriod = 3;
+    outlinePass.visibleEdgeColor.set( 0xFF0000 );
+    outlinePass.hiddenEdgeColor.set( 0xFF0000 );
     composer.addPass( outlinePass );
 
     renderer.domElement.addEventListener( 'mousemove', onMouseMove );
@@ -160,7 +164,8 @@ const Map3D = (props) => {
     flyingSeagulls(seagulls, tdelta);
     swimmingDolphins(dolphins, t);
 
-    renderer.render(scene, camera);
+    // renderer.render(scene, camera);
+    composer.render();
   };
 
   const giveBuoyancy = (obj, t, factor, init) => {
@@ -237,10 +242,12 @@ const Map3D = (props) => {
           if (hotMesh.name === hoverStr)
             selMeshArr.push(hotMesh);
         });
+        outlinePass.selectedObjects = selMeshArr;
       }
     } else {
       if (hoverStr !== '') {
         hoverStr = '';
+        outlinePass.selectedObjects = [];
         setHoverName('');
       }
     }
