@@ -60,6 +60,8 @@ const PearlItem = ({ pearl }) => {
 };
 
 const Saferoom = ({ account: { clamBalance, address }, updateCharacter }) => {
+  clamBalance = 7;
+  address = '0x22D60EF15c3c744B1ff6ff8D79f2017221Ee76fF'
   const [clams, setClams] = useState([]);
   const [selectedClam, setSelectedClam] = useState();
 
