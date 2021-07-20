@@ -11,8 +11,7 @@ import * as THREE from "three";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { OutlinePass } from "three/examples/jsm/postprocessing/OutlinePass";
-import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-import { FXAAShader } from "three/examples/jsm/shaders/FXAAShader.js";
+import { SMAAPass } from "three/examples/jsm/postprocessing/SMAAPass.js";
 import { OrbitControls } from "../../loaders/OrbitControls";
 import loadGLTF from "./loaders/gltf_loader";
 
@@ -123,9 +122,8 @@ const Map3D = () => {
     outlinePass.hiddenEdgeColor.set( 0xFF0000 );
     composer.addPass( outlinePass );
     
-    effectFXAA = new ShaderPass( FXAAShader );
-    effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
-    composer.addPass( effectFXAA );
+    const pass = new SMAAPass( window.innerWidth * renderer.getPixelRatio(), window.innerHeight * renderer.getPixelRatio() );
+    composer.addPass( pass );
 
     renderer.domElement.addEventListener( 'mousemove', onMouseMove );
     renderer.domElement.addEventListener( 'pointerdown', onMouseDown );
