@@ -20,6 +20,7 @@ import { PEARLS } from "../../constants";
 
 import clamContract from "../../web3/clam";
 import { getDNADecoded } from "../../web3/dnaDecoder";
+import { ModalClam } from "./ModalClam";
 
 const getPearlImage = (p) =>
   require(`../../assets/img/clamjam/${p.src}`).default;
@@ -151,9 +152,11 @@ const Saferoom = ({ account: { clamBalance, address }, updateCharacter }) => {
         {/* chat character   */}
         {!address && <Character name="tanja" />}
 
-        <Modal isShowing={isShowing} onClose={toggle}>
+        {/* <Modal isShowing={isShowing} onClose={toggle}>
           <ClamView {...selectedClam} />
-        </Modal>
+        </Modal> */}
+        <ModalClam clams={clams} selClam={selectedClam} onClose={()=>setSelectedClam(null)}></ModalClam>
+        <div id='konvaDiv'></div>
         {address && (
           <div className="flex-1 min-h-full min-w-full flex absolute z-20  justify-center items-start mt-64">
             <div className="w-4/5 flex flex-col">
