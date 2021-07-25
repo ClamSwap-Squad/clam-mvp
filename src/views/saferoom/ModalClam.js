@@ -59,17 +59,6 @@ export class ModalClam extends React.Component {
 				if (oldMode) {this.camera.position.set(-0.4, 0.9, -1.4);}
 				else  this.camera.position.set(0, 0.15, -0.3);
 				this.camera.lookAt(0, 0, 0);
-				var intRatio = 1;
-				if 		(selClam.dna === '12804198351679021128652011791586053250140732725436207319173023233863832503415') intRatio = 1.05;
-				else if (selClam.dna === '84673788352152873849251525425340537990871053887685079711687736953381312948717') intRatio = 0.8;
-				else if (selClam.dna === '53305306313046294378626289905123987562036433973297052882394105246732690786676') intRatio = 0.9;
-				else if (selClam.dna === '95972378013754794205954534991373510264884982458660240148715801297280583816157') intRatio = 1.05;
-				else if (selClam.dna === '16549148208335345974705663611152001125498675625253632557494621770130398710228') intRatio = 1;
-				else if (selClam.dna === '103527869864378335284759080060910348962305366383117350158996085281170390900560') intRatio = 1;
-				else if (selClam.dna === '88272851022381101964278758446711648461036538568170722855589602687509508474964') intRatio = 0.8;
-				this.lightGroup.children.forEach(light => {
-					light.intensity = light.oriIntensity * intRatio;
-				});
 				
 				this.totalGroup.children.forEach(child => {
 					child.visible = child.dnaId === selClam.dna;
