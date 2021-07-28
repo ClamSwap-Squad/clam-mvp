@@ -8,7 +8,6 @@ import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader';
 import decodeDna from "../../components/three/3DClams/decodeDna";
 import Accordion from "../../components/Accordion";
 import lighting from "../../components/three/3DClams/config/lighting-setup-2.json";
-// import lighting from "./config/lighting-setup-2.json";
 
 import { get } from "lodash";
 import "./ModalClam.css";
@@ -63,15 +62,6 @@ export class ModalClam extends React.Component {
 				this.totalGroup.children.forEach(child => {
 					child.visible = child.dnaId === selClam.dna;
 				});
-				// const traits = decodeDna(selClam.dnaDecoded);
-				// const clamDir = "/clam-models/" + traits.shellShape.toLowerCase() + "/";
-				// for (let i = this.totalGroup.children.length - 1; i >= 0; i--) {
-				// 	this.totalGroup.remove(this.totalGroup.children[i]);
-				// }
-				// this.dnaId = selClam.dna;
-				// this.shellModel = null; this.tongueModel = null;
-				// this.loadModel(clamDir, traits, 'shell');
-				// this.loadModel(clamDir, traits, 'tongue');
 			});
 		}
 		if (!this.clamsArr.length && nextProps.clams.length) {
@@ -79,7 +69,7 @@ export class ModalClam extends React.Component {
 			this.clamsArr.forEach(clamItem => {
 				const traits = decodeDna(clamItem.dnaDecoded);
 				const clamDir = "/clam-models/" + traits.shellShape.toLowerCase() + "/";
-				const clamGroup = new THREE.Group(); clamGroup.position.z += 0.08; clamGroup.position.y -= 0.03;
+				const clamGroup = new THREE.Group(); clamGroup.position.z += 0.05;
 				clamGroup.visible = false;
 				clamGroup.dnaId = clamItem.dna;
 				this.totalGroup.add(clamGroup);
@@ -191,21 +181,20 @@ export class ModalClam extends React.Component {
 	};
 
 	initScene = () => {
-		this.renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
+		this.renderer = new THREE.WebGLRenderer({antialias:true, alpha:true, preserveDrawingBuffer: true});
 		this.renderer.setSize(cWidth, cHeight);
 		if (!document.getElementById("clamModalContainer")) return false;
 		document.getElementById("clamModalContainer").appendChild(this.renderer.domElement);
-		this.renderer.setClearColor(0xD8D8D8, 0);
 		this.renderer.shadowMap.enabled = true;
 		this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+		this.renderer.gammaOutput = true;
 
 		this.camera = new THREE.PerspectiveCamera(75, cWidth / cHeight, 0.1, 1000);
 		if (oldMode) {this.camera.position.set(-0.4, 0.9, -1.4); this.camera.zoom = 7; this.camera.updateProjectionMatrix();}
 		else  this.camera.position.set(0, 0.15, -0.3);
 
 		this.scene = new THREE.Scene();
-		this.totalGroup = new THREE.Group(); this.scene.add(this.totalGroup);
-		this.lightGroup = new THREE.Group(); this.scene.add(this.lightGroup);
+		this.totalGroup = new THREE.Object3D(); this.scene.add(this.totalGroup);
 
 		var controls = new OrbitControls(this.camera, this.renderer.domElement);
 		controls.enablePan = false;
@@ -216,12 +205,9 @@ export class ModalClam extends React.Component {
 			const src = new THREE.ObjectLoader().parse(lighting);
 			let objs = src.children;
 			do {
-				objs[0].oriIntensity = objs[0].intensity;
-				this.lightGroup.add(objs[0]);
+				objs[0].intensity *= 0.7;
+				this.scene.add(objs[0]);
 			} while (objs.length > 0);
-			// objs.forEach(lightItem => {
-			// 	this.scene.add(lightItem);
-			// });
 		} else {
 			const ambientLight = new THREE.AmbientLight( 0xFFFFFF, 0.8 ); this.scene.add( ambientLight );
 			const shadowLight = new THREE.DirectionalLight( 0xFFFFFF, 1.5 ); this.scene.add( shadowLight ); shadowLight.position.set(1, 1, 1); shadowLight.castShadow = true;
@@ -234,18 +220,16 @@ export class ModalClam extends React.Component {
 		const modelUrl = (type === 'shell')?clamDir + 'clam.glb': clamDir + 'Tongues/' + traits.tongue.toLowerCase() + '.glb';
 		new GLTFLoader().load( modelUrl, async ( gltf ) => {
 			const obj = gltf.scene.children[0];
-			const vPos = new THREE.Box3(new THREE.Vector3()).setFromObject(obj);
 			obj.traverse( (child) => {
 				if (child instanceof THREE.Mesh) {
 					child.castShadow = true;
 					child.receiveShadow = true;
+					if (child.material.map) child.material.map.anisotropy = 16;
 					if (type === 'tongue') {
 						child.material.normalMap = this.tongueMap;
 					}
 				}
 			})
-			// obj.position.x -= (vPos.min.x + vPos.max.x) / 2;
-			// obj.position.z -= (vPos.min.z + vPos.max.z) / 2;
 			clamGroup.add(obj);
 			if (type === 'shell') {
 				this.loadModel(clamDir, traits, 'tongue', clamGroup);
