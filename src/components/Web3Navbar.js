@@ -194,13 +194,15 @@ const Web3Navbar = ({ updateAccount, ...redux }) => {
             {account && (
               <>
                 <div className="flex lg:mt-0 px-4 py-2 mr-2 rounded-xl shadow bg-gray-600 bg-opacity-80">
+                <Link to="/saferoom">
                   <span className="p-1 text-sm text-gray-200 font-bold font-sans">
                      Clams in Safe: {activateClamBalance}
 
                      { Number(activateClamBalance) > 0 && location.pathname.indexOf('saferoom') === -1
-                       && <Link to="/saferoom">&nbsp; <FontAwesomeIcon icon={faSignInAlt} /></Link>
+                       && <span>&nbsp; <FontAwesomeIcon icon={faSignInAlt} /></span>
                      }
                   </span>
+                  </Link>
                 </div>
                 {/* {Number(activateClamBalance) > 0 &&
                   location.pathname.indexOf("saferoom") === -1 && (
