@@ -5,7 +5,6 @@ import * as THREE from "three";
 export default function Model(props) {
   const group = useRef();
   const { nodes, materials } = useGLTF('/pearl-models/round/Pearl_round.glb');
-  console.log(materials);
   const { textures: {
     map,
     envMap,
