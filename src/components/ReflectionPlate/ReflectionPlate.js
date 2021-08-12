@@ -12,7 +12,7 @@ export const ReflectionPlate = memo(() => {
     color: 0x7b9eba,
   } ), []);
   const { scene } = useThree();
-
+  console.log(scene);
   useEffect(() => {
     groundMirror.position.y = -0.0005;
     groundMirror.rotateX( - Math.PI / 2 );
