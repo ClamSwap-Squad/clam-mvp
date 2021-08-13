@@ -12,10 +12,10 @@ export const PearlScene = (props) => {
       camera={{
         fov: 50,
         aspect: 1,
-        near: 0.1,
+        near: 0.005,
         far: 100,
-        position: [0, 0.06, 1],
-        zoom: 10,
+        position: [0, 0.06, 2],
+        zoom: 5,
       }}
       dpr={window.devicePixelRatio}
       onCreated={canvasCtx => {
@@ -25,21 +25,19 @@ export const PearlScene = (props) => {
     >
       <Suspense fallback={<Html><ClamLoading /></Html>}>
         {children}
-        {/*<fog attach="fog" args={['#7b9eba', 1, 3]} />*/}
-        {/*<color attach="background" args={['#7b9eba']} />*/}
         <PearlBackground />
       </Suspense>
       <ambientLight
       args={[0xffffff, 2]}
       />
       <OrbitControls
-        target={[0, 0.028, 0]}
-        minPolarAngle={Math.PI/2 - 0.2}
-        maxPolarAngle={Math.PI/2 - 0.2}
+        target={[0, 0.12, 0]}
+        minPolarAngle={Math.PI/2 - 0.13}
+        maxPolarAngle={Math.PI/2 - 0.13}
         enableRotate={true}
         enablePan={false}
         enableZoom={false}
-        rotateSpeed={0.3}
+        rotateSpeed={0.2}
       />
     </Canvas>
   );

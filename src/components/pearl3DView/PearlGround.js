@@ -6,7 +6,7 @@ export const PearlGround = () => {
   return (
     <group rotation={[-Math.PI / 2, 0, 0]}>
       <mesh >
-        <planeGeometry args={[2, 2]} />
+        <planeGeometry args={[20, 20]} />
         <meshStandardMaterial opacity={0.55} transparent={true} map={texture} />
       </mesh>
     </group>

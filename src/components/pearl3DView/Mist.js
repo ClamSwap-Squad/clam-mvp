@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei"
 import * as THREE from "three";
@@ -6,61 +6,55 @@ import * as THREE from "three";
 export const Mist = () => {
   //const texture = useTexture('/pearl-models/patterns/cloud.png');
   const texture = useTexture('/pearl-models/patterns/mist-element.png');
-  const ref = useRef(null);
+  const groupRef = useRef(null);
   const [vec] = useState(new THREE.Vector3());
-  const [material] = useState(new THREE.MeshLambertMaterial({color: 0xffffff, map: texture, transparent: true, opacity: 1 }));
-  const [geometry] = useState(new THREE.PlaneGeometry(0.04, 0.04));
+  const [smokeParticles] = useState(
+    Array.from({ length: 33 })
+      .map((_, index) => ({
+        positionX: Math.random() * 0.3 - 0.15,
+        positionY: Math.random() * 0.1 + 0.036,
+        positionZ: -0.13 - index * 0.0135,
+        key: index,
+      }))
+  );
+
+  const [material] = useState(new THREE.MeshLambertMaterial({color: 0x6e85d2, map: texture, transparent: true, opacity: 1 }));
+  const [geometry] = useState(new THREE.PlaneGeometry(0.2, 0.25));
   const { camera } = useThree();
 
+  const smokes = useMemo(() => {
+    return smokeParticles.map((particle) => (
+      <mesh
+        position={[particle.positionX, particle.positionY, particle.positionZ]}
+        rotation={[0, Math.PI, Math.PI/2]}
+        args={[geometry, material]}
+        key={particle.key}
+      />
+    ))
+  }, [smokeParticles])
+
   useFrame(({ clock }) => {
-    //console.log(camera.rotation);
-    if (ref.current) {
-      /*console.log(camera.position.x);
-      ref.current.rotation.y = camera.rotation.y;*/
+    if (groupRef.current) {
       camera.getWorldDirection( vec );
       vec.y = 0;
-      vec.add(ref.current.position);
-      ref.current.lookAt(vec);
-      /*ref.current.children.forEach((mesh, i) => {
-        const shiftX = Math.sin(clock.getElapsedTime() * (i + 1) / 5) * 0.002;
-        const shiftY = Math.sin(clock.getElapsedTime() * (i + 1) / 5) * 0.001;
-        mesh.position.x = defaultPosition.x + shiftX;
-        mesh.position.y = defaultPosition.y + shiftY;
-      });*/
+      vec.add(groupRef.current.position);
+      groupRef.current.lookAt(vec);
+
+      const delta = clock.getDelta();
+      groupRef.current.children.forEach((mesh, i) => {
+        let k = 1;
+        if (i % 2) {
+          k = -1;
+        }
+        mesh.rotation.z += (delta * 0.2);
+        mesh.position.x = smokeParticles[i].positionX + Math.sin(clock.elapsedTime * 0.4)* 0.1 * k;
+      });
     }
   })
 
   return (
-    /*<group ref={ref}>
-      <mesh position={[0, 0.02, -0.035]} rotation={[0, Math.PI, -Math.PI/2]}>
-        <meshLambertMaterial color={0xb9a5cc} map={texture} transparent={true} opacity={1} />
-        <planeGeometry args={[0.03, 0.07]} />
-      </mesh>
-
-    </group>*/
-    <group ref={ref}>
-      <mesh position={[0, 0.02, -0.035]} rotation={[0, Math.PI, Math.PI/2]} args={[geometry, material]} />
-      <mesh position={[-0.005, 0.017, -0.036]} rotation={[0, Math.PI, -Math.PI/2]} args={[geometry, material]} />
-      <mesh position={[0, 0.015, -0.037]} rotation={[0, Math.PI, Math.PI/2]} args={[geometry, material]} />
-      <mesh position={[0.01, 0.017, -0.038]} rotation={[0, Math.PI, -Math.PI/2]} args={[geometry, material]} />
-      <mesh position={[0.02, 0.02, -0.039]} rotation={[0, Math.PI, Math.PI/2]} args={[geometry, material]} />
-      <mesh position={[-0.025, 0.017, -0.040]} rotation={[0, Math.PI, -Math.PI/2]} args={[geometry, material]} />
-      <mesh position={[0, -0.015, -0.030]} rotation={[0, Math.PI, Math.PI/2]} args={[geometry, material]} />
-      <mesh position={[0.02, 0.017, -0.031]} rotation={[0, Math.PI, -Math.PI/2]} args={[geometry, material]} />
-      <mesh position={[0, 0.02, -0.035]} rotation={[0, Math.PI, Math.PI/2]} args={[geometry, material]} />
-      <mesh position={[-0.005, 0.017, -0.036]} rotation={[0, Math.PI, -Math.PI/2]} args={[geometry, material]} />
-      <mesh position={[0, 0.015, -0.037]} rotation={[0, Math.PI, Math.PI/2]} args={[geometry, material]} />
-      <mesh position={[0.01, 0.017, -0.038]} rotation={[0, Math.PI, -Math.PI/2]} args={[geometry, material]} />
-      <mesh position={[0.02, 0.02, -0.039]} rotation={[0, Math.PI, Math.PI/2]} args={[geometry, material]} />
-      <mesh position={[-0.025, 0.017, -0.040]} rotation={[0, Math.PI, -Math.PI/2]} args={[geometry, material]} />
-      <mesh position={[0, -0.015, -0.030]} rotation={[0, Math.PI, Math.PI/2]} args={[geometry, material]} />
-      <mesh position={[0.02, 0.017, -0.031]} rotation={[0, Math.PI, -Math.PI/2]} args={[geometry, material]} />
-      <mesh position={[0.01, 0.017, -0.041]} rotation={[0, Math.PI, -Math.PI/2]} args={[geometry, material]} />
-      <mesh position={[0.02, 0.02, -0.042]} rotation={[0, Math.PI, Math.PI/2]} args={[geometry, material]} />
-      <mesh position={[-0.025, 0.017, -0.043]} rotation={[0, Math.PI, -Math.PI/2]} args={[geometry, material]} />
-      <mesh position={[0, -0.015, -0.044]} rotation={[0, Math.PI, Math.PI/2]} args={[geometry, material]} />
-      <mesh position={[0, 0.017, -0.045]} rotation={[0, Math.PI, -Math.PI/2]} args={[geometry, material]} />
-      <mesh position={[-0.01, 0.017, -0.046]} rotation={[0, Math.PI, -Math.PI/2]} args={[geometry, material]} />
+    <group ref={groupRef}>
+      {smokes}
     </group>
   );
 };
