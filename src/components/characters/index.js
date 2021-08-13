@@ -6,6 +6,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import "./index.scss";
+import "./3Dbutton.css"
 
 import { VotingStore } from "../../store/voting";
 
@@ -46,6 +47,24 @@ const CharacterSpeak = (props) => {
 
     */
 
+
+    function slideText() {
+      let id = null;
+      const elem = document.getElementById("slide");
+      let pos = 0;
+      clearInterval(id);
+      id = setInterval(frame, 60);
+      function frame() {
+        if (pos == 10) {
+          clearInterval(id);
+        } else {
+          pos++;
+          elem.style.left = pos + "px";
+        }
+      }
+    }
+
+
   const onClickNext = (direct = false) => {
     let timeOut = 0;
     if (speechTrack[trackCount].dismiss && !direct) {
@@ -75,6 +94,7 @@ const CharacterSpeak = (props) => {
           if (!direct) {
             setSpeech(speechTrack[speechTrack[trackCount].next].text);
             setTrackCount(speechTrack[trackCount].next);
+            slideText();
             if (btnTrack[speechTrack[trackCount].next].next) {
               document.querySelector("#btn-next").style.display = "block";
               setButtonNextText(btnTrack[speechTrack[trackCount].next].next);
@@ -249,7 +269,7 @@ const CharacterSpeak = (props) => {
       <div className="text-bubble">
         <div className="name">{charName}</div>
         <div className="speech">
-          <p className="speech-text">{speech}</p>
+          <p className="speech-text" id="slide"  >{speech}</p>
         </div>
         {(votingWalletConnected &&
           [
@@ -263,17 +283,25 @@ const CharacterSpeak = (props) => {
           "shell_voting_complete",
         ].indexOf(props.speech) === -1 ? (
           <div className="buttons">
-            <button className="btn character-btn" id="btn-alt" onClick={onClickAlt}>
-              {buttonAltText}
-            </button>
-            <button
-              className="btn character-btn"
-              id="btn-next"
-              onClick={(e) => onClickNext()}
-            >
-              {buttonNextText}
-            </button>
-          </div>
+          <button
+            className="pushable character-btn"
+            id="btn-alt"
+            onClick={onClickAlt}
+          >
+            <span className="shadow"></span>
+            <span className="edge"></span>
+            <span className="front"> {buttonAltText}</span>
+          </button>
+          <button
+            className=" pushable character-btn"
+            id="btn-next"
+            onClick={(e) => onClickNext()}
+          >
+            <span className="shadow"></span>
+            <span className="edge"></span>
+            <span className="front"> {buttonNextText}</span>
+          </button>
+        </div>
         ) : (
           ""
         )}
