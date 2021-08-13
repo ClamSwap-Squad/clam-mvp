@@ -34,11 +34,12 @@ export const PearlScene = (props) => {
       />
       <OrbitControls
         target={[0, 0.028, 0]}
-        minPolarAngle={0}
+        minPolarAngle={Math.PI/2 - 0.2}
         maxPolarAngle={Math.PI/2 - 0.2}
         enableRotate={true}
         enablePan={false}
         enableZoom={false}
+        rotateSpeed={0.3}
       />
     </Canvas>
   );
