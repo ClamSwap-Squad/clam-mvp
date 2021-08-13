@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Html, OrbitControls } from "@react-three/drei";
-
+import * as THREE from "three";
 import { PearlBackground } from "./PearlBackground";
 import { ClamLoading } from "../clam3DView/ClamLoading";
 
@@ -18,6 +18,10 @@ export const PearlScene = (props) => {
         zoom: 10,
       }}
       dpr={window.devicePixelRatio}
+      onCreated={canvasCtx => {
+        canvasCtx.gl.toneMapping = THREE.NoToneMapping;
+        canvasCtx.gl.physicallyCorrectLights = true;
+      }}
     >
       <Suspense fallback={<Html><ClamLoading /></Html>}>
         {children}
@@ -25,9 +29,8 @@ export const PearlScene = (props) => {
         {/*<color attach="background" args={['#7b9eba']} />*/}
         <PearlBackground />
       </Suspense>
-      <spotLight
-        args={[0xffffff, 0.5, 28.08, 0.214, 0, 1]}
-        position={[0, 8.856156, 0]}
+      <ambientLight
+      args={[0xffffff, 2]}
       />
       <OrbitControls
         target={[0, 0.028, 0]}

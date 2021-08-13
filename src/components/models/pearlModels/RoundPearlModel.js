@@ -26,6 +26,7 @@ export default function Model(props) {
           map={map}
           envMap={envMap}
           emissiveMap={emissiveMap}
+          envMapIntensity={1.2}
         />
       </mesh>
     </group>
