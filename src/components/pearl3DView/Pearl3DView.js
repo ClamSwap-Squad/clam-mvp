@@ -7,7 +7,7 @@ export const Pearl3DView = (props) => {
   const { width, height } = props;
 
   return (
-    <div style={{width: "100%", height, maxWidth: width, position: "relative"}}>
+    <div className="w-full max-w-canvas h-canvas cursor-grab active:cursor-grabbing">
       <PearlScene>
         <Pearl />
         <ReflectionPlate />
