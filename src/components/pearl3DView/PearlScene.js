@@ -1,12 +1,15 @@
 import { Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Html, OrbitControls } from "@react-three/drei";
+import { Html } from "@react-three/drei";
 import * as THREE from "three";
+
 import { PearlBackground } from "./PearlBackground";
 import { ClamLoading } from "../clam3DView/ClamLoading";
+import { CameraControls } from './PearlCameraControls';
 
 export const PearlScene = (props) => {
   const { children } = props;
+
   return (
     <Canvas
       camera={{
@@ -28,17 +31,9 @@ export const PearlScene = (props) => {
         <PearlBackground />
       </Suspense>
       <ambientLight
-      args={[0xffffff, 2]}
+        args={[0xffffff, 2]}
       />
-      <OrbitControls
-        target={[0, 0.12, 0]}
-        minPolarAngle={Math.PI/2 - 0.13}
-        maxPolarAngle={Math.PI/2 - 0.13}
-        enableRotate={true}
-        enablePan={false}
-        enableZoom={false}
-        rotateSpeed={0.2}
-      />
+      <CameraControls />
     </Canvas>
   );
 };
