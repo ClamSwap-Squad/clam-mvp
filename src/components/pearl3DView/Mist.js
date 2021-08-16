@@ -19,7 +19,7 @@ export const Mist = () => {
         rotation={[0, Math.PI, Math.PI/2 * particle.rotationZ]}
         key={particle.key}
       >
-        <meshLambertMaterial color={0xffffff} map={texture} transparent={true} opacity={1} />
+        <meshLambertMaterial color={0xffffff} map={texture} transparent={true} opacity={0.66} />
         <planeGeometry args={[0.15, 0.15]} />
       </mesh>
     ))

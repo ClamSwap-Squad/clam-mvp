@@ -21,11 +21,15 @@ export const CameraControls = () => {
     <orbitControls
       ref={controls}
       args={[camera, domElement]}
-      enableZoom={false}
+      enableZoom={true}
+      enablePan={false}
+      enableDamping={true}
       minPolarAngle={Math.PI/2 - 0.13}
       maxPolarAngle={Math.PI/2 - 0.13}
+      maxDistance={2.2}
+      minDistance={1}
       target={[0, 0.12, 0]}
-      rotateSpeed={0.2}
+      rotateSpeed={0.5}
     />
   );
 };

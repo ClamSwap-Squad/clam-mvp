@@ -1,4 +1,4 @@
-export const generateSmokeParticles = () => Array.from({length: 30})
+export const generateSmokeParticles = () => Array.from({length: 20})
   .reduce((acc, _, index) => {
     const smoke1 = {
       positionX: -0.25 + index * 0.01,
