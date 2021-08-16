@@ -10,7 +10,7 @@ export const Pearl = () => {
   });
 
   return (
-    <group position={[0, 0.001, 0]}>
+    <group position={[0, 0.001, 0]} scale={[4, 4, 4]}>
       <RoundPearlModel textures={textures} />
     </group>
   );

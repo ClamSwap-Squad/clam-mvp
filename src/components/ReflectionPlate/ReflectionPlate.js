@@ -4,7 +4,7 @@ import { Reflector } from "three/examples/jsm/objects/Reflector";
 import { useThree } from "@react-three/fiber";
 
 export const ReflectionPlate = memo(() => {
-  const geometry = useMemo(() => new THREE.PlaneGeometry( 2, 2 ), []);
+  const geometry = useMemo(() => new THREE.PlaneGeometry( 20, 20 ), []);
   const groundMirror = useMemo(() => new Reflector( geometry, {
     clipBias: 0.003,
     textureWidth: window.innerWidth * window.devicePixelRatio,
