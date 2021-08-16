@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Clams3D from "../../components/three/3DClams/3DClams";
 import Accordion from "../../components/Accordion";
 import { get } from "lodash";
 
@@ -66,25 +65,16 @@ export default ({ dna, dnaDecoded }) => {
     <>
       <div className="flex flex-col justify-between">
         <div className="flex justify-between flex-col sm:flex-row">
-          {/*<Clams3D
-            width={400}
-            height={400}
-            clamDna={dna}
-            decodedDna={dnaDecoded}
-            showTraitsTable={showTraits}
-          />*/}
           {/** 3D Clam with react three fiber */}
-          {/*<Clam3DView
+          <Clam3DView
             width={400}
             height={400}
             clamDna={dna}
             decodedDna={dnaDecoded}
             showTraitsTable={showTraits}
-          />*/}
-          <Pearl3DView
-            width={400}
-            height={400}
           />
+          {/** 3D Clam with react three fiber */}
+          {/*<Pearl3DView />*/}
           <div className="w-full md:w-1/2 px-4 md:px-6">
             <Accordion data={accordionData} />
           </div>
