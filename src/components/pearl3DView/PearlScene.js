@@ -1,10 +1,9 @@
 import { Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Html } from "@react-three/drei";
 import * as THREE from "three";
 
 import { PearlBackground } from "./PearlBackground";
-import { ClamLoading } from "../clam3DView/ClamLoading";
+import { Loading3DView } from "../Loading3DView";
 import { CameraControls } from './PearlCameraControls';
 
 export const PearlScene = (props) => {
@@ -26,7 +25,7 @@ export const PearlScene = (props) => {
         canvasCtx.gl.physicallyCorrectLights = true;
       }}
     >
-      <Suspense fallback={<Html><ClamLoading /></Html>}>
+      <Suspense fallback={Loading3DView}>
         {children}
         <PearlBackground />
       </Suspense>

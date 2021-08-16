@@ -1,17 +1,16 @@
 import { useRef, useState, useMemo } from "react";
-import { useThree, useFrame } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei"
 import * as THREE from "three";
 
 import { generateSmokeParticles } from "../../utils/mist";
 
 export const Mist = () => {
-  const texture = useTexture('/pearl-models/patterns/mist-element.png');
-  const groupRef = useRef(null);
   const [vec] = useState(new THREE.Vector3());
-
   const [smokeParticles] = useState(generateSmokeParticles());
-  const { camera } = useThree();
+  const groupRef = useRef(null);
+
+  const texture = useTexture('/pearl-models/patterns/mist-element.png');
 
   const smokes = useMemo(() => {
     return smokeParticles.map((particle) => (
@@ -26,7 +25,7 @@ export const Mist = () => {
     ))
   }, [smokeParticles])
 
-  useFrame(() => {
+  useFrame(({ camera }) => {
     if (groupRef.current) {
       camera.getWorldDirection( vec );
       vec.y = 0;
@@ -34,12 +33,12 @@ export const Mist = () => {
       groupRef.current.lookAt(vec);
 
       groupRef.current.children.forEach((mesh) => {
-        mesh.rotation.z += (0.0015);
+        mesh.rotation.z += (0.005);
         const positionX = mesh.position.x;
         if (positionX < -0.35) {
           mesh.position.x = 0.35;
         } else {
-          mesh.position.x -= 0.0003;
+          mesh.position.x -= 0.0002;
         }
       });
     }

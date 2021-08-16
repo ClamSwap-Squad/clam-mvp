@@ -1,19 +1,37 @@
 export const generateSmokeParticles = () => Array.from({length: 30})
   .reduce((acc, _, index) => {
     const smoke1 = {
-      positionX: Math.random() * 0.3 - 0.4,
+      positionX: -0.25 + index * 0.01,
       positionY: Math.random() * 0.09 + 0.015,
-      positionZ: -0.13 - index * 0.014,
+      positionZ: -0.13 - index * 0.015,
       key: index + '_1',
-      rotationZ: Math.random(),
+      rotationZ: Math.PI * Math.random(),
     };
+
     const smoke2 = {
-      positionX: Math.random() * 0.3,
+      positionX: -0.1 + index * 0.01,
       positionY: Math.random() * 0.09 + 0.015,
-      positionZ: -0.13 - index * 0.014,
+      positionZ: -0.13 - index * 0.015,
       key: index + '_2',
-      rotationZ: -1 * Math.random(),
+      rotationZ: -Math.PI * Math.random(),
     };
-    acc.push(smoke1, smoke2);
+
+    const smoke3 = {
+      positionX: 0.05 + index * 0.01,
+      positionY: Math.random() * 0.09 + 0.015,
+      positionZ: -0.13 - index * 0.015,
+      key: index + '_3',
+      rotationZ: Math.PI * Math.random(),
+    };
+
+    const smoke4 = {
+      positionX: 0.2 + index * 0.01,
+      positionY: Math.random() * 0.09 + 0.015,
+      positionZ: -0.13 - index * 0.015,
+      key: index + '_4',
+      rotationZ: -Math.PI * Math.random(),
+    };
+
+    acc.push(smoke1, smoke2, smoke3, smoke4);
     return acc;
   }, []);
