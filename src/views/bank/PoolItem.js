@@ -147,34 +147,34 @@ const PoolItem = ({
           </div>
           <div className="text-sm block">
             <p className="text-gray-500 font-semibold text-xs mb-1 leading-none">Reward Share</p>
-            <p className="font-bold text-black flex justify-center">
+            <div className="font-bold text-black flex justify-center">
               {pool.multiplier}%
               <TooltipExtraInformation text="Percent of $GEM rewards pool" />
-            </p>
+            </div>
           </div>
 
           <div className="text-sm block">
             <p className="text-gray-500 font-semibold text-xs mb-1 leading-none">APR</p>
-            <p className="font-bold text-black flex justify-center">
+            <div className="font-bold text-black flex justify-center">
               {String(apr)}%
               <TooltipExtraInformation text="Percent of $GEM rewards pool" />
-            </p>
+            </div>
           </div>
 
           <div className="text-sm block">
             <p className="text-gray-500 font-semibold text-xs mb-1 leading-none">Deposited</p>
-            <p className="font-bold text-gray-300 flex justify-center">
+            <div className="font-bold text-gray-300 flex justify-center">
               {pool.userDepositAmountInPool}
               <TooltipExtraInformation text="In USD" />
-            </p>
+            </div>
           </div>
 
           <div className="text-sm block">
             <p className="text-gray-500 font-semibold text-xs mb-1 leading-none">To Harvest</p>
-            <p className="font-bold text-gray-300 flex justify-center">
+            <div className="font-bold text-gray-300 flex justify-center">
               {pool.userRewardAmountInPool}
               <TooltipExtraInformation text="In USD" />
-            </p>
+            </div>
           </div>
 
           <div className="text-sm block">
