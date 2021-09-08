@@ -6,9 +6,9 @@ import { useEthers } from "@usedapp/core";
 import { pendingGem, gemPerBlock } from "../../web3/bank";
 import { hasMaxUintAllowanceBank } from "../../web3/bep20";
 
+import { TooltipExtraInformation } from "../../components/tooltipExtraInformation";
 import PoolHarvest from "./utils/PoolHarvest";
 import PoolDepositWithdraw from "./utils/PoolDepositWithdraw";
-
 import { exchangeUrl, getBalancesFormatted, PoolData } from "./utils";
 
 import { gemTokenAddress } from "../../web3/constants";
@@ -147,22 +147,34 @@ const PoolItem = ({
           </div>
           <div className="text-sm block">
             <p className="text-gray-500 font-semibold text-xs mb-1 leading-none">Reward Share</p>
-            <p className="font-bold text-black text-center">{pool.multiplier}%</p>
+            <p className="font-bold text-black flex justify-center">
+              {pool.multiplier}%
+              <TooltipExtraInformation text="Percent of $GEM rewards pool" />
+            </p>
           </div>
 
           <div className="text-sm block">
             <p className="text-gray-500 font-semibold text-xs mb-1 leading-none">APR</p>
-            <p className="font-bold text-black">{String(apr)}%</p>
+            <p className="font-bold text-black flex justify-center">
+              {String(apr)}%
+              <TooltipExtraInformation text="Percent of $GEM rewards pool" />
+            </p>
           </div>
 
           <div className="text-sm block">
             <p className="text-gray-500 font-semibold text-xs mb-1 leading-none">Deposited</p>
-            <p className="font-bold text-gray-300 text-center">{pool.userDepositAmountInPool}</p>
+            <p className="font-bold text-gray-300 flex justify-center">
+              {pool.userDepositAmountInPool}
+              <TooltipExtraInformation text="In USD" />
+            </p>
           </div>
 
           <div className="text-sm block">
             <p className="text-gray-500 font-semibold text-xs mb-1 leading-none">To Harvest</p>
-            <p className="font-bold text-gray-300 text-center">{pool.userRewardAmountInPool}</p>
+            <p className="font-bold text-gray-300 flex justify-center">
+              {pool.userRewardAmountInPool}
+              <TooltipExtraInformation text="In USD" />
+            </p>
           </div>
 
           <div className="text-sm block">

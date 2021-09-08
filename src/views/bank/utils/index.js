@@ -45,13 +45,13 @@ export const getBalancesFormatted = async (account, lpToken, isSingleStake) => {
 export const PoolData = ({ depositFee, urlForExchange }) => {
   return (
     <div className="w-full px-2">
-      {/* <div className="flex flex-row justify-between">
-        <p className="text-gray-500 font-semibold">TVL:</p>
-        <p className="font-bold text-black text-center">$5,006,710</p>
-      </div> */}
       <div className="flex flex-row justify-between">
         <p className="text-gray-500 font-semibold">Deposit fee:</p>
         <p className="font-bold text-black text-center">{depositFee}%</p>
+      </div>
+       <div className="flex flex-row justify-between">
+        <p className="text-gray-500 font-semibold">TVL:</p>
+        <p className="font-bold text-black text-center">$5,006,710</p>
       </div>
       <div className="flex">
         <a
