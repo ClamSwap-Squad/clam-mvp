@@ -99,7 +99,6 @@ const ClamShowModal = ({
                 height={400}
                 clamDna={clamDna}
                 decodedDna={clamDnaDecoded}
-                showTraitsTable={showTraits}
               />
             )}
             {isLoading && (
