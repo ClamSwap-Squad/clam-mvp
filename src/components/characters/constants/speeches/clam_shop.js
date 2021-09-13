@@ -39,7 +39,7 @@ export const CLAM_SHOP_SPEECH = {
       text: `Congrats on your Clam! You can take your time to savour your luck. We send your collected clams directly to the Saferoom, so you can see them there.`,
       next: false,
       dismiss: true,
-      skip: true,
+      skip: false,
     },
 
     processing: {
