@@ -31,7 +31,6 @@ const ClamDisplayModal = ({ account: { address, clamToCollect, clamBalance } }) 
 
           if (clamData.dna.length > 1) {
             setClamDna(clamData.dna);
-            console.log(clamData.birthTime);
             setClamBirthTime(clamData.birthTime);
 
             const decodedDna = await getDNADecoded(clamData.dna).catch(console.log);
