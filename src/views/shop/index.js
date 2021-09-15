@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { connect } from "redux-zero/react";
 import { useEthers } from "@usedapp/core";
+import { useHistory, useLocation } from "react-router-dom";
 
 import Character from "../../components/characters/CharacterWrapper";
 import Web3Navbar from "../../components/Web3Navbar";
@@ -21,10 +22,16 @@ import ClamDisplayModal from "./ClamDisplayModal";
 import ClamHarvestModal from "./ClamHarvestModal";
 import { WelcomeUser } from "./character/WelcomeUser";
 
-const Shop = ({ account: { address, clamToCollect }, updateCharacter, updateAccount, character }) => {
+const Shop = ({
+  account: { address, clamToCollect },
+  updateCharacter,
+  updateAccount,
+  character,
+}) => {
   const [modalToShow, setModalToShow] = useState(null);
   const [userReady, setUserReady] = useState(false);
-
+  const { search } = useLocation();
+  const history = useHistory();
   const { activateBrowserWallet } = useEthers();
 
   useEffect(() => {
@@ -51,6 +58,17 @@ const Shop = ({ account: { address, clamToCollect }, updateCharacter, updateAcco
       });
     }
   }, [address, modalToShow]);
+
+  useEffect(() => {
+    const query = new URLSearchParams(search);
+    const paramValue = query.get("view");
+
+    if (address && paramValue === "harvest") {
+      setModalToShow("harvest");
+      setUserReady(true);
+      history.push("/shop");
+    }
+  }, [search, address]);
 
   return (
     <>
