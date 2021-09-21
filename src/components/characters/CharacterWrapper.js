@@ -157,26 +157,28 @@ const CharacterWrapper = ({
                   </button>
                 )}
               </div>
-              <div className="absolute top-4 right-8 text-white">
-                {isDialogHideable && (
-                  <button
-                    data-tip="Hide"
-                    className="mr-2 pointer-events-auto tooltip"
-                    onClick={onClickMinimizedButton}
-                  >
-                    <FontAwesomeIcon icon={faMinusCircle} />
-                  </button>
-                )}
-                {isNeedSkipDialog && (
-                  <button
-                    data-tip="Don't show again"
-                    className="pointer-events-auto tooltip"
-                    onClick={onClickSkipDialogButton}
-                  >
-                    <FontAwesomeIcon icon={faTimesCircle} />
-                  </button>
-                )}
-              </div>
+              {showBubble && (
+                <div className="absolute top-4 right-8 text-white">
+                  {isDialogHideable && (
+                    <button
+                      data-tip="Hide"
+                      className="mr-2 pointer-events-auto tooltip"
+                      onClick={onClickMinimizedButton}
+                    >
+                      <FontAwesomeIcon icon={faMinusCircle} />
+                    </button>
+                  )}
+                  {isNeedSkipDialog && (
+                    <button
+                      data-tip="Don't show again"
+                      className="pointer-events-auto tooltip"
+                      onClick={onClickSkipDialogButton}
+                    >
+                      <FontAwesomeIcon icon={faTimesCircle} />
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         )}

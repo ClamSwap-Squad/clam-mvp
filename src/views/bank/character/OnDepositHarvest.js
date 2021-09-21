@@ -76,7 +76,10 @@ export const onWithdrawPearlRewardsAlert = (updateCharacter, cb) => {
     },
     buttonAlt: {
       text: "No",
-      dismiss: truncate,
+      alt: {
+        action: "cb",
+        destination: () => WelcomeUserBack({ updateCharacter, suppressSpeechBubble: true }),
+      },
     },
   });
 };

@@ -5,6 +5,7 @@ import { actions } from "store/redux";
 
 import { withdraw, getAllPools } from "web3/bank";
 import { formatToWei } from "web3/shared";
+import { getBurnedPearls } from "web3/pearlBurner";
 
 import { useForm } from "react-hook-form";
 import BigNumber from "bignumber.js";
@@ -26,7 +27,6 @@ const WithdrawTab = ({
   updateCharacter,
   updateAccount,
 }) => {
-  const [withdrawFee, setWithdrawFee] = useState(false);
   const [inTx, setInTx] = useState(false);
 
   const { handleSubmit, formState } = useForm();
@@ -37,7 +37,12 @@ const WithdrawTab = ({
   };
 
   const handleWithdraw = async () => {
-    if (withdrawFee) {
+    let isPearlsBurned = false;
+    if (selectedPool.isNative) {
+      isPearlsBurned = !!(await getBurnedPearls());
+    }
+
+    if (isPearlsBurned) {
       onWithdrawPearlRewardsAlert(updateCharacter, async () => {
         await executeWithdraw();
       });

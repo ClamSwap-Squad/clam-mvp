@@ -82,3 +82,9 @@ export const decodeBonusRewardsFromMulticall = (values, tokenIds) => {
 
   return result;
 };
+
+export const getBurnedPearls = async () => {
+  const pearlsCount = await pearlBurner().methods.pearlsBurned().call();
+
+  return parseInt(pearlsCount, 10);
+};
