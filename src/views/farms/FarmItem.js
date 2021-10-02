@@ -138,8 +138,10 @@ const FarmItem = ({
       pearlOpenClam({ updateCharacter });
       await propClamOpenForPearl(clamId);
       setInTx(false);
+      setButtonText("Collect Pearl");
+      setAction("collect");
       pearlCollectReadyPrompt({ updateCharacter }, async () => {
-        return onClickCollectPearl();
+        onClickCollectPearl();
       });
     } catch (err) {
       updateAccount({ error: err.message });
