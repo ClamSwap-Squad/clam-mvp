@@ -207,6 +207,56 @@ const FarmItem = ({
     }
   };
 
+  useEffect(async () => {
+    // wallet is connected
+    if (address || refreshClams) {
+      const initClams = async () => {
+        try {
+          if (isFirstLoading) {
+            setLoading(true);
+            setIsFirstLoading(false);
+          }
+          // get staked clams
+          let clamsStakedIds = await getStakedClamIds(address);
+
+          // get owned clams
+          const tokenIdsCalls = clamContract.prepTokenOfOwnerByIndexMulticall(
+            address,
+            +clamBalance
+          );
+          const tokenIdsResult = await aggregate(tokenIdsCalls, chainId);
+          let tokenIdsDecoded = clamContract.decodeTokenOfOwnerByIndexFromMulticall(
+            tokenIdsResult.returnData
+          );
+          tokenIdsDecoded.push("502");
+          clamsStakedIds = ["502", ...clamsStakedIds];
+
+          console.log({ tokenIdsDecoded, clamsStakedIds });
+
+          const [ownedClams, stakedClams] = await Promise.all([
+            getClamsDataByIds(tokenIdsDecoded),
+            getClamsDataByIds(clamsStakedIds),
+          ]);
+
+          const ownedClamsImg = await addClamImg(ownedClams);
+          const stakedClamsImg = await addClamImg(stakedClams);
+          const rarities = stakedClams.map((clam) => clam.dnaDecoded.rarity);
+
+          setClams(ownedClamsImg);
+          setClamsStaked(stakedClamsImg);
+          setStakedRarities(rarities);
+        } catch (error) {
+          console.log({ error });
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      await initClams();
+      setRefreshClams(false);
+    }
+  }, [address, clamBalance, refreshClams]);
+
   const getClamFunction = () => {
     if (action === "collect") return onClickCollectPearl();
     if (action === "open") return onClickOpenClam();
