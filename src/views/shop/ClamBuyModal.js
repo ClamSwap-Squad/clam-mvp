@@ -66,15 +66,17 @@ const ClamBuyModal = ({
 
   useEffect(() => {
     const balanceBN = new BigNumber(parseEther(gemBalance).toString());
-    const lockedBN = new BigNumber(lockedGem * 1e18);
-    const totalBN = balanceBN.plus(lockedBN);
-    setCanBuy(totalBN.isGreaterThanOrEqualTo(new BigNumber(clamPrice)));
+
+    // Temp fix, until gemLocker bug is fixed
+    // const lockedBN = new BigNumber(lockedGem * 1e18);
+    // const totalBN = balanceBN.plus(lockedBN);
+    setCanBuy(balanceBN.isGreaterThanOrEqualTo(new BigNumber(clamPrice)));
   }, [gemBalance, clamPrice, lockedGem]);
 
   const onSubmit = async () => {
     await executeBuy();
 
-    // Temp fix, until gemLocker bug is figured out
+    // Temp fix, until gemLocker bug is fixed
     // if (new BigNumber(lockedGem).gt(0)) {
     //   buyClamWithVested(
     //     { address, updateCharacter, gem: formatNumber(+lockedGem, 3) },
