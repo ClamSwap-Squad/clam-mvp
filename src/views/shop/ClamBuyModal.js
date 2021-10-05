@@ -66,7 +66,7 @@ const ClamBuyModal = ({
 
   useEffect(() => {
     const balanceBN = new BigNumber(parseEther(gemBalance).toString());
-    const lockedBN = new BigNumber(lockedGem * 10e18);
+    const lockedBN = new BigNumber(lockedGem * 1e18);
     const totalBN = balanceBN.plus(lockedBN);
     setCanBuy(totalBN.isGreaterThanOrEqualTo(new BigNumber(clamPrice)));
   }, [gemBalance, clamPrice, lockedGem]);
