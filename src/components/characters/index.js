@@ -2,12 +2,14 @@ import React, { useEffect, useState, useRef } from "react";
 import { toast } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinusCircle, faTimesCircle, faEye } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next";
 
 import { SPEECHES, CHARACTERS, BUTTONS } from "./constants";
 import { VotingStore } from "../../store/voting";
 import "./index.scss";
 
 const CharacterSpeak = (props) => {
+  const { t } = useTranslation();
   const votingInProgress = VotingStore.useState((s) => s.inProgress);
   const votingComplete = VotingStore.useState((s) => s.complete);
   const votingCancelled = VotingStore.useState((s) => s.cancelled);
@@ -26,7 +28,8 @@ const CharacterSpeak = (props) => {
   let [trackCount, setTrackCount] = useState(
     Object.keys(speechTrack)[isNeedSkipFirstWelcome ? 2 : 0]
   );
-  const [speech, setSpeech] = useState(speechTrack[trackCount].text);
+  const [defaultSpeech, setSpeech] = useState(speechTrack[trackCount].text);
+  const speech = t(defaultSpeech, defaultSpeech);
   const [buttonNextText, setButtonNextText] = useState(btnTrack[trackCount].next);
   const [buttonAltText, setButtonAltText] = useState(btnTrack[trackCount].alt.text);
   const [skipDialog, setSkipDialog] = useState(null);
@@ -332,7 +335,7 @@ const CharacterSpeak = (props) => {
                 ref={btnAlt}
                 onClick={onClickAlt}
               >
-                {buttonAltText}
+                {t(buttonAltText)}
               </button>
               <button
                 className="btn character-btn"
@@ -340,7 +343,7 @@ const CharacterSpeak = (props) => {
                 ref={btnNext}
                 onClick={() => onClickNext()}
               >
-                {buttonNextText}
+                {t(buttonNextText)}
               </button>
             </div>
           ) : (

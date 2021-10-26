@@ -4,7 +4,7 @@ export const clamRarityAlreadyStaked = (updateCharacter, gem, cb) => {
   updateCharacter({
     name: "al",
     action: "farms.clamRarityAlreadyStaked.text",
-    variables: gem,
+    variables: { gem },
     forceTop: true,
     button: {
       text: "Yes",

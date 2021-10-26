@@ -27,6 +27,7 @@ import { getUsdPriceOfToken } from "../web3/pancakeRouter";
 import BigNumber from "bignumber.js";
 import NetworkService from "../utils/NetworkService";
 import { NavBarUserProfile } from "./navBarUserProfile";
+import { LanguageSwitcher } from "./languageSwitcher";
 
 import ClamIcon from "../assets/img/clam_icon.png";
 import PearlIcon from "../assets/img/pearl_icon.png";
@@ -367,6 +368,9 @@ const Web3Navbar = ({ updateAccount, ...redux }) => {
               </>
             )}
           </div>
+        </div>
+        <div className="absolute top-12 m-6">
+          <LanguageSwitcher />
         </div>
       </nav>
     </>
