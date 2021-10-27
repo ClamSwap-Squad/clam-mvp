@@ -5,12 +5,14 @@ import { actions } from "store/redux";
 import videoImage from "assets/locations/Bank.jpg";
 import videoMp4 from "assets/locations/Bank.mp4";
 import videoWebM from "assets/locations/Bank.webm";
+import { TourProvider } from "@reactour/tour";
 
 import { WalletConnectAndAssist } from "./character/WalletConnectAndAssist";
 import Character from "components/characters/CharacterWrapper";
 import VideoBackground from "components/VideoBackground";
 import { Modal, useModal } from "components/Modal";
 import { PageTitle } from "components/PageTitle";
+import { BankTour } from "./bankTour";
 
 import { getAllPools, harvestAllPools } from "web3/bank";
 import { fetchRewards } from "web3/gemLocker";
@@ -21,6 +23,33 @@ import BurnPearlModal from "./utils/BurnPearlModal";
 import { ExternalLinksBlock } from "./ExternalLinksBlock";
 import BigNumber from "bignumber.js";
 import { renderUsd } from "utils/number";
+
+const steps = [
+  {
+    selector: '[data-tour="step-1"]',
+    content: <p>This is additionav info</p>,
+  },
+  {
+    selector: '[data-tour="step-2"]',
+    content: <p>This is TVL</p>,
+  },
+  {
+    selector: '[data-tour="step-3"]',
+    content: <p>Vivamus sed dui nisi</p>,
+  },
+  {
+    selector: '[data-tour="step-4"]',
+    content: <p>Lorem ipsum dolor sit amet</p>,
+  },
+  {
+    selector: '[data-tour="step-5"]',
+    content: <p>consectetur adipiscing elit</p>,
+  },
+  {
+    selector: '[data-tour="step-6"]',
+    content: <p>Vivamus sed dui nisi</p>,
+  },
+];
 
 const Bank = ({
   account: { address, chainId, isBSChain, isWeb3Installed, isConnected },
@@ -91,7 +120,7 @@ const Bank = ({
   }, [isWeb3Installed, isBSChain, isConnected]);
 
   return (
-    <>
+    <TourProvider steps={steps}>
       <div className="bg-bank overflow-x-hidden">
         <Modal isShowing={isShowing} onClose={toggleModal} width={"60rem"}>
           <BurnPearlModal isNativeStaker={isNativeStaker} chainId={chainId} />
@@ -117,7 +146,8 @@ const Bank = ({
 
       {/* chat character   */}
       <Character name="tanja" />
-    </>
+      {totalTVL && <BankTour />}
+    </TourProvider>
   );
 };
 

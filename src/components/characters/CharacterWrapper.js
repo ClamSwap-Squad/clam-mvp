@@ -111,7 +111,7 @@ const CharacterWrapper = ({
   return (
     <div
       className={classNames(
-        "flex-1 min-h-full min-w-full md:flex items-center ",
+        "flex-1 min-h-full min-w-full md:flex items-center",
         { "z-30": showBubble },
         { "z-0": !showBubble }
       )}
@@ -122,7 +122,7 @@ const CharacterWrapper = ({
             ? "character-bubble fixed z-999 bottom-8 pointer-events-none w-screen"
             : "character-bubble hide-bubble fixed justify-end"
         }
-        style={{ zIndex: forceTop ? 9999 : (speech ? undefined : 0) }}
+        style={{ zIndex: forceTop ? 999999 : (speech ? undefined : 0) }}
       >
         {speech && (
           <div className="text-bubble flex-col justify-end pointer-events-none">
