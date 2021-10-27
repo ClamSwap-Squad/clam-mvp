@@ -122,6 +122,7 @@
     "bank.burn_pearl_confirmation.text": "This will forfeit your Pearl in return for a boost of {{gems}} $GEM streamed over 30 days. This is irreversible and you will not be able to get your Pearl back. Are you sure you want to continue?",
     "bank.burn_pearl_success.text": "All done! Your Pearl has been forfeited and your $GEM boost is now streaming.",
     "Yes": "Yes",
+    "No": "No",
     "Dismiss": "Dismiss",
     "Yes, I understand": "Yes, I understand",
     "Buy Clams": "Buy Clams",
@@ -137,5 +138,14 @@
     "Go to Bank": "Go to Bank",
     "Sure": "Sure",
     "Show me!": "Show me!",
-    "Refund": "Refund"
+    "Refund": "Refund",
+    "Cancel": "Cancel",
+    "No, I won't withdraw now": "No, I won't withdraw now",
+    "Claim more": "Claim more",
+    "Buy more": "Buy more",
+    "Not yet": "Not yet",
+    "Harvest Clams": "Harvest Clams",
+    "Choose Clam for Harvesting.": "Choose Clam for Harvesting.",
+    "What's the deal with Clams?": "What's the deal with Clams?",
+    "No, I want to buy Clams instead.": "No, I want to buy Clams instead."
 }
