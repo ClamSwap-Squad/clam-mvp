@@ -110,7 +110,7 @@ const Map3D = ({ isGuidedTourPassed, setIsGuidedTourPassed }) => {
 
     setLoading(false);
     composer = new EffectComposer(renderer);
-
+    console.log(scene);
     const renderPass = new RenderPass(scene, camera);
     composer.addPass(renderPass);
 
@@ -138,7 +138,7 @@ const Map3D = ({ isGuidedTourPassed, setIsGuidedTourPassed }) => {
   };
 
   const addLights = () => {
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.8);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.1);
     directionalLight.position.set(500, 400, -100);
     directionalLight.rotation.set(0, 0.3, -0.55);
     directionalLight.castShadow = true;
@@ -146,15 +146,27 @@ const Map3D = ({ isGuidedTourPassed, setIsGuidedTourPassed }) => {
     directionalLight.shadow.mapSize.set(2048, 2048);
     scene.add(directionalLight);
 
-    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
+    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0);
     directionalLight2.position.set(-2700, 2000, 900);
     directionalLight2.rotation.set(0, 0.3, 0.6);
 
     scene.add(directionalLight2);
 
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0xe0fffc, 0.4);
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0xe0fffc, 0);
     scene.add(hemiLight);
+
+    const vaultPumpkin = new THREE.PointLight(0xf5a442, 1, 100);
+    vaultPumpkin.position.set(0, 0, 0);
+    vaultPumpkin.castShadow = true;
+    scene.add(vaultPumpkin);
+
+    const sphereSize = 100;
+    const pointLightHelper = new THREE.PointLightHelper( vaultPumpkin, sphereSize );
+    scene.add( pointLightHelper );
+
   };
+
+
 
   const getOutlineMesh = (name) => {
     const mesh = modelObjs.current.find(k => k.name === name).model;
