@@ -68,14 +68,17 @@ const loadGLTF = async (url, scene, type = "island", name) => {
     gltf.scene.position.z = 440;
     gltf.scene.rotation.y = 5;
   } else if (type === "seagull") {
-    gltf.scene.scale.set(5, 5, 5);
-    gltf.scene.position.x = 0; //Position (x = right+ left-)
-    gltf.scene.position.y = 200; //Position (y = up+, down-)
-    gltf.scene.position.z = 0;
+    const gltfs = await Promise.all([
+        loadGLTFPromise(url),
+        loadGLTFPromise(url),
+        loadGLTFPromise(url),
+        loadGLTFPromise(url),
+    ]);
 
     const seagulls = [];
     for (let i = 1; i < 5; i++) {
-      const clone = gltf.scene.clone();
+      gltfs[i - 1].scene.name = name
+      const clone = gltfs[i - 1].scene;
 
       if (clone) {
         clone.scale.set(1, 1, 1);

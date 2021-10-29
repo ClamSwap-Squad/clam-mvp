@@ -171,20 +171,163 @@ const Map3D = ({ isGuidedTourPassed, setIsGuidedTourPassed }) => {
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0xe0fffc, 0);
     scene.add(hemiLight);
 
-    const vaultPumpkin = new THREE.PointLight(0xf5a442, 1, 100);
+    /*const vaultPumpkin = new THREE.PointLight(0xf5a442, 1, 100);
     vaultPumpkin.position.set(0, 0, 0);
     vaultPumpkin.castShadow = true;
     scene.add(vaultPumpkin);
 
     const sphereSize = 100;
     const pointLightHelper = new THREE.PointLightHelper( vaultPumpkin, sphereSize );
-    scene.add( pointLightHelper );
+    scene.add( pointLightHelper );*/
 
+    const width = 10;
+    const height = 10;
+    const intensity = 5;
+    /** First lamp */
+    const pointLight = new THREE.PointLight( 0xffffff, 1, 500, 2);
+    pointLight.position.set( -17, 57, 42 );
+    scene.add( pointLight );
+
+    const rectLight1 = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+    rectLight1.position.set( -10, 50, 48 );
+    rectLight1.lookAt( -17, 57, 42 );
+    scene.add( rectLight1 );
+
+    const rectLight2 = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+    rectLight2.position.set( -26, 50, 38 );
+    rectLight2.lookAt( -17, 57, 42 );
+    scene.add( rectLight2 );
+
+    /** Second lamp */
+    const pointLight2 = new THREE.PointLight( 0xffffff, 1, 500, 2);
+    pointLight2.position.set( 150, 57, -50 );
+    scene.add( pointLight2 );
+
+    const rectLight3 = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+    rectLight3.position.set( 149, 54, -41 );
+    rectLight3.lookAt( 150, 57, -50 );
+    scene.add( rectLight3 );
+
+    const rectLight4 = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+    rectLight4.position.set( 162, 54, -57 );
+    rectLight4.lookAt( 150, 57, -50 );
+    scene.add( rectLight4 );
+
+    /** Third lamp */
+    const pointLight3 = new THREE.PointLight( 0xffffff, 1, 500, 2);
+    pointLight3.position.set( 24, 47, -177 );
+    scene.add( pointLight3 );
+
+    const rectLight5 = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+    rectLight5.position.set( 20, 43, -171 );
+    rectLight5.lookAt( 24, 47, -177 );
+    scene.add( rectLight5 );
+
+    const rectLight6 = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+    rectLight6.position.set( 27, 43, -182 );
+    rectLight6.lookAt( 24, 47, -177 );
+    scene.add( rectLight6 );
+
+    /** Fourth lamp */
+    const pointLight4 = new THREE.PointLight( 0xffffff, 1, 500, 2);
+    pointLight4.position.set( -76, 46, -115);
+    scene.add( pointLight4 );
+
+    const rectLight7 = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+    rectLight7.position.set( -78, 43, -117 );
+    rectLight7.lookAt( -76, 46, -115 );
+    scene.add( rectLight7 );
+
+    const rectLight8 = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+    rectLight8.position.set( -66, 43, -109 );
+    rectLight8.lookAt( -76, 46, -115 );
+    scene.add( rectLight8 );
+
+    /** Fifth lamp */
+    const pointLight5 = new THREE.PointLight( 0xffffff, 1, 500, 2);
+    pointLight5.position.set( -78, 46,189);
+    scene.add( pointLight5 );
+
+    const rectLight9 = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+    rectLight9.position.set( -81, 44,185 );
+    rectLight9.lookAt( -78, 46,189 );
+    scene.add( rectLight9 );
+
+    const rectLight10 = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+    rectLight10.position.set( -70, 44,195 );
+    rectLight10.lookAt( -78, 46,189 );
+    scene.add( rectLight10 );
+
+    /** Sixth lamp */
+    const pointLight6 = new THREE.PointLight( 0xffffff, 1, 500, 2);
+    pointLight6.position.set( -76, 46,319);
+    scene.add( pointLight6);
+
+    const rectLight11 = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+    rectLight11.position.set( -68, 44,322 );
+    rectLight11.lookAt( -76, 46,319 );
+    scene.add( rectLight11 );
+
+    const rectLight12 = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+    rectLight12.position.set( -85, 43,313 );
+    rectLight12.lookAt( -76, 46,319 );
+    scene.add( rectLight12 );
+
+    /** Seventh lamp */
+    const pointLight7 = new THREE.PointLight( 0xffffff, 1, 500, 2);
+    pointLight7.position.set( -10, 46,353);
+    scene.add( pointLight7);
+
+    const rectLight13 = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+    rectLight13.position.set( -8, 44,357 );
+    rectLight13.lookAt( -10, 46, 353 );
+    scene.add( rectLight13 );
+
+    const rectLight14 = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+    rectLight14.position.set( -22, 44,346 );
+    rectLight14.lookAt( -10, 46, 353 );
+    scene.add( rectLight14 );
+
+    /** Eight lamp */
+    const pointLight8 = new THREE.PointLight( 0xffffff, 1, 500, 2);
+    pointLight8.position.set( 165, 98,-327);
+    scene.add( pointLight8);
+
+    const rectLight15 = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+    rectLight15.position.set( 158, 95,-320 );
+    rectLight15.lookAt( 165, 98,-327 );
+    scene.add( rectLight15 );
+
+    const rectLight16 = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+    rectLight16.position.set( 165, 95,-333 );
+    rectLight16.lookAt( 165, 98,-327 );
+    scene.add( rectLight16 );
+
+    /** Ninth lamp */
+    const pointLight9 = new THREE.PointLight( 0xffffff, 1, 500, 2);
+    pointLight9.position.set( 324, 96, -324);
+    scene.add( pointLight9);
+
+    const rectLight17 = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+    rectLight17.position.set( 320, 94, -320 );
+    rectLight17.lookAt( 324, 96, -324 );
+    scene.add( rectLight17 );
+
+    const rectLight18 = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+    rectLight18.position.set( 328, 94, -328 );
+    rectLight18.lookAt( 324, 96, -324 );
+    scene.add( rectLight18 );
+
+    /** Tenth lamp */
+    const pointLight10 = new THREE.PointLight( 0xffffff, 1, 500, 2);
+    pointLight10.position.set( 249, 120, -320);
+    scene.add( pointLight10);
+
+    const rectLight19 = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+    rectLight19.position.set( 249, 120, -316 );
+    rectLight19.lookAt( 249, 120, -320 );
+    scene.add( rectLight19 );
   };
-
-
-
-
 
   const getOutlineMesh = (name) => {
     const mesh = modelObjs.current.find(k => k.name === name).model;
