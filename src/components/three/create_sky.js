@@ -10,7 +10,7 @@ const createSky = ({ scene, water, renderer }) => {
   const skyUniforms = sky.material.uniforms;
 
   skyUniforms["turbidity"].value = 0;
-  skyUniforms["rayleigh"].value = 0.1;
+  skyUniforms["rayleigh"].value = 0.05;
   skyUniforms["mieCoefficient"].value = 0.003;
   skyUniforms["mieDirectionalG"].value = 1;
 

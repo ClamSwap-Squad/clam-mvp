@@ -103,11 +103,13 @@ export const ISLAND_OBJECTS = [
     buoyancy: { factor: 2, init: 38 }
   },
   {
-    objectUrl: "glb_files/seagull.glb",
+    objectUrl: "glb_files/bat_lowpoly.glb",
     type: "seagull",
+    name: "seagull",
   },
   {
     objectUrl: "glb_files/dolphin.glb",
     type: "dolphin",
+    name: "dolphin",
   },
 ];

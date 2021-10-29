@@ -106,7 +106,23 @@ const Map3D = ({ isGuidedTourPassed, setIsGuidedTourPassed }) => {
         boundingBox: ISLANDS_NAMES[ISLAND_OBJECTS[index].name] && new THREE.Box3().setFromObject(model),
       }));
 
-    setOutlineMeshes();
+      console.log(ISLANDS_NAMES);
+
+      Object.values(ISLANDS_NAMES).forEach(val => {
+        const mesh = modelObjs.current.find(k => k.name === val).model.children[0];
+
+        mesh.children.forEach(el => {
+          if(el.material.name === "orange_material") {
+            el.material.emissive = new THREE.Color( 0xff4700 );
+            el.material.emissiveIntensity = 0.3;
+          } else if(el.material.name === "eyes_pumkin") {
+            el.material.emissive = new THREE.Color( 0xff6900 );
+            el.material.emissiveIntensity = 1;
+          }
+        })
+      })
+
+    //setOutlineMeshes();
 
     setLoading(false);
     composer = new EffectComposer(renderer);
@@ -168,9 +184,11 @@ const Map3D = ({ isGuidedTourPassed, setIsGuidedTourPassed }) => {
 
 
 
+
+
   const getOutlineMesh = (name) => {
     const mesh = modelObjs.current.find(k => k.name === name).model;
-    return mesh.children.filter((el) => el.name === name);
+    mesh.children.filter((el) => el.name === name);
   };
 
   const setOutlineMeshes = () => {
@@ -266,6 +284,7 @@ const Map3D = ({ isGuidedTourPassed, setIsGuidedTourPassed }) => {
 
   const onMouseClick = () => {
     // places: bank, farm, market, vault, lighthouse
+    console.log(modelObjs);
     if (hoverStr === '') return;
     const obj = modelObjs.current.find(k => k.name === hoverStr);
     if (obj && obj.url && obj.urlType === 'external') {
