@@ -106,23 +106,24 @@ const Map3D = ({ isGuidedTourPassed, setIsGuidedTourPassed }) => {
         boundingBox: ISLANDS_NAMES[ISLAND_OBJECTS[index].name] && new THREE.Box3().setFromObject(model),
       }));
 
-      console.log(ISLANDS_NAMES);
-
+      // Does it really need?
       Object.values(ISLANDS_NAMES).forEach(val => {
-        const mesh = modelObjs.current.find(k => k.name === val).model.children[0];
-
-        mesh.children.forEach(el => {
-          if(el.material.name === "orange_material") {
-            el.material.emissive = new THREE.Color( 0xff4700 );
-            el.material.emissiveIntensity = 0.3;
-          } else if(el.material.name === "eyes_pumkin") {
-            el.material.emissive = new THREE.Color( 0xff6900 );
-            el.material.emissiveIntensity = 1;
-          }
-        })
+        const islandMesh = modelObjs.current.find(k => k.name === val).model.children[0];
+        const pumpkinMesh = islandMesh.children.filter(({ name }) => name.startsWith('pumpkin'));
+        pumpkinMesh.forEach((group) => {
+          group.children.forEach(el => {
+            if(el.material.name === "orange_material") {
+              el.material.emissive = new THREE.Color( 0xff4700 );
+              el.material.emissiveIntensity = 0.3;
+            } else if(el.material.name === "eyes_pumkin") {
+              el.material.emissive = new THREE.Color( 0xff6900 );
+              el.material.emissiveIntensity = 1;
+            }
+          });
+        });
       })
 
-    //setOutlineMeshes();
+    setOutlineMeshes();
 
     setLoading(false);
     composer = new EffectComposer(renderer);
@@ -331,7 +332,7 @@ const Map3D = ({ isGuidedTourPassed, setIsGuidedTourPassed }) => {
 
   const getOutlineMesh = (name) => {
     const mesh = modelObjs.current.find(k => k.name === name).model;
-    mesh.children.filter((el) => el.name === name);
+    return mesh.children[0].children.filter((el) => el.name === name);
   };
 
   const setOutlineMeshes = () => {
