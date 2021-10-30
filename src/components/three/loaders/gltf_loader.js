@@ -20,9 +20,13 @@ const enableShadowMap = (children) => {
 };
 
 const loadGLTF = async (url, scene, type = "island", name) => {
-  const gltf = await loadGLTFPromise(url);
-  gltf.scene.children = enableShadowMap(gltf.scene.children);
-  if(name) gltf.scene.name = name;
+  let gltf;
+
+  if (type !== "seagull") {
+    gltf = await loadGLTFPromise(url);
+    gltf.scene.children = enableShadowMap(gltf.scene.children);
+    if(name) gltf.scene.name = name;
+  }
 
   if (type === "island") {
     if(name === "lighthouse") {
@@ -68,6 +72,7 @@ const loadGLTF = async (url, scene, type = "island", name) => {
     gltf.scene.position.z = 440;
     gltf.scene.rotation.y = 5;
   } else if (type === "seagull") {
+    // scene.clone() doesnt work with bat model
     const gltfs = await Promise.all([
         loadGLTFPromise(url),
         loadGLTFPromise(url),
