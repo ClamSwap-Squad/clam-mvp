@@ -82,7 +82,7 @@ const loadGLTF = async (url, scene, type = "island", name) => {
 
       if (clone) {
         clone.scale.set(1, 1, 1);
-        clone.rotation.y = 6.2;
+        clone.rotation.y = 1;
         clone.rotation.x = 3.1;
         clone.rotation.z = 2.8;
 
