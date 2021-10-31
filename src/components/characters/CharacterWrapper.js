@@ -5,6 +5,8 @@ import { useHistory } from "react-router-dom";
 import classNames from "classnames";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinusCircle, faTimesCircle, faEye } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next";
+
 import { SPEECHES, CHARACTERS } from "./constants";
 import { withSkipDialog } from "../../hoc/withSkipDialog";
 import { actions } from "../../store/redux";
@@ -27,10 +29,16 @@ const CharacterWrapper = ({
   forceTop,
   suppressSpeechBubbleAction,
 }) => {
+  const { t } = useTranslation();
   const character = get(CHARACTERS, name);
-  let speech = get(SPEECHES, action, action);
-  if (speech && typeof speech !== "string") {
-    speech = variables ? speech(variables) : speech({});
+  const defaultSpeech = get(SPEECHES, action, action);
+  let speech;
+
+  if (defaultSpeech && typeof defaultSpeech !== "string") {
+    const resultedSpeech = variables ? defaultSpeech(variables) : defaultSpeech({});
+    speech = t(action, resultedSpeech, variables || {});
+  } else {
+    speech = t(action, defaultSpeech);
   }
   const actionPath = action ? action.replace(/\.text$/, "") : "";
   const isNeedSkipDialog = get(SPEECHES, `${actionPath}.skip`, false);
@@ -146,7 +154,7 @@ const CharacterWrapper = ({
                       button.alt ? handleButtonCallback(button) : handleClickButton(button)
                     }
                   >
-                    {button.text}
+                    {t(button.text)}
                   </button>
                 )}
                 {buttonAlt && buttonAlt.text && (
@@ -156,7 +164,7 @@ const CharacterWrapper = ({
                       buttonAlt.alt ? handleButtonCallback(buttonAlt) : handleClickButton(buttonAlt)
                     }
                   >
-                    {buttonAlt.text}
+                    {t(buttonAlt.text)}
                   </button>
                 )}
               </div>

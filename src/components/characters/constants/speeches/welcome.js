@@ -49,7 +49,7 @@ export const WELCOME_BUTTONS = {
         action: "url",
         destination: "https://clamisland.medium.com/announcing-the-clam-island-pearl-hunt-event-e980c7b8f2eb",
         next: "fourth",
-        text: "Yes please",
+        text: "Yes please!",
       },
     },
     third: {

@@ -102,7 +102,7 @@ export const FARM_SPEECH = {
       hideable: true,
     },
     clamRarityAlreadyStaked: {
-      text: (gem) =>
+      text: ({ gem }) =>
         `You already have a Clam with the same rarity tier in the farm. Depositing this Clam will mean that you permanently lose the $GEM boost of ${gem} associated with it. Are you sure you want to continue?`,
       next: `deposit`,
     },

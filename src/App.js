@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, Suspense } from "react";
 import { useWallet } from "@binance-chain/bsc-use-wallet";
 import { ToastContainer } from "react-toastify";
 import { isMobile } from "react-device-detect";
@@ -26,7 +26,7 @@ const App = () => {
   }, [account, connect]);
 
   return (
-    <>
+    <Suspense fallback="Loading">
       {isMobile && continueMobileAnyway === false ? (
         <div className="h-full absolute p-0 bg-gray-800">
           <div className="mockup-window bg-base-300 m-2">
@@ -67,7 +67,7 @@ const App = () => {
           <ToastContainer />
         </Router>
       )}
-    </>
+    </Suspense>
   );
 };
 

@@ -30,11 +30,11 @@ export const OTHER_SPEECH = {
 export const OTHER_BUTTONS = {
   skip: {
     propose: {
-      next: "Yes please",
+      next: "Yes please!",
       alt: "No, I love talking to you!",
     },
     restore: {
-      next: "Yes please!",
+      next: "Yes please",
       alt: "No, thanks",
     },
     agree: {
