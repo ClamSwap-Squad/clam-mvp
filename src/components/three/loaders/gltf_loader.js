@@ -83,21 +83,25 @@ const loadGLTF = async (url, scene, type = "island", name) => {
     const seagulls = [];
     for (let i = 1; i < 5; i++) {
       gltfs[i - 1].scene.name = name
-      const clone = gltfs[i - 1].scene;
+      const clone = gltfs[i - 1];
+      const cloneScene = clone.scene;
+      //var mixer = new THREE.AnimationMixer( clone );
+		//var action = mixer.clipAction( gltfs[i - 1].animations[ 0 ] );
+		//action.play();
 
       if (clone) {
-        clone.scale.set(1, 1, 1);
-        clone.rotation.y = 1;
-        clone.rotation.x = 3.1;
-        clone.rotation.z = 2.8;
+        cloneScene.scale.set(1, 1, 1);
+        cloneScene.rotation.y = 1;
+        cloneScene.rotation.x = 3.1;
+        cloneScene.rotation.z = 2.8;
 
         const zpos = i === 1 ? -100 : i === 2 ? 200 : i === 3 ? -300 : 0;
 
         const xpos = i === 1 ? 0 : i === 2 ? -50 : i === 3 ? 200 : 300;
 
-        clone.position.z = 0;
-        clone.position.x = 100;
-        clone.position.y = 0;
+        cloneScene.position.z = 0;
+        cloneScene.position.x = 100;
+        cloneScene.position.y = 0;
 
         const pivot = new THREE.Object3D();
         pivot.position.z = zpos;
@@ -106,7 +110,7 @@ const loadGLTF = async (url, scene, type = "island", name) => {
         pivot.userData.speed = Math.random() * 0.01;
 
         scene.add(pivot);
-        pivot.add(clone);
+        pivot.add(cloneScene);
         seagulls.push({
           obj: clone,
           pivot,
