@@ -7,6 +7,10 @@ import { LanguageButton } from "./languageButton";
 export const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
 
+  if (!LANGUAGES[i18n.language]) {
+    i18n.changeLanguage("us");
+  }
+
   return (
     <div className="dropdown">
       <LanguageButton lng={i18n.language} onClick={null} />

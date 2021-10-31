@@ -5,6 +5,10 @@ import { LANGUAGES } from "constants/languages";
 export const LanguageButton = (props) => {
   const { lng, disabled, onClick } = props;
 
+  if (!LANGUAGES[lng]) {
+    return null;
+  }
+
   return (
     <button className="btn btn-sm w-20" key={lng} onClick={onClick} disabled={disabled}>
       <ReactCountryFlag
