@@ -1,0 +1,74 @@
+.bg-color {
+  background: rgba(32, 8, 59, 0.75);
+  backdrop-filter: blur(167px);
+}
+
+.section-title {
+  font-family: Chillax-Medium;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 56px;
+  line-height: 78px;
+}
+
+.bg {
+  position: absolute;
+  background-image: url("../../assets/landing/landing-header.png");
+  background-size: cover;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  min-height: 900px;
+}
+
+.team-advisors {
+  @extend .bg-color;
+  .profile-img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+  }
+
+  section {
+    margin-bottom: 190px;
+    .row {
+      margin-bottom: 70px;
+    }
+  }
+
+  .heading {
+    @extend .section-title;
+    margin-bottom: 50px;
+    color: #0F0F0F;
+  }
+}
+
+.partners {
+    margin-bottom: 130px;
+    .heading {
+        @extend .section-title;
+        margin-bottom: 80px;
+    }
+
+    .partner-logos {
+        .logo {
+            width: 120px;
+        }
+    }
+}
+
+.landing-footer {
+  @extend .bg-color;
+
+  .logo {
+    position: static;
+    width: 280px;
+    left: 37px;
+    top: 0px;
+  }
+
+  .social-nav-icon {
+    width: 30px;
+  }
+}
