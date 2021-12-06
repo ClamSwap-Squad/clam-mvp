@@ -8,12 +8,14 @@ import CommunityRewards from "./views/community_rewards";
 import PearlHunt from "./views/pearl_hunt";
 import Saferoom from "./views/saferoom/Saferoom";
 import { Infocenter } from "./views/infocenter";
+import { LandingPage } from "./views/landing";
 // import Vault from "./views/vault/Vault";
 // import ShellPresale from "./views/shell_presale";
 // import ShellVoting from "./views/shell_voting";
 
 const ROUTES = [
   { title: "Home", url: "/", component: Home, exact: true, icon: "home.svg", order: 1 },
+  { title: "Landing", url: "/landing", component: LandingPage, exact: true },
   {
     title: "Saferoom",
     url: "/saferoom",

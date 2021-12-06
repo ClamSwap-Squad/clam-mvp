@@ -1,0 +1,144 @@
+.bg-color {
+  background: rgba(32, 8, 59, 0.75);
+  backdrop-filter: blur(167px);
+}
+
+.section-title {
+  font-family: Chillax-Medium;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 56px;
+  line-height: 78px;
+}
+
+.start-farming-btn {
+  @apply text-black bg-white p-4 rounded-full px-10;
+  font-family: Chillax-Medium;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.eco-header {
+  .header-bg {
+    background-image: url("../../assets/landing/landing-header.png");
+    background-size: contain;
+    width: 100%;
+    height: 900px;
+  }
+
+  .header-text {
+    position: absolute;
+    width: 700px;
+    top: 40%;
+    left: 5%;
+    .heading {
+      @extend .section-title;
+      margin-bottom: 50px;
+      color: #fff;
+      font-size: 64px;
+    }
+    .sub-heading {
+      @extend .section-title;
+      margin-bottom: 50px;
+      color: #fff;
+      font-size: 40px;
+    }
+  }
+
+  .nav {
+    position: absolute;
+    top: 20px;
+    width: 100%;
+    padding-left: 5%;
+    padding-right: 5%;
+    .logo {
+      width: 300px;
+    }
+    .nav-link {
+      font-family: Chillax-Medium;
+      font-size: 32px;
+      font-weight: 500;
+      color: #fff;
+    }
+  }
+}
+
+.ecosystem {
+  @extend .bg-color;
+  padding-top: 144px;
+
+  .heading {
+    @extend .section-title;
+    margin-bottom: 50px;
+    color: #fff;
+  }
+
+  .eco-img {
+    width: 500px;
+  }
+  .eco-text {
+    width: 500px;
+    color: #fff;
+  }
+  .get-farming-btn {
+    @apply text-white p-4 rounded-full px-12;
+    font-family: Chillax-Medium;
+    font-size: 40px;
+    font-weight: 600;
+    background-color: #0072e3;
+    margin-bottom: 144px;
+  }
+}
+
+.team-advisors {
+  @extend .bg-color;
+  padding-top: 100px;
+  .profile-img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+  }
+
+  section {
+    margin-bottom: 190px;
+    .row {
+      margin-bottom: 70px;
+    }
+  }
+
+  .heading {
+    @extend .section-title;
+    margin-bottom: 50px;
+    color: #ffffff;
+  }
+}
+
+.partners {
+  padding-top: 50px;
+  margin-bottom: 130px;
+  .heading {
+    @extend .section-title;
+    margin-bottom: 80px;
+  }
+
+  .partner-logos {
+    .logo {
+      width: 120px;
+    }
+  }
+}
+
+.landing-footer {
+  @extend .bg-color;
+
+  .logo {
+    position: static;
+    width: 280px;
+    left: 37px;
+    top: 0px;
+  }
+
+  .social-nav-icon {
+    width: 30px;
+  }
+}
