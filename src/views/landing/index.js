@@ -11,7 +11,7 @@ import "./index.scss";
 export const LandingPage = () => {
   return (
     <>
-      {/* <Header /> */}
+      <Header />
       <Ecosystem />
       <Partners />
       <TeamAdvisors />

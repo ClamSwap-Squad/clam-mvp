@@ -42,7 +42,7 @@ const ProfileComp = (props) => {
 
 export const TeamAdvisors = () => {
   return (
-    <div className="team-advisors flex flex-col justify-center text-white">
+    <div className="team-advisors flex flex-col justify-center text-white" id="team">
       {ITEMS.map((item) => (
         <section className="flex flex-col justify-center items-center" key={item.title}>
           <h1 className="heading">{item.title}</h1>
@@ -60,6 +60,7 @@ export const TeamAdvisors = () => {
           </div>
         </section>
       ))}
+
     </div>
   );
 };
