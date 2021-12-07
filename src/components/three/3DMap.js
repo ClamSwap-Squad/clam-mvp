@@ -106,7 +106,7 @@ const Map3D = ({ isGuidedTourPassed, setIsGuidedTourPassed }) => {
         boundingBox: ISLANDS_NAMES[ISLAND_OBJECTS[index].name] && new THREE.Box3().setFromObject(model),
       }));
 
-    setOutlineMeshes();
+    // setOutlineMeshes();
 
     setLoading(false);
     composer = new EffectComposer(renderer);
@@ -337,7 +337,7 @@ const Map3D = ({ isGuidedTourPassed, setIsGuidedTourPassed }) => {
       {loading && (
         <>
           <LoadingScreen text="Taking you to Clam Island..." />
-          <LiteVersionSwitcher />
+          {/*<LiteVersionSwitcher />*/}
         </>
       )}
       <button className="zoom-btn zoom-in text-blue-500" onClick={zoomIn}>
@@ -352,8 +352,6 @@ const Map3D = ({ isGuidedTourPassed, setIsGuidedTourPassed }) => {
         ref={mapRef}
       />
       <div id="hoverLabel" ref={hoverLabelRef}>Opening Soon</div>
-      {!isGuidedTourPassed && <MapGuider controls={cameraControls.current} islandModels={modelObjs.current} setIsGuidedTourPassed={setIsGuidedTourPassed} />}
-      {isGuidedTourPassed && <GuidedTourButton setIsGuidedTourPassed={setIsGuidedTourPassed} />}
     </div>
   );
 };

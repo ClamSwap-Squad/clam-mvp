@@ -11,12 +11,6 @@
   .nav-icon {
     @include nav-icon;
     @apply bg-white;
-    &:hover {
-      @apply bg-darkPearl;
-      img {
-        @apply w-12;
-      }
-    }
   }
 
   .current-nav-icon {

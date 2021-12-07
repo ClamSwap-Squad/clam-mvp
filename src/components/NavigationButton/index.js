@@ -36,9 +36,9 @@ const NavigationButton = () => {
   const navIcons = () => {
     const icons = NAV_ROUTES.map((k, i) => {
       return <div key={i} className="nav-access-btn" onClick={toggle}>
-        <Link to={k.url} className={checkSelectedRoute(k, "class")}>
+        <div className={checkSelectedRoute(k, "class")}>
           <img src={checkSelectedRoute(k)} />
-        </Link>
+        </div>
         <p>{k.title}</p>
       </div>
     });

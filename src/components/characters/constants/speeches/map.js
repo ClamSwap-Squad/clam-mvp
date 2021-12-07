@@ -111,6 +111,11 @@ export const MAP_SPEECH = {
       hideable: false,
     },
   },
+  appDisabled: {
+    text: "Ahoy there, Traveller! Unfortunately Clam Island is currently under maintenance to perform the Arcidae Update! This should only take a short while, but you will have to come back later. Sorry for any inconvenience!",
+    skip: false,
+    hideable: false,
+  },
 };
 
 export const MAP_BUTTONS = {

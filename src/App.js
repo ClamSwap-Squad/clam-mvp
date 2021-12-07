@@ -2,7 +2,7 @@ import React from "react";
 import { ToastContainer } from "react-toastify";
 import { isMobile } from "react-device-detect";
 import { useSessionStorage } from "react-use";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
 
 import ROUTES from "./router";
 import NavigationButton from "components/NavigationButton";
@@ -51,6 +51,7 @@ const App = () => {
               {ROUTES.map((k, i) => {
                 return <Route key={i} path={k.url} exact={k.exact} component={k.component} />;
               })}
+              <Redirect to="/" />
             </Switch>
           </div>
           <GoogleAnalytics4 />

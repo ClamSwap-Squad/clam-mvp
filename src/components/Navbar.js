@@ -145,8 +145,7 @@ const Navbar = ({
                 </div>
 
                 <div className="flex lg:mt-0 px-4 py-2 mr-2 rounded-xl shadow bg-gray-600 bg-opacity-80">
-                  <Link
-                    to="/saferoom/clam"
+                  <div
                     className="flex"
                     style={
                       location.pathname.indexOf("saferoom") === -1
@@ -169,15 +168,14 @@ const Navbar = ({
                           src={PearlIcon}
                         />{" "}
                       </IconTip>{" "}
-                      {location.pathname.indexOf("saferoom") === -1 && (
+                      {/*{location.pathname.indexOf("saferoom") === -1 && (
                         <FontAwesomeIcon icon={faExternalLinkAlt} className="ml-1" />
-                      )}
+                      )}*/}
                     </span>
-                  </Link>
+                  </div>
                 </div>
                 <div className="flex lg:mt-0 px-4 py-2 mr-2 rounded-xl shadow bg-gray-600 bg-opacity-80">
-                  <Link
-                    to="/farms"
+                  <div
                     className="flex"
                     style={
                       location.pathname.indexOf("farms") === -1 ? null : { pointerEvents: "none" }
@@ -198,11 +196,11 @@ const Navbar = ({
                           src={PearlIcon}
                         />
                       </IconTip>
-                      {location.pathname.indexOf("farms") === -1 && (
+                     {/* {location.pathname.indexOf("farms") === -1 && (
                         <FontAwesomeIcon icon={faExternalLinkAlt} className="ml-1" />
-                      )}
+                      )}*/}
                     </span>
-                  </Link>
+                  </div>
                 </div>
                 <NavBarUserProfile account={address} disconnect={onDisconnect} />
               </>
