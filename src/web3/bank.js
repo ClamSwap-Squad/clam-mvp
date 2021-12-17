@@ -249,14 +249,18 @@ const calculateAPRandTVL = async (pool) => {
       totalSupply(pool.lpToken),
     ]);
 
-    tokenPrice = new BigNumber(pairUsdValue).dividedBy(formatEther(totalLpSupply));
+    tokenPrice =
+      +pairUsdValue === 0 ? 0 : new BigNumber(pairUsdValue).dividedBy(formatEther(totalLpSupply));
 
-    apr = new BigNumber(gemPrice)
-      .multipliedBy(gemPerYearByAlloc)
-      .dividedBy(new BigNumber(tokenPrice).multipliedBy(supply))
-      .multipliedBy(100)
-      .toNumber()
-      .toFixed(2);
+    apr =
+      +pairUsdValue === 0
+        ? 0
+        : new BigNumber(gemPrice)
+            .multipliedBy(gemPerYearByAlloc)
+            .dividedBy(new BigNumber(tokenPrice).multipliedBy(supply))
+            .multipliedBy(100)
+            .toNumber()
+            .toFixed(2);
 
     tvl = getTvl(tokenPrice, supply);
   }
