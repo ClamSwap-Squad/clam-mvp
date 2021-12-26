@@ -158,7 +158,26 @@ const Map3D = ({ isGuidedTourPassed, setIsGuidedTourPassed }) => {
 
   const getOutlineMesh = (name) => {
     const mesh = modelObjs.current.find(k => k.name === name).model;
-    return mesh.children.filter((el) => el.name === name);
+
+    switch (name) {
+      case ISLANDS_NAMES.lighthouse:
+        return mesh.children.filter((el) => el.name === ISLANDS_NAMES.lighthouse);
+
+      case ISLANDS_NAMES.market:
+        return mesh.children.filter((el) => el.name === ISLANDS_NAMES.market);
+
+      case ISLANDS_NAMES.bank:
+        return mesh.children[0].children.filter((el) => el.name === 'mesh_0_5');
+
+      case ISLANDS_NAMES.vault:
+        return mesh.children[0].children.filter((el) => ['mesh_0_18', 'mesh_0_19', 'mesh_0_20', 'mesh_0_21'].includes(el.name));
+
+      case ISLANDS_NAMES.farm:
+        return mesh.children.filter((el) => el.name === ISLANDS_NAMES.farm);
+
+      default:
+        return [];
+    }
   };
 
   const setOutlineMeshes = () => {
@@ -269,7 +288,7 @@ const Map3D = ({ isGuidedTourPassed, setIsGuidedTourPassed }) => {
     raycaster.setFromCamera(mouse, camera);
     const intersect = raycaster.intersectObjects(outlineMeshes, true)[0];
     if (intersect) {
-      const interParent = intersect.object.parent.name;
+      const interParent = intersect.object.parent.parent.name;
       const currentHover = hoverStr;
       switch (interParent) {
         case ISLANDS_NAMES.lighthouse: {

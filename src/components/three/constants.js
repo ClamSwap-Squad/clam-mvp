@@ -16,14 +16,14 @@ export const ISLAND_OBJECTS = [
     buoyancy: { factor: 2, init: -5 }
   },
   {
-    objectUrl: "glb_files/farm_island.glb",
+    objectUrl: "glb_files/farm_island1.glb",
     type: "island",
     name: ISLANDS_NAMES.farm,
     clickable: true,
     url: "/farms",
   },
   {
-    objectUrl: "glb_files/Market_Island.glb",
+    objectUrl: "glb_files/Market_Island1.glb",
     type: "island",
     name: ISLANDS_NAMES.market,
     clickable: true,
@@ -39,7 +39,7 @@ export const ISLAND_OBJECTS = [
     buoyancy: { factor: 2, init: -4 }
   },
   {
-    objectUrl: "glb_files/Info_Island.glb",
+    objectUrl: "glb_files/Info_Island1.glb",
     type: "island",
     name: ISLANDS_NAMES.lighthouse,
     clickable: true,
