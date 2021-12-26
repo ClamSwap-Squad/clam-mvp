@@ -170,7 +170,7 @@ const Map3D = ({ isGuidedTourPassed, setIsGuidedTourPassed }) => {
         return mesh.children[0].children.filter((el) => el.name === 'mesh_0_5');
 
       case ISLANDS_NAMES.vault:
-        return mesh.children[0].children.filter((el) => ['mesh_0_18', 'mesh_0_19', 'mesh_0_20', 'mesh_0_21'].includes(el.name));
+        return mesh.children[0].children.filter((el) => ['mesh_0', 'mesh_0_1', 'mesh_0_2', 'mesh_0_3'].includes(el.name));
 
       case ISLANDS_NAMES.farm:
         return mesh.children.filter((el) => el.name === ISLANDS_NAMES.farm);
