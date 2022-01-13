@@ -4,7 +4,7 @@ import BigNumber from "bignumber.js";
 import { connect } from "redux-zero/react";
 import { actions, store } from "store/redux";
 
-import Web3 from "web3";
+import Web3 from "node_modules/web3";
 import Web3Modal, { connectors } from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { useAsync } from "react-use";

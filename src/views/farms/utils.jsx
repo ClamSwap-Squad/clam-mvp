@@ -1,7 +1,7 @@
 import {
   pearlSendToSaferoom,
   pearlGenerateNew,
-  pearlGenerateNewWarning,
+  // pearlGenerateNewWarning,
 } from "./character/pearlCollection";
 
 import { depositClamSuccess, depositClamError } from "./character/clamDeposit";
