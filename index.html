@@ -16,6 +16,15 @@
     -->
     <link rel="manifest" href="/manifest.json" />
     <title>Clam Island</title>
+
+    <script>
+      window.global = window;
+    </script>
+    <script type="module">
+      import { Buffer } from "buffer";
+
+      window.Buffer = Buffer;
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
