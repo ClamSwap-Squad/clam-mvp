@@ -11,25 +11,6 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "deposited",
-        "type": "uint256"
-      }
-    ],
-    "name": "DepositStake",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
         "name": "value",
         "type": "uint256"
       }
@@ -212,25 +193,6 @@
       }
     ],
     "name": "UpdateIndividualPearlRewards",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "withdrawn",
-        "type": "uint256"
-      }
-    ],
-    "name": "WithdrawStake",
     "type": "event"
   },
   {
@@ -494,24 +456,6 @@
       }
     ],
     "name": "correctIndividualPearlBalancesToTotal",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_account",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_deposited",
-        "type": "uint256"
-      }
-    ],
-    "name": "depositStake",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1236,29 +1180,6 @@
       }
     ],
     "name": "unlockRewards",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_account",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_totalBalance",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_withdrawn",
-        "type": "uint256"
-      }
-    ],
-    "name": "withdrawStake",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
