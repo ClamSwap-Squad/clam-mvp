@@ -10,7 +10,7 @@ import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 import { enterPearlHuntCompetition } from "web3/pearlHunt";
 
-import { pbkdf2Sync } from "crypto";
+// import { pbkdf2Sync } from "node_modules/crypto";
 
 const InfoLine = ({ label, value }) => (
   <div className="w-full flex justify-between">
@@ -39,7 +39,7 @@ const PearlInfo = ({
       }
       const salt = "clamIslandPearlHunt";
       const rounds = 2;
-      const tgHandleHash = await pbkdf2Sync(tgHandle, salt, rounds, 32, "sha512").toString("hex");
+      // const tgHandleHash = await pbkdf2Sync(tgHandle, salt, rounds, 32, "sha512").toString("hex");
 
       updateCharacter({
         name: "diego",
@@ -49,7 +49,7 @@ const PearlInfo = ({
         },
       });
 
-      await enterPearlHuntCompetition(address, pearl.pearlId, tgHandleHash);
+      // await enterPearlHuntCompetition(address, pearl.pearlId, tgHandleHash);
 
       toast.success("Your pearl has been entered in contest!");
       updateCharacter({

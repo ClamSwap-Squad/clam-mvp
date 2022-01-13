@@ -1,4 +1,4 @@
-import { getSnoise, getSnoiseVertexShader } from "./noise-shader.js";
+import { getSnoise, getSnoiseVertexShader } from "./noise-shader";
 
 const MAX_AMPLITUDE = 0.0017;
 const MAX_FREQUENCY = 1.6;

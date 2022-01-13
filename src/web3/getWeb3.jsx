@@ -1,4 +1,4 @@
-import Web3 from "web3";
+import Web3 from "node_modules/web3";
 
 const RPC_URL = process.env.REACT_APP_RPC_URL;
 

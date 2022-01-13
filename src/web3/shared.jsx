@@ -1,5 +1,5 @@
 import { formatUnits } from "@ethersproject/units";
-import Web3 from "web3";
+import Web3 from "node_modules/web3";
 import { store } from "../store/redux";
 import BigNumber from "bignumber.js";
 import { aggregate } from "./multicall";
