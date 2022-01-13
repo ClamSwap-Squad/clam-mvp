@@ -6,7 +6,8 @@ const filterContracts = (fileName) => {
   if (
     lowerCaseName.includes("mock") ||
     lowerCaseName.includes("debugging") ||
-    lowerCaseName.includes("deprecated")
+    lowerCaseName.includes("deprecated") ||
+    lowerCaseName.includes("testnet")
   ) {
     return false;
   }

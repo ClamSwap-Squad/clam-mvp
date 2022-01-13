@@ -115,7 +115,11 @@ const PoolItem = ({
             <p className="mb-1 text-xs font-semibold leading-none text-center">APR</p>
 
             <div className="items-center font-bold text-black">
-              {pool.apr ? renderPercentage(+pool.apr, 2) : "loading..."}
+              {pool.apr || pool.apr === 0
+                ? pool.apr === "∞"
+                  ? pool.apr
+                  : renderPercentage(+pool.apr, 2)
+                : "loading..."}
               <InfoTooltip text="Annual Percentage Return - non-compounded rate of return" />
             </div>
           </div>

@@ -5,7 +5,7 @@ import moment from "moment";
 import { actions } from "store/redux";
 import { formatMsToDuration } from "utils/time";
 import { color, shape, periodStart, periodInSeconds, periodCheckpoint } from "web3/pearlBurner";
-import { getGemPrice } from "web3/gemOracle";
+import { getGemPrice } from "web3/pancakeRouter";
 import { useTimer } from "hooks/useTimer";
 import { getPearlsMaxBoostTime } from "utils/getPearlsMaxBoostTime";
 import PearlInfo from "./PearlInfo";

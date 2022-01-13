@@ -9,8 +9,7 @@ import { getAccount, formatFromWei } from "./shared";
 
 import { aggregate } from "./multicall";
 import poolAssets from "../views/bank/poolsAssets";
-import { getUsdValueOfPair, getUsdPriceOfToken } from "./pancakeRouter";
-import { getGemPrice } from "./gemOracle";
+import { getUsdValueOfPair, getUsdPriceOfToken, getGemPrice } from "./pancakeRouter";
 import { totalSupply } from "./bep20";
 
 const bank = () =>
@@ -250,14 +249,18 @@ const calculateAPRandTVL = async (pool) => {
       totalSupply(pool.lpToken),
     ]);
 
-    tokenPrice = new BigNumber(pairUsdValue).dividedBy(formatEther(totalLpSupply));
+    tokenPrice =
+      +pairUsdValue === 0 ? 0 : new BigNumber(pairUsdValue).dividedBy(formatEther(totalLpSupply));
 
-    apr = new BigNumber(gemPrice)
-      .multipliedBy(gemPerYearByAlloc)
-      .dividedBy(new BigNumber(tokenPrice).multipliedBy(supply))
-      .multipliedBy(100)
-      .toNumber()
-      .toFixed(2);
+    apr =
+      +pairUsdValue === 0
+        ? 0
+        : new BigNumber(gemPrice)
+            .multipliedBy(gemPerYearByAlloc)
+            .dividedBy(new BigNumber(tokenPrice).multipliedBy(supply))
+            .multipliedBy(100)
+            .toNumber()
+            .toFixed(2);
 
     tvl = getTvl(tokenPrice, supply);
   }
