@@ -9,8 +9,7 @@ import { getAccount, formatFromWei } from "./shared";
 
 import { aggregate } from "./multicall";
 import poolAssets from "../views/bank/poolsAssets";
-import { getUsdValueOfPair, getUsdPriceOfToken } from "./pancakeRouter";
-import { getGemPrice } from "./gemOracle";
+import { getUsdValueOfPair, getUsdPriceOfToken, getGemPrice } from "./pancakeRouter";
 import { totalSupply } from "./bep20";
 
 const bank = () =>
