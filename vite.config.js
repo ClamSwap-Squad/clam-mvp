@@ -34,7 +34,8 @@ srcRootContent.forEach((directory) => {
 
 const alias = {
   ...absolutePathAliases,
-  node_modules: path.resolve(__dirname, "./node_modules/"),
+  // node_modules: path.resolve(__dirname, "./node_modules/"),
+  "@web3": path.resolve(__dirname, "./node_modules/web3/dist/web3.min.js"),
 };
 
 // https://vitejs.dev/config/
