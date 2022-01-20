@@ -1,12 +1,16 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
+import { faExternalLinkAlt, faSyncAlt } from "@fortawesome/free-solid-svg-icons";
 
 import { CONNECT_WALLET_TIP } from "constants/ui";
 
-export const ExternalLinksBlock = ({ totalTVL, harvestAllPools }) => (
+export const ExternalLinksBlock = ({ totalTVL, harvestAllPools, onExchangeButtonClick }) => (
   <div className="flex">
     <div className="mr-2 btn glass drop-shadow-button btn-unclickable">TVL: {totalTVL}</div>
+    <button className="mr-2 btn btn-secondary drop-shadow-button" onClick={onExchangeButtonClick}>
+      <FontAwesomeIcon icon={faSyncAlt} className="mr-1" />
+      Exchange
+    </button>
     <a
       className="mr-2 btn btn-secondary drop-shadow-button"
       href="https://app.bogged.finance/swap?tokenIn=BNB&tokenOut=0x01c16da6E041Cf203959624Ade1F39652973D0EB"

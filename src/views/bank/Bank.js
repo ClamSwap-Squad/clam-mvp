@@ -11,6 +11,7 @@ import Character from "components/characters/CharacterWrapper";
 import VideoBackground from "components/VideoBackground";
 import { Modal, useModal } from "components/Modal";
 import { PageTitle } from "components/PageTitle";
+import { PancakeSwap } from "components/pancakeSwap";
 
 import { getAllPools, harvestAllPools } from "web3/bank";
 import { fetchRewards } from "web3/gemLocker";
@@ -102,6 +103,7 @@ const Bank = ({
         >
           <BurnPearlModal isNativeStaker={isNativeStaker} />
         </Modal>
+        <PancakeSwap isShowing={true} />
         {/* container */}
         {/* video */}
         <VideoBackground videoImage={videoImage} videoMp4={videoMp4} videoWebM={videoWebM} />
