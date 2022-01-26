@@ -16,6 +16,14 @@ import { balanceOf } from "web3/bep20";
 import { color, periodInSeconds, periodStart, shape } from "web3/pearlBurner";
 import { getTraitsBeforeMaxYield } from "utils/getTraitsBeforeMaxYield";
 
+import {
+  addMulticallListeners,
+  removeMulticallListeners,
+  fetchingMulticallResults,
+  errorFetchingMulticallResults,
+  updateMulticallResults,
+} from "./actions";
+
 const initialState = {
   account: {
     bnbBalance: "0",
@@ -116,6 +124,13 @@ const initialState = {
       pearls: {},
     },
   },
+  multicall: {
+    callResults: {},
+    callListeners: {},
+  },
+  block: {
+    currentBlock: 0,
+  }
 };
 
 const middlewares = connect ? applyMiddleware(connect(initialState)) : [];
@@ -361,6 +376,21 @@ export const actions = (store) => ({
       },
     },
   }),
+
+  addMulticallListeners,
+  removeMulticallListeners,
+  fetchingMulticallResults,
+  errorFetchingMulticallResults,
+  updateMulticallResults,
+
+  setBlock: (state, currentBlock) => {
+    return {
+      block: {
+        ...state.block,
+        currentBlock,
+      },
+    };
+  },
 });
 
 export default { store, actions };

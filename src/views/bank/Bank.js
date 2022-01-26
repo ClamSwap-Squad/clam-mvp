@@ -34,6 +34,8 @@ const Bank = ({
   );
   const [totalTVL, setTotalTVL] = useState(0);
   const { isShowing, toggleModal } = useModal();
+  const { isShowing: isExchangeModalShowing, toggleModal: toggleExchangeModal } = useModal({show: true});
+
   const isNativeStaker =
     pools.length && pools.some((p) => p.isNative && +p.userDepositAmountInPool > 0);
 
@@ -103,7 +105,7 @@ const Bank = ({
         >
           <BurnPearlModal isNativeStaker={isNativeStaker} />
         </Modal>
-        <PancakeSwap isShowing={true} />
+        <PancakeSwap isShowing={isExchangeModalShowing} onClose={toggleExchangeModal} />
         {/* container */}
         {/* video */}
         <VideoBackground videoImage={videoImage} videoMp4={videoMp4} videoWebM={videoWebM} />
@@ -114,6 +116,7 @@ const Bank = ({
             <ExternalLinksBlock
               totalTVL={totalTVL}
               harvestAllPools={address ? harvestAllPools : null}
+              onExchangeButtonClick={toggleExchangeModal}
             />
           </div>
           <div className="py-4 flex flex-col">

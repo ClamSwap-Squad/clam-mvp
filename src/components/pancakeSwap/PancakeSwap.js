@@ -5,18 +5,24 @@ import { CurrencyInputPanel } from "./components/CurrencyInputPanel";
 import { CurrencySwitcher } from "./components/CurrencySwitcher";
 import { SwapButton } from "./components/SwapButton";
 import { useSwapCallback } from "./hooks/useSwapCallback";
-
+import { useDerivedSwapInfo } from "./hooks";
 import { DEFAULT_TOKEN_LIST } from "./constants/defaultTokenList";
+import { usePollBlockNumber } from "./hooks/blockHooks";
+import { Updater } from "./hooks/multicallUpdater";
 
 export const PancakeSwap = (props) => {
-  const { isShowing } = props;
-  useSwapCallback();
+  const { isShowing, onClose } = props;
+
   const [userInput, setUserInput] = useState("");
   const [selectedInputCurrency, setSelectedInputCurrency] = useState(DEFAULT_TOKEN_LIST[0]);
   const [userOutput, setUserOutput] = useState("");
   const [selectedOutputCurrency, setSelectedOutputCurrency] = useState(DEFAULT_TOKEN_LIST[1]);
+  usePollBlockNumber();
+  Updater();
 
-  const { toggleModal } = useModal();
+  const { v2Trade, currencyBalances, parsedAmount, currencies, inputError: swapInputError } =
+    useDerivedSwapInfo(selectedInputCurrency?.address, selectedOutputCurrency?.address, userInput);
+  useSwapCallback();
 
   const handleInputSelect = (currency) => {
     setSelectedInputCurrency(currency);
@@ -32,7 +38,7 @@ export const PancakeSwap = (props) => {
   return (
     <Modal
       isShowing={isShowing}
-      onClose={toggleModal}
+      onClose={onClose}
       width={"355px"}
       modalClassName="overflow-y-hidden"
       title="Exchange tokens"

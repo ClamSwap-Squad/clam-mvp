@@ -3,11 +3,13 @@ import { ToastContainer } from "react-toastify";
 import { isMobile } from "react-device-detect";
 import { useSessionStorage } from "react-use";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { Web3ReactProvider } from "@web3-react/core";
 
 import ROUTES from "./router";
 import NavigationButton from "components/NavigationButton";
 import { GoogleAnalytics4 } from "components/googleAnalytics4";
 import Web3ProvidersModal from "components/Web3ProvidersModal";
+import { getLibrary } from "utils/web3React";
 
 // Main App Component
 const App = () => {
@@ -45,14 +47,16 @@ const App = () => {
         </div>
       ) : (
         <Router>
-          <div className="p-0 h-full">
-            <Web3ProvidersModal />
-            <Switch>
-              {ROUTES.map((k, i) => {
-                return <Route key={i} path={k.url} exact={k.exact} component={k.component} />;
-              })}
-            </Switch>
-          </div>
+          <Web3ReactProvider getLibrary={getLibrary}>
+            <div className="p-0 h-full">
+              <Web3ProvidersModal />
+              <Switch>
+                {ROUTES.map((k, i) => {
+                  return <Route key={i} path={k.url} exact={k.exact} component={k.component} />;
+                })}
+              </Switch>
+            </div>
+          </Web3ReactProvider>
           <GoogleAnalytics4 />
           <NavigationButton />
           <ToastContainer />
