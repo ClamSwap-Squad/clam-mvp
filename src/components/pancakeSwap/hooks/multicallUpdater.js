@@ -10,6 +10,7 @@ import { useMulticallContract } from "./useContract";
 import { parseCallKey } from "../utils/multicallActions";
 import { chunkArray } from "../utils/chunkArray";
 import { retry, CancelledError, RetryableError } from "../utils/retry";
+import { aggregate } from "web3/multicall";
 
 const {
   fetchingMulticallResults: fetchingMulticallResultsAC,
@@ -32,12 +33,14 @@ async function fetchChunk(multicallContract, chunk, minBlockNumber) {
   let returnData;
   try {
     //debugger
-    [resultsBlockNumber, returnData] = await multicallContract.aggregate(
+    const callResponse = await aggregate(
       chunk.map((obj) => [obj.address, obj.callData]),
       {
         blockTag: minBlockNumber,
       }
-    )
+    );
+    resultsBlockNumber = callResponse.blockNumber;
+    returnData = callResponse.returnData;
   } catch (err) {
     const error = err;
     if (
@@ -65,12 +68,12 @@ async function fetchChunk(multicallContract, chunk, minBlockNumber) {
     console.debug("Failed to fetch chunk inside retry", error);
     throw error;
   }
-  if (resultsBlockNumber.toNumber() < minBlockNumber) {
+  if (+resultsBlockNumber < minBlockNumber) {
     console.debug(
       `Fetched results for old block number: ${resultsBlockNumber.toString()} vs. ${minBlockNumber}`
     );
   }
-  return { results: returnData, blockNumber: resultsBlockNumber.toNumber() };
+  return { results: returnData, blockNumber: +resultsBlockNumber };
 }
 
 /**
