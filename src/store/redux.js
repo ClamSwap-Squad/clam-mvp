@@ -2,6 +2,20 @@ import createStore from "redux-zero";
 import { applyMiddleware } from "redux-zero/middleware";
 import { connect } from "redux-zero/devtools";
 
+// dispatcher imports
+import clamContract, { getClamValueInShellToken, getPearlValueInShellToken } from "web3/clam";
+import {
+  gemTokenAddress,
+  shellTokenAddress,
+  clamNFTAddress,
+  pearlNFTAddress,
+} from "constants/constants";
+import { getStakedClamIds, rngRequestHashForProducedPearl } from "web3/pearlFarm";
+import { EmptyBytes, getOwnedClams, getOwnedPearls, formatFromWei } from "web3/shared";
+import { balanceOf } from "web3/bep20";
+import { color, periodInSeconds, periodStart, shape } from "web3/pearlBurner";
+import { getTraitsBeforeMaxYield } from "utils/getTraitsBeforeMaxYield";
+
 const initialState = {
   account: {
     bnbBalance: "0",
@@ -18,6 +32,13 @@ const initialState = {
     address: undefined,
     clams: [],
     pearls: [],
+  },
+  price: {
+    gem: "0",
+    shell: "0",
+  },
+  ui: {
+    isFetching: false,
   },
   presale: {
     cap: "0",
@@ -45,6 +66,13 @@ const initialState = {
     rng: undefined, // f  rom call rngRequestHashFromBuyersClam
     hashRequest: undefined,
   },
+  pearlHuntData: {
+    accountPearlCount: "0",
+    lastWinner: undefined,
+  },
+  clamSwapData: {
+    rng: undefined, // from call rngRequestHashFromBuyersClam
+  },
   character: {
     name: undefined,
     action: undefined,
@@ -69,6 +97,25 @@ const initialState = {
     selectedPool: undefined,
   },
   konvaObjects: [],
+  boostParams: {},
+  sorting: {
+    saferoom: {
+      clams: {},
+      pearls: {},
+    },
+    farmDepositingModal: {
+      clams: {},
+    },
+    farm: {
+      clams: {},
+    },
+    shop: {
+      clams: {},
+    },
+    bank: {
+      pearls: {},
+    },
+  },
 };
 
 const middlewares = connect ? applyMiddleware(connect(initialState)) : [];
@@ -95,6 +142,27 @@ export const actions = (store) => ({
       },
     };
   },
+  resetAccount: () => {
+    return {
+      account: { ...initialState.account },
+    };
+  },
+  updatePrice: (state, value) => {
+    return {
+      price: {
+        ...state.price,
+        ...value,
+      },
+    };
+  },
+  updateUI: (state, value) => {
+    return {
+      ui: {
+        ...state.ui,
+        ...value,
+      },
+    };
+  },
   updatePresale: (state, value) => {
     return {
       presale: {
@@ -115,6 +183,22 @@ export const actions = (store) => ({
     return {
       communityRewardsData: {
         ...state.communityRewardsData,
+        ...value,
+      },
+    };
+  },
+  updatePearlHunt: (state, value) => {
+    return {
+      pearlHuntData: {
+        ...state.pearlHuntData,
+        ...value,
+      },
+    };
+  },
+  updateClamSwap: (state, value) => {
+    return {
+      clamSwapData: {
+        ...state.clamSwapData,
         ...value,
       },
     };
@@ -159,6 +243,131 @@ export const actions = (store) => ({
       },
     };
   },
+
+  dispatchFetchAccountAssets: async (state, value) => {
+    console.log("dispatchFetchAccountAssets");
+    const {
+      account: { address, isBSChain },
+    } = state;
+
+    if (isBSChain) {
+      // get Clam and Pearsm  in farm
+      const stakedClamsInFarm = await getStakedClamIds(address);
+      const pearlsReadyInFarm = await Promise.all(
+        stakedClamsInFarm.map((clamId) => rngRequestHashForProducedPearl(clamId, address))
+      );
+      const pearlBalanceInFarm = pearlsReadyInFarm.filter((el) => el !== EmptyBytes).length;
+      const clamBalanceInFarm = stakedClamsInFarm.length;
+
+      const [clamBalance, pearlBalance, gemBalance, shellBalance] = await Promise.all([
+        balanceOf(clamNFTAddress, address),
+        balanceOf(pearlNFTAddress, address),
+        balanceOf(gemTokenAddress, address).then((b) => formatFromWei(b)),
+        balanceOf(shellTokenAddress, address).then((b) => formatFromWei(b)),
+      ]);
+
+      const clams = await getOwnedClams({
+        address,
+        balance: clamBalance,
+        clamContract,
+      });
+
+      const pearls = await getOwnedPearls({
+        address,
+        balance: pearlBalance,
+      });
+
+      const [
+        boostColor,
+        boostShape,
+        boostPeriodStart,
+        boostPeriodInSeconds,
+        clamValueInShellToken,
+        pearlValueInShellToken,
+      ] = await Promise.all([
+        color(),
+        shape(),
+        periodStart(),
+        periodInSeconds(),
+        getClamValueInShellToken(),
+        getPearlValueInShellToken(),
+      ]);
+
+      const boostParams = {
+        boostColor,
+        boostShape,
+        boostPeriodStart,
+        boostPeriodInSeconds,
+        clamValueInShellToken,
+        pearlValueInShellToken,
+      };
+
+      return {
+        account: {
+          ...state.account,
+          clamBalanceInFarm,
+          clamBalance,
+          pearlBalanceInFarm,
+          pearlBalance,
+          gemBalance,
+          shellBalance,
+          clams,
+          pearls: pearls.map((pearl) =>
+            Object.assign(pearl, {
+              traitsBeforeMaxBoost: getTraitsBeforeMaxYield({
+                shape: pearl.dnaDecoded.shape,
+                color: pearl.dnaDecoded.color,
+                currentBoostColour: boostColor,
+                currentBoostShape: boostShape,
+              }),
+            })
+          ),
+          reason: "dispatchFetchAccountAssets",
+        },
+        boostParams: {
+          ...state.boostParams,
+          ...boostParams,
+        },
+      };
+    }
+  },
+  updateClams: async (state) => {
+    const {
+      account: { address },
+    } = state;
+
+    const clamBalance = await balanceOf(clamNFTAddress, address);
+
+    const clams = await getOwnedClams({
+      address,
+      balance: clamBalance,
+      clamContract,
+    });
+
+    return {
+      account: {
+        ...state.account,
+        clams,
+        clamBalance,
+      },
+    };
+  },
+  updateSortOrder: (state, sortOrder = {}, page, entity) => ({
+    sorting: {
+      ...state.sorting,
+      [page]: {
+        ...state.sorting[page],
+        [entity]: sortOrder,
+      },
+    },
+  }),
+
+  updateBoostParams: (state, params) => ({
+    boostParams: {
+      ...state.boostParams,
+      ...params,
+    },
+  }),
 });
 
 export default { store, actions };

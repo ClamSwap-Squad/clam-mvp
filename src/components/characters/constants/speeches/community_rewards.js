@@ -1,19 +1,19 @@
 export const COMMUNITY_REWARDS_SPEECH = {
   community_rewards_not_allowed: {
     first: {
-      text: `Hi there, traveller! According to your wallet address, you claim any rewards. If this is a mistake, try switching to a different wallet address.`,
+      text: `Hi there, traveller! According to your wallet address, you can't claim any rewards. If this is a mistake, try switching to a different wallet address.`,
       next: false,
       dismiss: false,
       skip: false,
     },
     claimed: {
-      text: `Welcome, traveller! It looks like you cannot claim any rewards. If you want to buy Clams, please buy it by going to the shop on from the island`,
+      text: `Welcome, traveller! It looks like you cannot claim any rewards. Would you like to buy a Clam instead?`,
       next: false,
       dismiss: false,
       skip: false,
     },
     congrats: {
-      text: `Your claim was successfully processed! Let me just go fetch your rewards.`,
+      text: `Your claim was successfully processed! Let me just go fetch your reward.`,
       next: "collection",
       dismiss: true,
       skip: false,
@@ -28,13 +28,13 @@ export const COMMUNITY_REWARDS_SPEECH = {
       skip: false,
     },
     welcome_connected: {
-      text: `Welcome back, traveller! As promised, you are able to claim a rewards. Would you like to proceed?`,
+      text: `Welcome back, traveller! As promised, you are able to claim a reward. Would you like to proceed?`,
       next: `claim`,
       dismiss: false,
       skip: false,
     },
     claim: {
-      text: `Excellent. Please claim your reward using the menu above. Each awarded address can only claim one reward. If you have already claimed, you can see your reward in the Safe Room.`,
+      text: `Excellent. Please claim your reward using the menu above. You can only claim one reward at a time. Claimed rewards will appear in the Saferoom.`,
       next: false,
       dismiss: false,
       skip: false,
@@ -46,7 +46,7 @@ export const COMMUNITY_REWARDS_SPEECH = {
       skip: false,
     },
     collection: {
-      text: `Your Reward is ready for collection!`,
+      text: `Your reward is ready for collection!`,
       next: false,
       dismiss: true,
       skip: false,
@@ -57,7 +57,7 @@ export const COMMUNITY_REWARDS_SPEECH = {
     },
 
     collectionProcessing: {
-      text: `One moment, just let me unbox this rewards for you. Did you know that no one knows what reward is inside until you collect it, not even me?`,
+      text: `One moment, just let me unbox this reward for you. Did you know that no one knows the traits of your reward until you collect it, not even me?`,
       next: false,
       dismiss: true,
       skip: false,

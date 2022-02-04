@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { connect } from "redux-zero/react";
 import { formatUnits } from "@ethersproject/units";
 import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
 
 import {
   getClamValueInShellToken,
@@ -16,8 +18,13 @@ import "./index.scss";
 
 import { actions } from "../../store/redux";
 import { Modal, useModal } from "components/Modal";
+import { ClamsSorting } from "components/clamsSorting";
+import { getSortedClams } from "utils/clamsSort";
+
+import { formatNumberToLocale } from "utils/formatNumberToLocale";
 
 import {
+  harvestClamProcessing,
   harvestClamSpeak,
   harvestCongrats,
   harvestError,
@@ -43,40 +50,59 @@ const ClamItem = ({ clam, clamValueInShellToken, pearlValueInShellToken, harvest
         </div>
         <div className="flex-1 bg-white p-6 flex flex-col justify-between">
           <div className="flex-1">
-            <div className="text-sm font-medium flex justify-between">
-              <div className="px-4 py-2 badge badge-success">#{tokenId}</div>
-              <Link
-                to={`/saferoom/clam?id=${tokenId}`}
-                className="font-montserrat underline"
-                style={{ color: "#757575" }}
-              >
-                View in saferoom
-              </Link>
+            <div className="flex justify-between px-4 py-2">
+              <div className=" badge badge-success">#{tokenId}</div>
+              <div className="text-green-400 text-bold">{clam.dnaDecoded.rarity}</div>
             </div>
+
             <div className="block mt-2">
               <div className="border rounded border-gray-200">
                 <dl>
-                  <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium text-gray-500">$SHELL</dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {formatShell(harvestableShell)}
-                    </dd>
+                  <div className="bg-gray-50 px-4 py-5 sm:grid sm:gap-4 sm:px-6">
+                    <div className="flex flex-row w-full justify-between">
+                      <dt className="text-sm font-medium text-gray-500">$SHELL</dt>
+                      <dd className="mt-1 text-sm text-gray-900 sm:mt-0">
+                        {formatShell(harvestableShell)}
+                      </dd>
+                    </div>
                   </div>
-                  <div className="bg-gray-100 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium text-gray-500">Lifespan</dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {+pearlProductionCapacity - +pearlsProduced} pearls
-                    </dd>
+                  <div className="bg-gray-100 px-4 py-5 sm:grid sm:gap-4 sm:px-6">
+                    <div className="flex flex-row w-full justify-between">
+                      <dt className="text-sm font-medium text-gray-500">Lifespan</dt>
+                      <dd className="mt-1 text-sm text-gray-900 sm:mt-0">
+                        {+pearlProductionCapacity - +pearlsProduced} / {+pearlProductionCapacity}{" "}
+                        pearls
+                      </dd>
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 px-4 py-5 sm:grid sm:gap-4 sm:px-6">
+                    <div className="flex flex-row w-full justify-between">
+                      <dt className="text-sm font-medium text-gray-500">Clam Boost</dt>
+                      <dd className="mt-1 text-sm text-gray-900 sm:mt-0">
+                        {formatNumberToLocale(clam.pearlBoost, 2) + "x"}
+                      </dd>
+                    </div>
                   </div>
                 </dl>
               </div>
             </div>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center flex-col">
+            <Link
+              to={`/saferoom/clam?id=${tokenId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-outline btn-neutral mt-4 font-montserrat font-bold w-full"
+            >
+              View in saferoom&nbsp;
+              <FontAwesomeIcon icon={faExternalLinkAlt} />
+            </Link>
             <div className="w-full">
               <button
                 className="btn btn-secondary mt-4 font-montserrat font-bold w-full"
-                onClick={() => harvestClam(tokenId)}
+                onClick={() =>
+                  harvestClam(tokenId, formatNumberToLocale(harvestableShell, 1, true))
+                }
               >
                 Harvest
               </button>
@@ -101,6 +127,10 @@ const ClamHarvestModal = ({
   account: { address, clamBalance, ...stateAccount },
   updateCharacter,
   updateAccount,
+  updateClams,
+  sorting: {
+    shop: { clams: clamsSortOrder },
+  },
 }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [clams, setClams] = useState([]);
@@ -110,13 +140,16 @@ const ClamHarvestModal = ({
 
   const { isShowing, toggleModal } = useModal({ show: true });
 
-  const harvestClam = async (tokenId) => {
+  const harvestClam = async (tokenId, shell) => {
     toggleModal();
     // character speaks
-    harvestClamSpeak({ updateCharacter, setModalToShow }, async () => {
+    console.log(shell);
+    harvestClamSpeak({ updateCharacter, setModalToShow, shell: shell }, async () => {
       try {
+        harvestClamProcessing({ updateCharacter });
         await harvestClamForShell(tokenId, address);
-        harvestCongrats({ updateCharacter, setModalToShow }); // character speaks
+        await updateClams();
+        harvestCongrats({ updateCharacter, setModalToShow, shell: shell }); // character speaks
         setModalToShow(null);
       } catch (e) {
         console.error(e);
@@ -179,7 +212,7 @@ const ClamHarvestModal = ({
 
   return (
     <div className="HarvestModal">
-      <Modal isShowing={isShowing} onClose={closeModal} width={"90rem"} title={"Choose a Clam"}>
+      <Modal isShowing={isShowing} onClose={closeModal} width={"90rem"}>
         {isLoading ? (
           <div>
             <h1>Loading ...</h1>
@@ -207,19 +240,25 @@ const ClamHarvestModal = ({
         ) : (
           <div>
             {clams.length && !isLoading ? (
-              <div className="ClamDeposit max-h-160 overflow-y-auto p-2">
+              <div className="ClamDeposit p-2">
                 <div>
                   <h3 className="heading">{message}</h3>
-                  <div className="grid md:grid-cols-4 grid-cols-1 gap-4 flex-2">
-                    {clams.map((clam, i) => (
-                      <ClamItem
-                        key={i}
-                        clam={clam}
-                        harvestClam={harvestClam}
-                        clamValueInShellToken={clamValueInShellToken}
-                        pearlValueInShellToken={pearlValueInShellToken}
-                      />
-                    ))}
+                  <div className="flex flex-row justify-center text-center gap-6 mb-3">
+                    <h1 className="text-gray-600 font-aristotelica-bold text-3xl pt-3">Choose a Clam</h1>
+                    <ClamsSorting page="shop" textSize="sm" />
+                  </div>
+                  <div className="max-h-160 overflow-y-auto grid md:grid-cols-4 grid-cols-1 gap-4 flex-2 pt-3">
+                    {getSortedClams(clams, clamsSortOrder.value, clamsSortOrder.order).map(
+                      (clam, i) => (
+                        <ClamItem
+                          key={i}
+                          clam={clam}
+                          harvestClam={harvestClam}
+                          clamValueInShellToken={clamValueInShellToken}
+                          pearlValueInShellToken={pearlValueInShellToken}
+                        />
+                      )
+                    )}
                   </div>
                 </div>
               </div>

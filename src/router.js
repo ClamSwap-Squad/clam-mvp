@@ -5,7 +5,9 @@ import ClamPresale from "./views/clam_presale";
 import Shop from "./views/shop";
 import ClamClaimer from "./views/clam_claimers";
 import CommunityRewards from "./views/community_rewards";
+import PearlHunt from "./views/pearl_hunt";
 import Saferoom from "./views/saferoom/Saferoom";
+import ClamSwap from "./views/clam_swap";
 import { Infocenter } from "./views/infocenter";
 // import Vault from "./views/vault/Vault";
 // import ShellPresale from "./views/shell_presale";
@@ -25,7 +27,8 @@ const ROUTES = [
   { title: "Shop", url: "/shop", component: Shop, exact: true, icon: "shop.svg", order: 5 },
   { title: "Clam Claimer", url: "/clam-claimer", component: ClamClaimer, exact: true },
   { title: "Community Rewards", url: "/rewards", component: CommunityRewards, exact: true },
-  // TODOs
+  { title: "Pearl Hunt", url: "/pearl-hunt", component: PearlHunt, exact: true },
+  { title: "Clam Swap", url: "/clam-swap", component: ClamSwap, exact: true }, // TODOs
   { title: "Farms", url: "/farms", component: Farms, exact: true, icon: "farm.svg", order: 3 },
   { title: "Bank", url: "/bank", component: Bank, exact: true, icon: "bank.svg", order: 2 },
   { title: "Infocenter", url: "/info", component: Infocenter, exact: true, icon: "lighthouse.svg" },

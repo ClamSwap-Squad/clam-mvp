@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { connect } from "redux-zero/react";
 import { get } from "lodash";
 import { useHistory } from "react-router-dom";
+import { Reveal } from "react-text-reveal";
 import classNames from "classnames";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinusCircle, faTimesCircle, faEye } from "@fortawesome/free-solid-svg-icons";
@@ -26,6 +27,8 @@ const CharacterWrapper = ({
   skipDialogs,
   forceTop,
   suppressSpeechBubbleAction,
+  loading,
+  restrictReveal,
 }) => {
   const character = get(CHARACTERS, name);
   let speech = get(SPEECHES, action, action);
@@ -37,6 +40,7 @@ const CharacterWrapper = ({
   const isDialogHideable = get(SPEECHES, `${actionPath}.hideable`, false);
 
   const [showBubble, setShowBubble] = useState(true);
+  const [canPlay, setCanPlay] = useState(false);
   const [stateSpeech, setStateSpeech] = useState();
 
   let history = useHistory();
@@ -108,6 +112,20 @@ const CharacterWrapper = ({
     }
   }, [isNeedSkipDialog, actionPath]);
 
+  useEffect(() => {
+    if (!loading && showBubble) {
+      setTimeout(() => {
+        setCanPlay(true);
+      }, 300);
+    }
+  }, [action, loading, showBubble]);
+
+  useEffect(() => {
+    if (loading || !showBubble) {
+      setCanPlay(false);
+    }
+  }, [loading, showBubble]);
+
   return (
     <div
       className={classNames(
@@ -129,37 +147,43 @@ const CharacterWrapper = ({
             <div className="text-wrapper">
               <div className="name px-10">{character.name}</div>
               <div className="speech">
-                <div
-                  className="speech-text"
-                  dangerouslySetInnerHTML={{
-                    __html: stateSpeech ? stateSpeech : speech,
-                  }}
-                />
+                <div className="speech-text">
+                  <Reveal canPlay={canPlay} ease={"cubic-bezier(0,0.4,0.4,1)"} duration={500}>
+                    {stateSpeech ? stateSpeech : speech}
+                  </Reveal>
+                </div>
               </div>
-              {/* todo */}
-              <div className="buttons">
-                {button.text && (
-                  <button
-                    className="btn character-btn"
-                    id="btn-next"
-                    onClick={() =>
-                      button.alt ? handleButtonCallback(button) : handleClickButton(button)
-                    }
-                  >
-                    {button.text}
-                  </button>
-                )}
-                {buttonAlt && buttonAlt.text && (
-                  <button
-                    className="btn character-btn"
-                    onClick={() =>
-                      buttonAlt.alt ? handleButtonCallback(buttonAlt) : handleClickButton(buttonAlt)
-                    }
-                  >
-                    {buttonAlt.text}
-                  </button>
-                )}
-              </div>
+              <Reveal canPlay={canPlay} ease={"cubic-bezier(0,0.4,0.4,1)"} duration={500}>
+                <div className="buttons">
+                  {button.text && (
+                    <button
+                      className="btn character-btn"
+                      id="btn-next"
+                      onClick={() => {
+                        if (!restrictReveal) {
+                          setCanPlay(false);
+                        }
+                        button.alt ? handleButtonCallback(button) : handleClickButton(button);
+                      }}
+                    >
+                      {button.text}
+                    </button>
+                  )}
+                  {buttonAlt && buttonAlt.text && (
+                    <button
+                      className="btn character-btn"
+                      onClick={() => {
+                        setCanPlay(false);
+                        buttonAlt.alt
+                          ? handleButtonCallback(buttonAlt)
+                          : handleClickButton(buttonAlt);
+                      }}
+                    >
+                      {buttonAlt.text}
+                    </button>
+                  )}
+                </div>
+              </Reveal>
               <div className="absolute mt-4 right-8 text-white">
                 {isDialogHideable && (
                   <button
@@ -217,6 +241,7 @@ const mapToProps = ({
     suppressSpeechBubble,
     skipDialogs,
     forceTop,
+    restrictReveal,
   },
 }) => ({
   name,
@@ -227,6 +252,7 @@ const mapToProps = ({
   suppressSpeechBubble,
   skipDialogs,
   forceTop,
+  restrictReveal,
 });
 
 const mapDispatchToProps = () => ({

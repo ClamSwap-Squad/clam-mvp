@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "redux-zero/react";
-import { useAsync } from "react-use";
 import "./index.scss";
 
 import { Switch, Route, useRouteMatch, Redirect, useLocation, useHistory } from "react-router-dom";
@@ -10,57 +9,44 @@ import ClamView from "./ClamView";
 import PearlView from "./PearlView";
 import { TabContainer } from "./TabContainer";
 import { SaferoomNav } from "./SaferoomNav";
+import { ClamInspect } from "./ClamInspect";
+import { PearlInspect } from "./PearlInspect";
 
 import videoImage from "assets/locations/Saferoom.jpg";
 import videoMp4 from "assets/locations/Saferoom.mp4";
 import videoWebM from "assets/locations/Saferoom.webm";
 import VideoBackground from "components/VideoBackground";
 import { PageTitle } from "components/PageTitle";
+import { useWeb3Modal } from "components/Web3ProvidersModal";
 import { SAFEROOM_TABS as TABS } from "constants/ui";
+import { getSortedClams } from "utils/clamsSort";
+import { getSortedPearls } from "utils/pearlsSort";
 
 import { actions } from "store/redux";
 
 import LoadingScreen from "components/LoadingScreen";
 
 const Saferoom = ({
-  account: { clamBalance, pearlBalance, address, clams, pearls },
+  ui,
+  account: { clamBalance, pearlBalance, address, clams: unsortedCalms, pearls: unsortedPearls },
   updateCharacter,
+  price: { gem: gemPriceUSD },
+  boostParams,
+  sorting: { saferoom: saferoomSorting },
+  ...state
 }) => {
   const [selectedAsset, setSelectedAsset] = useState();
   const [tab, setTab] = useState(clamBalance !== "0" ? TABS.clam : TABS.pearl);
-  const [loading, setLoading] = useState(false);
-
+  const [clams, setClams] = useState([]);
+  const [pearls, setPearls] = useState([]);
   let { path, url } = useRouteMatch();
   const { search, pathname } = useLocation();
   const history = useHistory();
+  const { onConnect } = useWeb3Modal(state);
+
+  const isInspectPage = pathname.includes("inspect");
 
   const { isShowing, toggleModal } = useModal();
-
-  useEffect(async () => {
-    // wallet is connected and has clams
-    if (address && (+clamBalance > 0 || +pearlBalance > 0)) {
-      try {
-        setLoading(true);
-        // for first time needs to wait to downlaod all clams
-        if (clams.length > 0 || pearls.length > 0) {
-          setLoading(false);
-        }
-      } catch (error) {
-        setLoading(false);
-        console.log({ error });
-      }
-    }
-  }, [address, clams, pearls]);
-
-  useAsync(async () => {
-    updateCharacter({
-      name: "tanja",
-      action: "saferoom.connect.text",
-      button: {
-        text: undefined,
-      },
-    });
-  });
 
   const isPrevButtonShown = () => {
     if (TABS.clam === tab && selectedAsset) {
@@ -121,6 +107,32 @@ const Saferoom = ({
   };
 
   useEffect(() => {
+    if (!address) {
+      updateCharacter({
+        name: "tanja",
+        action: "saferoom.connect.text",
+        button: {
+          text: "Connect Wallet",
+          alt: {
+            action: "cb",
+            destination: onConnect,
+          },
+        },
+        buttonAlt: {
+          text: "Inspect Clam / Pearl",
+          alt: {
+            action: "cb",
+            destination: () => {
+              history.push("/saferoom/clam/inspect/-1");
+            },
+          },
+        },
+        restrictReveal: true,
+      });
+    }
+  }, [address, pathname]);
+
+  useEffect(() => {
     const query = new URLSearchParams(search);
     const id = query.get("id");
 
@@ -138,20 +150,45 @@ const Saferoom = ({
     }
   }, [address, search, pearls, clams]);
 
+  useEffect(() => {
+    const { order, value } = saferoomSorting.clams;
+    const sortedClams = getSortedClams(unsortedCalms, value, order);
+    setClams(sortedClams);
+  }, [unsortedCalms, saferoomSorting.clams.order, saferoomSorting.clams.value]);
+
+  useEffect(() => {
+    const { order, value } = saferoomSorting.pearls;
+    const sortedPearls = getSortedPearls(unsortedPearls, value, order);
+    setPearls(sortedPearls);
+  }, [unsortedPearls, saferoomSorting.pearls.order, saferoomSorting.pearls.value]);
+
+  useEffect(() => {
+    if (pathname.includes("clam") && tab !== TABS.clam) {
+      setTab(TABS.clam);
+    }
+
+    if (pathname.includes("pearl") && tab !== TABS.pearl) {
+      setTab(TABS.pearl);
+    }
+  }, [pathname]);
+
   return (
     <>
-      {loading && <LoadingScreen />}
+      {ui.isFetching && <LoadingScreen />}
 
       {/* container */}
       <VideoBackground videoImage={videoImage} videoMp4={videoMp4} videoWebM={videoWebM} />
 
       {/* chat character   */}
-      {!address && <Character name="tanja" />}
+      {!address && !isInspectPage && <Character name="tanja" />}
 
       <Modal isShowing={isShowing} onClose={toggleModal}>
         {tab === "Clam" && (
           <ClamView
             {...selectedAsset}
+            gemPriceUSD={gemPriceUSD}
+            {...boostParams}
+            view="saferoom"
             onClickNext={isNextButtonShown() && onClickNext}
             onClickPrev={isPrevButtonShown() && onClickPrev}
           />
@@ -159,6 +196,9 @@ const Saferoom = ({
         {tab === "Pearl" && (
           <PearlView
             {...selectedAsset}
+            gemPriceUSD={Number(gemPriceUSD)}
+            {...boostParams}
+            view="saferoom"
             onClickNext={isNextButtonShown() && onClickNext}
             onClickPrev={isPrevButtonShown() && onClickPrev}
           />
@@ -171,7 +211,6 @@ const Saferoom = ({
             <>
               {/* navbar */}
               <SaferoomNav
-                setTab={setTab}
                 tab={tab}
                 url={url}
                 clamBalance={clamBalance}
@@ -187,7 +226,6 @@ const Saferoom = ({
                   <Route path={`${path}/:tabId`}>
                     <TabContainer
                       clams={clams}
-                      setTab={setTab}
                       pearls={pearls}
                       openDetailedInfo={openDetailedInfo}
                     />
@@ -196,6 +234,18 @@ const Saferoom = ({
               </div>
             </>
           )}
+          <Switch>
+            <Route path={`${path}/clam/inspect/:tokenId`}>
+              {!ui.isFetching && (
+                <ClamInspect gemPriceUSD={gemPriceUSD} address={address} {...boostParams} />
+              )}
+            </Route>
+            <Route path={`${path}/pearl/inspect/:tokenId`}>
+              {!ui.isFetching && (
+                <PearlInspect gemPriceUSD={gemPriceUSD} address={address} {...boostParams} />
+              )}
+            </Route>
+          </Switch>
         </div>
       </div>
     </>

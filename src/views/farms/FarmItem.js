@@ -16,11 +16,12 @@ import {
   stakePrice,
   gemsTransferred,
 } from "web3/pearlFarm";
+import { getRNGFromHashRequest } from "web3/rng";
+import { getAllowance, getBalance, infiniteApproveSpending } from "web3/gem";
 import { canCurrentlyProducePearl, canStillProducePearls } from "web3/clam";
-import { getPearlData, tokenOfOwnerByIndex, accountPearlBalance } from "web3/pearl";
-import { formatFromWei } from "web3/shared";
-import { zeroHash } from "web3/constants";
-import { getPearlDNADecoded } from "web3/pearlDnaDecoder";
+import { tokenOfOwnerByIndex, accountPearlBalance } from "web3/pearl";
+import { formatFromWei, getOwnedPearls } from "web3/shared";
+import { pearlFarmAddress, zeroHash } from "constants/constants";
 
 import {
   pearlCollectSuccess,
@@ -32,6 +33,8 @@ import {
 } from "./character/pearlCollection";
 
 import ActionButton from "views/bank/utils/ActionButton";
+import BigNumber from "bignumber.js";
+import { renderNumber } from "utils/number";
 
 const FarmItem = ({
   clamId,
@@ -45,6 +48,8 @@ const FarmItem = ({
   updateAccount,
   account: { address },
   withdrawingClamId,
+  updateClams,
+  updateStakedClams,
 }) => {
   const [inTx, setInTx] = useState(false);
   const [isInitLoading, setIsInitLoading] = useState(true);
@@ -56,7 +61,8 @@ const FarmItem = ({
   const [canStillProducePearl, setCanStillProducePearl] = useState(false);
   const [canProducePearl, setCanProducePearl] = useState(false);
   const [readyForPearl, setReadyForPearl] = useState(false);
-  const [gemsNeededForPearlProd, setGemsNeededForPearl] = useState(0);
+  const [gemApproved, setGemApproved] = useState(false);
+  const [pearlPrice, setPearlPrice] = useState("0");
   const isWithdrawing = withdrawingClamId === clamId;
   const calculateTimeLeft = useCallback(() => {
     const now = Math.round(Date.now() / 1000);
@@ -81,9 +87,12 @@ const FarmItem = ({
         setPearlProductionTime(_pearlProductionTime);
 
         const rngHashForProducedPearl = await rngRequestHashForProducedPearl(clamId, address);
-
-        const isReadyForPearl = rngHashForProducedPearl !== zeroHash && !!rngHashForProducedPearl;
-        setReadyForPearl(isReadyForPearl);
+        if (rngHashForProducedPearl !== zeroHash && !!rngHashForProducedPearl) {
+          const dna = await getRNGFromHashRequest(rngHashForProducedPearl);
+          if (dna !== zeroHash && !!dna) {
+            setReadyForPearl(true);
+          }
+        }
 
         const canProduce = await canCurrentlyProducePearl(clamId);
         setCanProducePearl(canProduce);
@@ -91,8 +100,16 @@ const FarmItem = ({
         const canStillProduce = await canStillProducePearls(clamId);
         setCanStillProducePearl(canStillProduce);
 
-        const priceForPearlInGem = await stakePrice();
-        setGemsNeededForPearl(priceForPearlInGem);
+        const pPrice = await stakePrice(); // price as string
+        setPearlPrice(pPrice);
+
+        // set up for GEM approval comparison check
+        const pPriceAsBigNumber = new BigNumber(pPrice);
+        const gemAllowance = await getAllowance(address, pearlFarmAddress).then(
+          (v) => new BigNumber(v)
+        );
+
+        setGemApproved(pPriceAsBigNumber.lt(gemAllowance));
       } catch (err) {
         updateAccount({ error: err.message });
       }
@@ -138,7 +155,7 @@ const FarmItem = ({
       pearlOpenClam({ updateCharacter });
       await propClamOpenForPearl(clamId);
       setInTx(false);
-      pearlCollectReadyPrompt({ updateCharacter }, async () => {
+      pearlCollectReadyPrompt({ updateCharacter, pearlPrice }, async () => {
         return onClickCollectPearl();
       });
     } catch (err) {
@@ -153,54 +170,83 @@ const FarmItem = ({
   const onClickCollectPearl = async () => {
     try {
       const gems = await gemsTransferred(address, clamId);
-      pearlGemPrompt({ updateCharacter, gems: formatFromWei(gems) }, async () => {
-        pearlCollectProcessing({ updateCharacter });
-        try {
-          setInTx(true);
-          setButtonText("Hold on ...");
+      const isLegacyPearl = new BigNumber(gems).gt(0);
+      pearlGemPrompt(
+        {
+          updateCharacter,
+          pearlPrice: renderNumber(+formatFromWei(pearlPrice), 3),
+          gems: isLegacyPearl ? renderNumber(+formatFromWei(gems), 3) : "",
+        },
+        async () => {
+          pearlCollectProcessing({ updateCharacter });
+          try {
+            setInTx(true);
+            setButtonText("Hold on ...");
 
-          await collectPearl(clamId);
+            if (!isLegacyPearl) {
+              const gemBalance = await getBalance(address).then((v) => new BigNumber(v)); // from string to BN
+              if (gemBalance.lt(pearlPrice))
+                throw new Error(
+                  `You need at least ${formatFromWei(pearlPrice)} GEM to collect Pearl`
+                );
 
-          const userBalanceOfPearls = await accountPearlBalance(address);
-          const lastUsersPearlId = await tokenOfOwnerByIndex(address, +userBalanceOfPearls - 1);
+              if (!gemApproved) {
+                setButtonText("Approving GEM...");
+                await infiniteApproveSpending(address, pearlFarmAddress, pearlPrice);
+              }
+            }
 
-          const { dna: pearlDna } = await getPearlData(lastUsersPearlId);
-          const pearlDnaDecoded = await getPearlDNADecoded(pearlDna);
+            await collectPearl(clamId);
 
-          const viewPearl = () => {
-            onViewPearl({
-              clamId,
-              dna: pearlDna,
-              dnaDecoded: pearlDnaDecoded,
-              showPearlModal: true,
-            });
-          };
+            const [pearlBalance] = await Promise.all([accountPearlBalance(address), updateClams()]);
 
-          setInTx(false);
-
-          // character speaks
-          pearlCollectSuccess({ updateCharacter, viewPearl }, () => {
-            ifPearlSendSaferoom({
-              updateCharacter,
+            const lastUsersPearlId = await tokenOfOwnerByIndex(address, +pearlBalance - 1);
+            const pearls = await getOwnedPearls({
               address,
-              clamId,
-              setInTx,
+              balance: pearlBalance,
             });
-          });
-        } catch (err) {
-          updateAccount({ error: err.message });
-          setInTx(false);
-          setButtonText("Collect Pearl");
-          setAction("collect");
-          const errorMsg = JSON.parse(err.message.split("\n").slice(1).join(""));
-          toast.error(
-            <>
-              <p>There was an error collecting your pearl.</p>
-              <p>{errorMsg.message}</p>
-            </>
-          );
+
+            updateAccount({ pearlBalance, pearls });
+
+            const viewPearl = () => {
+              onViewPearl({
+                clamId,
+                pearl: pearls.find(({ pearlId }) => pearlId === lastUsersPearlId),
+                showPearlModal: true,
+              });
+            };
+
+            setInTx(false);
+
+            // character speaks
+            pearlCollectSuccess({ updateCharacter, viewPearl }, () => {
+              ifPearlSendSaferoom({
+                updateCharacter,
+                address,
+                clamId,
+                cb: () => {
+                  updateClams();
+                  updateStakedClams();
+                },
+              });
+            });
+            updateClams();
+            updateStakedClams();
+          } catch (err) {
+            updateAccount({ error: err.message });
+            setInTx(false);
+            setButtonText("Collect Pearl");
+            setAction("collect");
+            const errorMsg = JSON.parse(err.message.split("\n").slice(1).join(""));
+            toast.error(
+              <>
+                <p>There was an error collecting your pearl.</p>
+                <p>{errorMsg.message}</p>
+              </>
+            );
+          }
         }
-      });
+      );
     } catch (err) {
       updateAccount({ error: err.message });
       pearlError({ updateCharacter });
@@ -214,8 +260,11 @@ const FarmItem = ({
 
   return (
     <div className="FarmItem bg-opacity-90">
-      <div className="w-1/4 m-2 mx-auto text-center px-4 py-2 badge badge-success">#{clamId}</div>
-      <div className="flex-1 justify-center md:flex items-center p-4">
+    <div className="flex justify-between px-4 pt-4">
+      <div className=" badge badge-success">#{clamId}</div>
+      <div className="text-green-400 text-bold">{dnaDecoded.rarity}</div>
+    </div>
+      <div className="flex-1 justify-center md:flex items-start p-4">
         <button onClick={(e) => onViewDetails(e)}>
           <img className="w-auto" src={img} />
         </button>
@@ -240,28 +289,33 @@ const FarmItem = ({
                 <p className="font-bold text-black">{clam.remainingFormattedTime}</p>
               </div>
               <div className="text-sm block">
-                <p className="text-gray-500 font-semibold text-xs mb-1 leading-none">
+                <p className="text-gray-500 font-semibold text-xs text-right mb-1 leading-none">
                   Lifespan Remaining
                 </p>
-                <p className="font-bold text-black text-right">{clam.remainingLifeSpan}</p>
+                <p className="font-bold text-black text-right">
+                  {clam.remainingLifeSpan + " Pearls"}
+                </p>
               </div>
             </div>
           </div>
 
           <div className="px-4 py-2">
             <button
-              className="withdraw-btn flex justify-center items-center"
+              className="btn btn-neutral btn-outline w-full"
+              onClick={(e) => onViewDetails(e)}
+            >
+              View Details
+            </button>
+          </div>
+
+          <div className="px-4 py-2">
+            <button
+              className="btn btn-secondary w-full"
               onClick={onWithdrawClam}
               disabled={isWithdrawing}
             >
               <Spinner show={isWithdrawing} color="#ff4b47" />
               Withdraw
-            </button>
-          </div>
-
-          <div className="px-4 py-2 text-center">
-            <button className="view-details" onClick={(e) => onViewDetails(e)}>
-              View Details
             </button>
           </div>
         </>
@@ -270,21 +324,33 @@ const FarmItem = ({
           {isInitLoading ? (
             <ActionButton
               onClick={getClamFunction}
-              style={action === "open" ? "btn-deposit w-full" : "btn-harvest w-full"}
+              style={action === "open" ? "btn btn-primary w-full" : "btn btn-secondary w-full"}
               isDisabled={true}
               isLoading={inTx}
             >
               <Spinner show="true" color="#333333" /> Loading...
             </ActionButton>
           ) : (
-            <ActionButton
-              onClick={getClamFunction}
-              style={action === "open" ? "btn-deposit w-full" : "btn-harvest w-full"}
-              isDisabled={!canProducePearl || inTx || now <= pearlProductionTime}
-              isLoading={inTx}
-            >
-              {buttonText}
-            </ActionButton>
+            <>
+              <ActionButton
+                onClick={getClamFunction}
+                style={action === "open" ? "btn btn-primary w-full" : "btn btn-secondary w-full"}
+                isDisabled={!canProducePearl || inTx || now <= pearlProductionTime}
+                isLoading={inTx}
+              >
+                {buttonText}
+              </ActionButton>
+
+                <button
+                  className="btn btn-secondary w-full mt-4"
+                  onClick={onWithdrawClam}
+                  disabled={isWithdrawing || inTx || action === "collect"}
+                >
+                  <Spinner show={isWithdrawing} color="#ff4b47" />
+                  Withdraw
+                </button>
+
+            </>
           )}
         </div>
       )}

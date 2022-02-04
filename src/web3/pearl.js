@@ -1,5 +1,5 @@
 import pearlNFTAbi from "./abi/Pearl.json";
-import { pearlNFTAddress } from "./constants";
+import { pearlNFTAddress } from "../constants/constants";
 import { contractFactory } from "./index";
 
 const balanceOf = async ({ account, abi, address }) => {
@@ -42,7 +42,7 @@ export const getPearlByIndex = async (account, index) => {
   return value;
 };
 
-export const ownerOf = async (tokenId) => {
+export const ownerOfPearl = async (tokenId) => {
   const pearlNft = contractFactory({ abi: pearlNFTAbi, address: pearlNFTAddress });
   const value = await pearlNft.methods.ownerOf(tokenId).call();
   return value;
@@ -130,6 +130,7 @@ export const decodePearlDataFromMulticall = (values, tokenIds) => {
             dna: "uint256",
             pearlsRemaining: "uint256",
             gemBoost: "uint256",
+            pearlPrice: "uint256",
           },
         },
         values[index]
@@ -140,12 +141,12 @@ export const decodePearlDataFromMulticall = (values, tokenIds) => {
   return result;
 };
 
-export const calculateBonusRewards = async (baseGemRewards, dnaDecoded) => {
+export const legacyCalculateBonusRewards = async (baseGemRewards, dnaDecoded) => {
   const { size, lustre, nacreQuality, surface, rarityValue } = dnaDecoded;
   const pearlNft = contractFactory({ abi: pearlNFTAbi, address: pearlNFTAddress });
 
   return pearlNft.methods
-    .calculateBonusRewards(baseGemRewards, size, lustre, nacreQuality, surface, rarityValue)
+    .legacyCalculateBonusRewards(baseGemRewards, size, lustre, nacreQuality, surface, rarityValue)
     .call();
 };
 

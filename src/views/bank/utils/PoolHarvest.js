@@ -21,7 +21,7 @@ import { useTimer } from "hooks/useTimer";
 
 // WHEN HARVEST IS CLICKED. CALLED IN ./Poolitem.js
 const PoolHarvest = ({
-  account: { address, chainId },
+  account: { address },
   bank: { selectedPool, rewards },
   updateBank,
   updateCharacter,
@@ -79,7 +79,7 @@ const PoolHarvest = ({
     try {
       await harvest(selectedPool.poolId);
 
-      const setUpPools = await getAllPools({ address, chainId });
+      const setUpPools = await getAllPools({ address });
 
       updateBank({
         pools: setUpPools, //update all pools
@@ -148,7 +148,7 @@ const PoolHarvest = ({
           <div className="flex items-start">
             <div className="avatar -mt-1">
               <div className="rounded-full w-12 h-12">
-                <img src="https://clamisland.fi/favicon/android-chrome-192x192.png" />
+                <img src={`${process.env.PUBLIC_URL}/favicon/android-chrome-192x192.png`} />
               </div>
             </div>
           </div>
@@ -240,7 +240,7 @@ const PoolHarvest = ({
         <div className="dropdown dropdown-top dropdown-end dropdown-hover">
           <ActionButton
             onClick={handleHarvest}
-            style="btn-harvest w-full"
+            style="btn-secondary w-full"
             isDisabled={inTx || !address}
             isLoading={inTx}
           >
@@ -309,7 +309,7 @@ const PoolHarvest = ({
                   {rewards.vestedPearlRewards?.map((rewardData, i) => (
                     <UnlockRow
                       key={`pearl-${i}`}
-                      type={"Pearl Boost"}
+                      type={"Pearl Yield"}
                       amount={renderNumber(rewardData.bonusRemaining)}
                       unlockDay={rewardData.endDay}
                     />

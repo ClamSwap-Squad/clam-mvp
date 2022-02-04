@@ -1,8 +1,11 @@
 import clamNFTAbi from "./abi/Clam.json";
 import clamShopAbi from "./abi/ClamShop.json";
-import { clamNFTAddress, clamShopAddress } from "./constants";
+import { clamNFTAddress, clamShopAddress } from "../constants/constants";
 import { contractFactory } from "./index";
 import { getOracleFee } from "./rng";
+import { getRNGFromHashRequest } from "./rng";
+import { zeroHash } from "../constants/constants";
+import BigNumber from "bignumber.js";
 
 const balanceOf = async ({ account, abi, address }) => {
   const token = contractFactory({ abi, address });
@@ -18,6 +21,18 @@ export const accountClamBalance = async (account) => {
     address: clamNFTAddress,
   });
   return bal;
+};
+
+export const getMinPearlProductionDelay = async () => {
+  const clamNft = contractFactory({ abi: clamNFTAbi, address: clamNFTAddress });
+  const minPearlProductionDelay = await clamNft.methods.minPearlProductionDelay().call();
+  return minPearlProductionDelay;
+};
+
+export const getMaxPearlProductionDelay = async () => {
+  const clamNft = contractFactory({ abi: clamNFTAbi, address: clamNFTAddress });
+  const maxPearlProductionDelay = await clamNft.methods.maxPearlProductionDelay().call();
+  return maxPearlProductionDelay;
 };
 
 export const totalClamSupply = async () => {
@@ -131,6 +146,14 @@ export const getPrice = async () => {
   return value;
 };
 
+export const getPriceUsd = async () => {
+  const clamShop = contractFactory({
+    abi: clamShopAbi,
+    address: clamShopAddress,
+  });
+  const value = await clamShop.methods.priceUsd().call();
+  return value;
+};
 export const getWeekSupply = async () => {
   const clamShop = contractFactory({
     abi: clamShopAbi,
@@ -161,8 +184,12 @@ export const checkHasClamToCollect = async (address) => {
     address: clamShopAddress,
   });
 
-  const value = await clamShop.methods.rngRequestHashForFarmedClam(address).call();
-  return value;
+  const requestHash = await clamShop.methods.rngRequestHashForFarmedClam(address).call();
+  if (requestHash === zeroHash) {
+    return requestHash;
+  }
+  const rng = await getRNGFromHashRequest(requestHash);
+  return rng;
 };
 
 export const collectClam = async (account) => {
@@ -187,7 +214,7 @@ export const collectClam = async (account) => {
   });
 };
 
-export const ownerOf = async (tokenId) => {
+export const ownerOfClam = async (tokenId) => {
   const clamNft = contractFactory({ abi: clamNFTAbi, address: clamNFTAddress });
   const owner = await clamNft.methods.ownerOf(tokenId).call();
 
@@ -224,6 +251,7 @@ export const prepTokenOfOwnerByIndexMulticall = (address, length) => {
 
 export const prepClamDataMulticall = (tokenIds) => {
   const contractCalls = [];
+
   for (let index = 0; index < tokenIds.length; index++) {
     contractCalls.push([
       clamNFTAddress,
@@ -248,6 +276,7 @@ export const prepClamDataMulticall = (tokenIds) => {
 
 export const prepClamProducedPearlIds = (tokenIds) => {
   const contractCalls = [];
+
   for (let index = 0; index < tokenIds.length; index++) {
     contractCalls.push([
       clamNFTAddress,
@@ -312,6 +341,7 @@ export const decodeClamDataFromMulticall = (values, tokenIds) => {
             pearlProductionStart: "uint256",
             producedPearlIds: "uint256[]",
             gemBoost: "uint256",
+            pearlBoostM: "uint256",
           },
         },
         values[index]
@@ -378,6 +408,23 @@ export const canCurrentlyProducePearl = async (clamId) => {
   return await clamNft.methods.canCurrentlyProducePearl(clamId).call();
 };
 
+export const getPearlBoost = async (clamId) => {
+  const { pearlBoost } = await getClamData(clamId);
+  if (new BigNumber(pearlBoost).gt(0)) return pearlBoost;
+  return "0";
+};
+
+export const calculatePearlBoost = async (dnaDecoded) => {
+  const { size, lifespan, rarityValue } = dnaDecoded;
+  const clamNft = contractFactory({
+    abi: clamNFTAbi,
+    address: clamNFTAddress,
+  });
+
+  const boost = await clamNft.methods.calculatePearlBoost(size, lifespan, rarityValue).call();
+  return boost;
+};
+
 export default {
   balanceOf,
   accountClamBalance,
@@ -397,4 +444,6 @@ export default {
   harvestClamForShell,
   prepClamProducedPearlIds,
   decodeProducedPearlIdsFromMulticall,
+  calculatePearlBoost,
+  ownerOfClam,
 };

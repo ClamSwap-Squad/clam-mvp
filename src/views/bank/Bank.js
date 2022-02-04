@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "redux-zero/react";
-import { useAsync } from "react-use";
 import { actions } from "store/redux";
+import { useAsync } from "react-use";
 import videoImage from "assets/locations/Bank.jpg";
 import videoMp4 from "assets/locations/Bank.mp4";
 import videoWebM from "assets/locations/Bank.webm";
@@ -52,7 +52,7 @@ const steps = [
 ];
 
 const Bank = ({
-  account: { address, chainId, isBSChain, isWeb3Installed, isConnected },
+  account: { address, isBSChain, isWeb3Installed, isConnected },
   bank: { pools },
   updateCharacter,
   updateBank,
@@ -65,30 +65,30 @@ const Bank = ({
   const isNativeStaker =
     pools.length && pools.some((p) => p.isNative && +p.userDepositAmountInPool > 0);
 
-  useEffect(async () => {
-    if (pools.length === 0 && chainId) {
-      const setUpPools = await getAllPools({ address, chainId });
-      const calcTotalTVL = setUpPools.reduce((prev, curr) => {
-        if (curr.tvl) {
-          return prev.plus(curr.tvl);
-        }
-      }, new BigNumber(0));
+  useAsync(async () => {
+    const currentPools = await getAllPools({ address });
 
-      setTotalTVL(renderUsd(+calcTotalTVL));
-      updateBank({ pools: setUpPools });
-
-      if (address) {
-        const rewards = await fetchRewards(chainId);
-        console.log({ rewards });
-        updateBank({ rewards });
+    const calcTotalTVL = currentPools.reduce((prev, curr) => {
+      if (curr.tvl) {
+        return prev.plus(curr.tvl);
       }
+    }, new BigNumber(0));
+
+    setTotalTVL(renderUsd(+calcTotalTVL));
+    updateBank({ pools: currentPools });
+
+    if (address) {
+      const rewards = await fetchRewards();
+      updateBank({ rewards });
     }
-  }, [pools, address, isBSChain]);
+  }, [address, isBSChain]);
 
   // update pools data every 5 seconds
-
-  useAsync(async () => {
+  /* removing is causing memory leak => TODO: replace to api request */
+  /*
+  useEffect(() => {
     const zero = new BigNumber(0);
+
     setInterval(async () => {
       if (chainId && address) {
         console.log("updated pools after 5s", { chainId, address });
@@ -107,6 +107,7 @@ const Bank = ({
       }
     }, 5000);
   }, [address]);
+*/
 
   // CHARACTER SPEAK. functions in ./character folder
   useEffect(async () => {
@@ -122,8 +123,13 @@ const Bank = ({
   return (
     <TourProvider steps={steps}>
       <div className="bg-bank overflow-x-hidden">
-        <Modal isShowing={isShowing} onClose={toggleModal} width={"60rem"}>
-          <BurnPearlModal isNativeStaker={isNativeStaker} chainId={chainId} />
+        <Modal
+          isShowing={isShowing}
+          onClose={toggleModal}
+          width={"45rem"}
+          modalClassName="overflow-y-hidden"
+        >
+          <BurnPearlModal isNativeStaker={isNativeStaker} />
         </Modal>
         {/* container */}
         {/* video */}

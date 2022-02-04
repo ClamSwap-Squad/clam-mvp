@@ -20,7 +20,7 @@ import "./3d_map.scss";
 import createWater from "./create_water";
 import createSky from "./create_sky";
 import { LiteVersionSwitcher } from "../liteVersionSwitcher";
-import { CAMERA_SETTINGS } from "constants/mapCameraSettings";
+import { CAMERA_SETTINGS } from "constants/ui/mapCameraSettings";
 
 import { ISLAND_OBJECTS, ISLANDS_NAMES } from './constants';
 import LoadingScreen from "components/LoadingScreen";
@@ -40,6 +40,7 @@ const Map3D = ({ isGuidedTourPassed, setIsGuidedTourPassed }) => {
   const history = useHistory();
   const [loading, setLoading] = useState(true);
   const [hoverName, setHoverName] = useState("");
+  const [loadedFiles, setLoadedFiles] = useState(0)
 
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
@@ -97,8 +98,9 @@ const Map3D = ({ isGuidedTourPassed, setIsGuidedTourPassed }) => {
     createSky({ scene, water, renderer });
     addLights();
 
-    modelObjs.current = (await Promise.all(ISLAND_OBJECTS.map(k =>
-      loadGLTF(k.objectUrl, scene, k.type, k.name)
+    const callback = () => setLoadedFiles((prev) => prev + 1);
+    modelObjs.current = (await Promise.all(ISLAND_OBJECTS.map((k, i) =>
+      loadGLTF(k.objectUrl, scene, k.type, k.name, callback)
     )))
       .map((model, index) => ({
         ...ISLAND_OBJECTS[index],
@@ -336,7 +338,7 @@ const Map3D = ({ isGuidedTourPassed, setIsGuidedTourPassed }) => {
     <div>
       {loading && (
         <>
-          <LoadingScreen text="Taking you to Clam Island..." />
+          <LoadingScreen text="Taking you to Clam Island..." progress={(loadedFiles / ISLAND_OBJECTS.length) * 100} />
           <LiteVersionSwitcher />
         </>
       )}

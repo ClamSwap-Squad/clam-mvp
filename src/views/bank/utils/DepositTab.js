@@ -1,13 +1,15 @@
 import React, { useState } from "react";
+import ReactGA from "react-ga4";
 import { useForm } from "react-hook-form";
 import BigNumber from "bignumber.js";
 import { connect } from "redux-zero/react";
 import { actions } from "../../../store/redux";
-import { get } from "lodash";
+import { get, round } from "lodash";
 
 import { deposit, getAllPools } from "../../../web3/bank";
 import { approveBankForMaxUint } from "../../../web3/bep20";
 import { formatToWei } from "../../../web3/shared";
+import { ACTIONS, CATEGORIES } from "constants/googleAnalytics";
 
 import { formatNumber, getBalancesFormatted } from "./";
 
@@ -23,11 +25,12 @@ import ActionButton from "./ActionButton";
 import { CONNECT_WALLET_TIP } from "../../../constants/ui";
 
 const DepositTab = ({
-  account: { address, chainId },
+  account: { address },
   bank: { depositAmount, selectedPool, ...bank },
   updateBank,
   updateCharacter,
   updateAccount,
+  dispatchFetchAccountAssets,
   depositFee,
 }) => {
   const [inTx, setInTx] = useState(false);
@@ -56,6 +59,12 @@ const DepositTab = ({
 
       await deposit(selectedPool.poolId, formatToWei(depositAmount));
 
+      ReactGA.event({
+        action: `${ACTIONS.depositedInBank}_${selectedPool.name.replace("-", "_")}`,
+        category: CATEGORIES.bank,
+        value: round(selectedPool.tokenPrice * depositAmount, 2),
+      });
+
       const balances = await getBalancesFormatted(
         address,
         selectedPool.lpToken,
@@ -65,7 +74,7 @@ const DepositTab = ({
       const depositBN = new BigNumber(depositAmount);
       const newDepositBN = currentDepositBN.plus(depositBN).toString();
 
-      const setUpPools = await getAllPools({ address, chainId });
+      const setUpPools = await getAllPools({ address });
 
       updateBank({
         pools: setUpPools, //update all pools
@@ -76,6 +85,8 @@ const DepositTab = ({
           userDepositAmountInPool: newDepositBN,
         },
       });
+
+      await dispatchFetchAccountAssets();
       setInTx(false);
       onDepositHarvestSuccess(updateCharacter); // character speak
     } catch (error) {
@@ -152,7 +163,7 @@ const DepositTab = ({
         </div>
         <div data-tip={CONNECT_WALLET_TIP} className={!address ? "tooltip" : ""}>
           <ActionButton
-            style="btn-deposit w-full"
+            style="btn-secondary w-full"
             isDisabled={!isValid || inTx || !address}
             isLoading={inTx}
           >
