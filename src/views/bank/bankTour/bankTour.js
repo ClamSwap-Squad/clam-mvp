@@ -9,14 +9,12 @@ import { useWeb3Modal } from "components/Web3ProvidersModal";
 import { BankTourSpeechFlow } from "./bankTourSpeechFlow";
 const actionCreators = actions();
 const updateCharacterAC = actionCreators.updateCharacter;
-const suppressSpeechBubbleAC = actionCreators.suppressSpeechBubbleAction;
 
 export const BankTour = ({ info, setInfo, state }) => {
   const [sizes, setSizes] = useState();
   const [tour, setTour] = useState();
   const isConnected = useRef(state.isConnected);
   const updateCharacter = useAction(updateCharacterAC);
-  const hideSpeechBubble = useAction(suppressSpeechBubbleAC);
   const { onConnect: connectWallet } = useWeb3Modal(state);
 
   const setShownElement = (elementId) => {
@@ -37,7 +35,7 @@ export const BankTour = ({ info, setInfo, state }) => {
 
   useEffect(() => {
     if (!tour) {
-      const tour = new BankTourSpeechFlow(updateCharacter, hideSpeechBubble, setShownElement, connectWallet, setInfo, isConnected);
+      const tour = new BankTourSpeechFlow(updateCharacter, setShownElement, connectWallet, setInfo, isConnected);
       setTour(tour);
       if (!info) {
         tour.start();

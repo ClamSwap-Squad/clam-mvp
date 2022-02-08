@@ -1,9 +1,23 @@
 import { BUTTONS } from "components/characters/constants";
+import { WelcomeUserBack } from "../character/WelcomeUserBack";
+
+const STEP_WAY = {
+  4: "5",
+  5: "6",
+  6: "7_1",
+  "7_1": "7_2",
+  "7_2": "7_3",
+  "7_3": "8",
+  8: "9",
+  9: "10",
+  10: "11_1",
+  "11_1": "11_2",
+  "11_2": "12",
+};
 
 export class BankTourSpeechFlow {
-  constructor(updateCharacter, hideSpeechBubble, setShownElement, connectWallet, setInfo, isConnected) {
+  constructor(updateCharacter, setShownElement, connectWallet, setInfo, isConnected) {
     this.updateCharacter = updateCharacter;
-    this.hideSpeechBubble = hideSpeechBubble;
     this.setShownElement = setShownElement;
     this.connectWallet = connectWallet;
     this.setInfo = setInfo;
@@ -48,8 +62,8 @@ export class BankTourSpeechFlow {
         alt: {
           action: "cb",
           destination: () => {
-            this.hideSpeechBubble(true);
             this.setInfo({ isCompleted: true });
+            WelcomeUserBack({ suppressSpeechBubble: true, updateCharacter: this.updateCharacter });
           },
         },
       },
@@ -122,7 +136,76 @@ export class BankTourSpeechFlow {
         text: BUTTONS.bankTour.step2.next,
         alt: {
           action: "cb",
-          destination: () => {},
+          destination: () => {
+            this.step3();
+          },
+        },
+      },
+    });
+  }
+
+  step3() {
+    this.setInfo({ step: "3" });
+
+    this.updateCharacter({
+      name: "tanja",
+      action: "bankTour.step3.text",
+      button: {},
+    });
+  }
+
+  step4() {
+    this.setInfo({ step: "4" });
+    this.updateCharacter({
+      name: "tanja",
+      action: "bankTour.step4.text",
+      button: {
+        text: BUTTONS.bankTour.step4.next,
+        alt: {
+          action: "cb",
+          destination: () => {
+            this.callStep("5");
+          },
+        },
+      },
+    });
+  }
+
+  step13() {
+    this.setInfo({ step: "13" });
+
+    this.updateCharacter({
+      name: "tanja",
+      action: "bankTour.step13.text",
+      button: {
+        text: BUTTONS.bankTour.step13.next,
+        alt: {
+          action: "cb",
+          destination: () => {
+            WelcomeUserBack({ suppressSpeechBubble: true, updateCharacter: this.updateCharacter });
+            this.setInfo({ isCompleted: true });
+          },
+        },
+      },
+    });
+  }
+
+  callStep(step) {
+    this.setInfo({ step });
+    this.updateCharacter({
+      name: "tanja",
+      action: `bankTour.step${step}.text`,
+      button: {
+        text: BUTTONS.bankTour[`step${step}`].next,
+        alt: {
+          action: "cb",
+          destination: () => {
+            if (step === "12") {
+              this.step13();
+            } else {
+              this.callStep(STEP_WAY[step]);
+            }
+          },
         },
       },
     });
