@@ -70,24 +70,6 @@
       },
       {
         "internalType": "uint256",
-        "name": "_deposited",
-        "type": "uint256"
-      }
-    ],
-    "name": "depositStake",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_account",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
         "name": "_amount",
         "type": "uint256"
       }
@@ -321,29 +303,6 @@
       }
     ],
     "name": "unlockRewards",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_account",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_totalBalance",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_withdrawn",
-        "type": "uint256"
-      }
-    ],
-    "name": "withdrawStake",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

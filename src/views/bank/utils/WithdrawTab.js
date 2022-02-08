@@ -16,7 +16,6 @@ import {
   onDepositHarvestTxn,
   onDepositHarvestError,
   onDepositHarvestSuccess,
-  onWithdrawPearlRewardsAlert,
 } from "../character/OnDepositHarvest";
 
 const WithdrawTab = ({
@@ -28,7 +27,6 @@ const WithdrawTab = ({
   dispatchFetchAccountAssets,
 }) => {
   const [inTx, setInTx] = useState(false);
-  const hasPearlRewards = selectedPool.isNative && rewards?.hasLockedPearlRewards;
 
   const { handleSubmit, formState } = useForm();
   const { errors } = formState;
@@ -38,16 +36,6 @@ const WithdrawTab = ({
   };
 
   const handleWithdraw = async () => {
-    if (hasPearlRewards) {
-      onWithdrawPearlRewardsAlert(updateCharacter, async () => {
-        await executeWithdraw();
-      });
-    } else {
-      await executeWithdraw();
-    }
-  };
-
-  const executeWithdraw = async () => {
     setInTx(true);
     onDepositHarvestTxn(updateCharacter);
 

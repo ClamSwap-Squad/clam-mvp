@@ -72,12 +72,6 @@ export const BANK_SPEECH = {
       dismiss: true,
       skip: false,
     },
-    withdraw_pearl_rewards_alert: {
-      text: "You still have pending Pearl reward boosts available. Withdrawing now will cause your boosted rewards to be reduced proportionally. Are you sure you want to withdraw?",
-      next: false,
-      dismiss: true,
-      skip: false,
-    },
     pearl_boost_yield_alert: {
       text: "This will destroy your Pearl in return for the investment boost, and is irreversible. Do you want to continue?",
       next: false,
@@ -137,10 +131,6 @@ export const BANK_BUTTONS = {
       alt: false,
     },
     deposit_fee_alert: {
-      next: "OK",
-      alt: false,
-    },
-    withdraw_pearl_rewards_alert: {
       next: "OK",
       alt: false,
     },

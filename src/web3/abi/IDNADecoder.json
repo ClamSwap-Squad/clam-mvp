@@ -65,14 +65,14 @@
             "type": "string"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint8",
             "name": "size",
-            "type": "uint256"
+            "type": "uint8"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint8",
             "name": "lifespan",
-            "type": "uint256"
+            "type": "uint8"
           },
           {
             "internalType": "bool",
@@ -85,9 +85,9 @@
             "type": "string"
           },
           {
-            "internalType": "uint256",
+            "internalType": "uint64",
             "name": "rarityValue",
-            "type": "uint256"
+            "type": "uint64"
           },
           {
             "internalType": "uint8[10]",
@@ -100,14 +100,14 @@
             "type": "uint8[6]"
           },
           {
-            "internalType": "uint256[3][4]",
+            "internalType": "uint8[3][4]",
             "name": "defaultHSV",
-            "type": "uint256[3][4]"
+            "type": "uint8[3][4]"
           },
           {
-            "internalType": "uint256[3][4]",
+            "internalType": "uint8[3][4]",
             "name": "adjHSV",
-            "type": "uint256[3][4]"
+            "type": "uint8[3][4]"
           }
         ],
         "internalType": "struct IDNADecoder.Traits",
@@ -129,19 +129,19 @@
     "name": "getTraits",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "uint8",
         "name": "",
-        "type": "uint256"
+        "type": "uint8"
       },
       {
-        "internalType": "uint256",
+        "internalType": "uint8",
         "name": "",
-        "type": "uint256"
+        "type": "uint8"
       },
       {
-        "internalType": "uint256",
+        "internalType": "uint64",
         "name": "",
-        "type": "uint256"
+        "type": "uint64"
       },
       {
         "internalType": "uint8[10]",

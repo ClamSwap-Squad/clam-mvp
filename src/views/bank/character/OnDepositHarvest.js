@@ -61,29 +61,6 @@ export const onDepositFeeAlert = (updateCharacter, cb) => {
   });
 };
 
-export const onWithdrawPearlRewardsAlert = (updateCharacter, cb) => {
-  updateCharacter({
-    name: "tanja",
-    action: "bank.withdraw_pearl_rewards_alert.text",
-    button: {
-      text: "Yes, I understand",
-      alt: {
-        action: "cb",
-        destination: () => {
-          cb();
-        },
-      },
-    },
-    buttonAlt: {
-      text: "No",
-      alt: {
-        action: "cb",
-        destination: () => WelcomeUserBack({ updateCharacter, suppressSpeechBubble: true }),
-      },
-    },
-  });
-};
-
 export const onPearlBoostYieldAlert = (updateCharacter, cb) => {
   updateCharacter({
     name: "tanja",
