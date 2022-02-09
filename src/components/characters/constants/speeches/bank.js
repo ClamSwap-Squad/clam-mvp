@@ -249,7 +249,7 @@ export const BANK_BUTTONS = {
       next: "Got it",
     },
     step8: {
-      next: "Great!t",
+      next: "Great!",
     },
     step9: {
       next: "Cool!",

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useAction } from "redux-zero/react";
-import { getRect } from "@reactour/utils";
+import { useElemRect } from "@reactour/utils";
 import { Mask } from "@reactour/mask";
 
 import { actions } from "store/redux";
@@ -11,16 +11,21 @@ const actionCreators = actions();
 const updateCharacterAC = actionCreators.updateCharacter;
 
 export const BankTour = ({ info, setInfo, state }) => {
-  const [sizes, setSizes] = useState();
   const [tour, setTour] = useState();
+  const [maskedElement, setMaskedElement] = useState();
   const isConnected = useRef(state.isConnected);
   const updateCharacter = useAction(updateCharacterAC);
   const { onConnect: connectWallet } = useWeb3Modal(state);
 
   const setShownElement = (elementId) => {
     const selectedElement = document.getElementById(elementId);
-    const sizes = getRect(selectedElement);
-    setSizes(sizes);
+    setMaskedElement(selectedElement);
+  };
+  const sizes = useElemRect(maskedElement, state.gemBalance);
+  const handleClickHighlighted = () => {
+    if (info?.step === "3") {
+      tour.step4();
+    }
   };
 
   useEffect(() => {
@@ -42,10 +47,18 @@ export const BankTour = ({ info, setInfo, state }) => {
       } else {
         setTimeout(() => {
           tour.proceed(info.step);
-        }, [1000]);
+        }, [700]);
       }
     }
   }, []);
 
-  return info ? <Mask sizes={sizes} /> : null;
+  return info && maskedElement ? (
+    <Mask
+      sizes={sizes}
+      onClickHighlighted={handleClickHighlighted}
+      highlightedAreaClassName={`${
+        ["3", "9", "11_1", "12"].includes(info?.step) ? "!block cursor-pointer" : ""
+      }`}
+    />
+  ) : null;
 };

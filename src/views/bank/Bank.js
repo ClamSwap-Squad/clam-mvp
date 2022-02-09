@@ -24,9 +24,10 @@ import BurnPearlModal from "./utils/BurnPearlModal";
 import { ExternalLinksBlock } from "./ExternalLinksBlock";
 import BigNumber from "bignumber.js";
 import { renderUsd } from "utils/number";
+import {GuidedTourButton} from "../../components/three/mapGuider/GuidedTourButton";
 
 const Bank = ({
-  account: { address, isBSChain, isWeb3Installed, isConnected },
+  account: { address, isBSChain, isWeb3Installed, isConnected, gemBalance },
   bank: { pools },
   updateCharacter,
   updateBank,
@@ -125,15 +126,22 @@ const Bank = ({
           </div>
           <div className="py-4 flex flex-col">
             {pools &&
-              pools.map((pool, i) => <PoolItem key={i} pool={pool} toggleModal={toggleModal} />)}
+              pools.map((pool, i) => <PoolItem id={i} key={i} pool={pool} toggleModal={toggleModal} />)}
           </div>
         </div>
       </div>
 
       {/* chat character   */}
       <Character name="tanja" forceTop />
-      {!isBankTourPassed && (
-        <BankTour info={bankTourInfo} setInfo={setBankTourInfo} state={{ ...state, isConnected }} />
+      {!isBankTourPassed && pools.length && (
+        <BankTour
+          info={bankTourInfo}
+          setInfo={setBankTourInfo}
+          state={{ ...state, isConnected, gemBalance }}
+        />
+      )}
+      {isBankTourPassed && (
+        <GuidedTourButton setIsGuidedTourPassed={() => setBankTourInfo(null)} />
       )}
     </>
   );

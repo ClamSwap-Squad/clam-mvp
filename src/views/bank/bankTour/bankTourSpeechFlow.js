@@ -146,6 +146,7 @@ export class BankTourSpeechFlow {
 
   step3() {
     this.setInfo({ step: "3" });
+    this.setShownElement("TokenExchangeButton");
 
     this.updateCharacter({
       name: "tanja",
@@ -155,25 +156,314 @@ export class BankTourSpeechFlow {
   }
 
   step4() {
-    this.setInfo({ step: "4" });
+    const currentAction = () => {
+      this.setInfo({ step: "4" });
+      this.setShownElement("BuyBNBTabButton");
+      this.updateCharacter({
+        name: "tanja",
+        action: "bankTour.step4.text",
+        button: {
+          text: BUTTONS.bankTour.step4.next,
+          alt: {
+            action: "cb",
+            destination: () => {
+              this.step5();
+            },
+          },
+        },
+      });
+    };
+
+    if (document.getElementById("BuyBNBTabButton")) {
+      currentAction();
+    } else {
+      document.getElementById("TokenExchangeButton").click();
+      setTimeout(() => {
+        currentAction();
+      }, 300);
+    }
+  }
+
+  step5() {
+    const currentAction = () => {
+      this.setInfo({ step: "5" });
+      this.setShownElement("ExchangeTabButton");
+      this.updateCharacter({
+        name: "tanja",
+        action: "bankTour.step5.text",
+        button: {
+          text: BUTTONS.bankTour.step5.next,
+          alt: {
+            action: "cb",
+            destination: () => {
+              this.step6();
+            },
+          },
+        },
+      });
+    };
+
+    if (document.getElementById("ExchangeTabButton")) {
+      currentAction();
+    } else {
+      document.getElementById("TokenExchangeButton").click();
+      setTimeout(() => {
+        currentAction();
+      }, 300);
+    }
+  }
+
+  step6() {
+    const currentAction = () => {
+      this.setInfo({ step: "6" });
+      this.setShownElement("ExchangeLinksBlock");
+      this.updateCharacter({
+        name: "tanja",
+        action: "bankTour.step6.text",
+        button: {
+          text: BUTTONS.bankTour.step6.next,
+          alt: {
+            action: "cb",
+            destination: () => {
+              document.getElementById("TokenExchangeButton").click();
+              this.step7_1();
+            },
+          },
+        },
+      });
+    };
+
+    if (document.getElementById("ExchangeLinksBlock")) {
+      currentAction();
+    } else if (
+      document.getElementById("ExchangeTabButton") &&
+      !document.getElementById("ExchangeLinksBlock")
+    ) {
+      document.getElementById("ExchangeTabButton").click();
+      setTimeout(() => {
+        currentAction();
+      }, 300);
+    } else {
+      document.getElementById("TokenExchangeButton").click();
+      setTimeout(() => {
+        document.getElementById("ExchangeTabButton").click();
+        setTimeout(() => {
+          currentAction();
+        }, 300);
+      }, 300);
+    }
+  }
+
+  step7_1() {
+    this.setInfo({ step: "7_1" });
+    this.setShownElement("PoolItem-0");
+
     this.updateCharacter({
       name: "tanja",
-      action: "bankTour.step4.text",
+      action: "bankTour.step7_1.text",
       button: {
-        text: BUTTONS.bankTour.step4.next,
+        text: BUTTONS.bankTour.step7_1.next,
         alt: {
           action: "cb",
           destination: () => {
-            this.callStep("5");
+            this.step7_2();
           },
         },
       },
     });
   }
 
+  step7_2() {
+    this.updateCharacter({
+      name: "tanja",
+      action: "bankTour.step7_2.text",
+      button: {
+        text: BUTTONS.bankTour.step7_2.next,
+        alt: {
+          action: "cb",
+          destination: () => {
+            this.step7_3();
+          },
+        },
+      },
+    });
+  }
+
+  step7_3() {
+    this.updateCharacter({
+      name: "tanja",
+      action: "bankTour.step7_3.text",
+      button: {
+        text: BUTTONS.bankTour.step7_3.next,
+        alt: {
+          action: "cb",
+          destination: () => {
+            this.step8();
+          },
+        },
+      },
+    });
+  }
+
+  step8() {
+    if (!document.getElementById("PoolDepositTab")) {
+      document.getElementById("PoolItem-0").click();
+    }
+    this.setInfo({ step: "8" });
+
+    setTimeout(() => {
+      this.setShownElement("PoolDepositTab");
+      this.updateCharacter({
+        name: "tanja",
+        action: "bankTour.step8.text",
+        button: {
+          text: BUTTONS.bankTour.step8.next,
+          alt: {
+            action: "cb",
+            destination: () => {
+              this.step9();
+            },
+          },
+        },
+      });
+    }, 300);
+  }
+
+  step9() {
+    const currentAction = () => {
+      this.setInfo({ step: "9" });
+      this.setShownElement("DepositGemButton");
+      this.updateCharacter({
+        name: "tanja",
+        action: "bankTour.step9.text",
+        button: {
+          text: BUTTONS.bankTour.step9.next,
+          alt: {
+            action: "cb",
+            destination: () => {
+              this.step10();
+            },
+          },
+        },
+      });
+    };
+
+    if (document.getElementById("DepositGemButton")) {
+      currentAction();
+    } else {
+      document.getElementById("PoolItem-0").click();
+      setTimeout(() => {
+        currentAction();
+      }, 300);
+    }
+  }
+
+  step10() {
+    const currentAction = () => {
+      this.setInfo({ step: "10" });
+      this.setShownElement("HarvestRewardsInfo");
+      this.updateCharacter({
+        name: "tanja",
+        action: "bankTour.step10.text",
+        button: {
+          text: BUTTONS.bankTour.step10.next,
+          alt: {
+            action: "cb",
+            destination: () => {
+              this.step11_1();
+            },
+          },
+        },
+      });
+    };
+
+    if (document.getElementById("HarvestRewardsInfo")) {
+      currentAction();
+    } else {
+      document.getElementById("PoolItem-0").click();
+      setTimeout(() => {
+        currentAction();
+      }, 300);
+    }
+  }
+
+  step11_1() {
+    const currentAction = () => {
+      this.setInfo({ step: "11_1" });
+      this.setShownElement("PoolHarvestButton");
+      this.updateCharacter({
+        name: "tanja",
+        action: "bankTour.step11_1.text",
+        button: {
+          text: BUTTONS.bankTour.step11_1.next,
+          alt: {
+            action: "cb",
+            destination: () => {
+              this.step11_2();
+            },
+          },
+        },
+      });
+    };
+
+    if (document.getElementById("PoolHarvestButton")) {
+      currentAction();
+    } else {
+      document.getElementById("PoolItem-0").click();
+      setTimeout(() => {
+        currentAction();
+      }, 300);
+    }
+  }
+
+  step11_2() {
+    this.updateCharacter({
+      name: "tanja",
+      action: "bankTour.step11_2.text",
+      button: {
+        text: BUTTONS.bankTour.step11_2.next,
+        alt: {
+          action: "cb",
+          destination: () => {
+            this.step12();
+          },
+        },
+      },
+    });
+  }
+
+  step12() {
+    const currentAction = () => {
+      this.setInfo({ step: "12" });
+      this.setShownElement("PoolBoostRewardsButton");
+      this.updateCharacter({
+        name: "tanja",
+        action: "bankTour.step12.text",
+        button: {
+          text: BUTTONS.bankTour.step12.next,
+          alt: {
+            action: "cb",
+            destination: () => {
+              this.step13();
+            },
+          },
+        },
+      });
+    };
+
+    if (document.getElementById("PoolBoostRewardsButton")) {
+      currentAction();
+    } else {
+      document.getElementById("PoolItem-0").click();
+      setTimeout(() => {
+        currentAction();
+      }, 300);
+    }
+  }
+
   step13() {
     this.setInfo({ step: "13" });
-
+    this.setShownElement(null);
     this.updateCharacter({
       name: "tanja",
       action: "bankTour.step13.text",
@@ -184,27 +474,6 @@ export class BankTourSpeechFlow {
           destination: () => {
             WelcomeUserBack({ suppressSpeechBubble: true, updateCharacter: this.updateCharacter });
             this.setInfo({ isCompleted: true });
-          },
-        },
-      },
-    });
-  }
-
-  callStep(step) {
-    this.setInfo({ step });
-    this.updateCharacter({
-      name: "tanja",
-      action: `bankTour.step${step}.text`,
-      button: {
-        text: BUTTONS.bankTour[`step${step}`].next,
-        alt: {
-          action: "cb",
-          destination: () => {
-            if (step === "12") {
-              this.step13();
-            } else {
-              this.callStep(STEP_WAY[step]);
-            }
           },
         },
       },
