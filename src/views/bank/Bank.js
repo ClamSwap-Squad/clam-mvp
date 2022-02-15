@@ -3,6 +3,7 @@ import { useLocalStorage } from "react-use";
 import { connect } from "redux-zero/react";
 import { actions } from "store/redux";
 import { useAsync } from "react-use";
+
 import videoImage from "assets/locations/Bank.jpg";
 import videoMp4 from "assets/locations/Bank.mp4";
 import videoWebM from "assets/locations/Bank.webm";
@@ -13,7 +14,7 @@ import VideoBackground from "components/VideoBackground";
 import { Modal, useModal } from "components/Modal";
 import { PageTitle } from "components/PageTitle";
 import { BANK_TOUR_STORAGE_KEY } from "constants/ui";
-import { BankTour } from "./bankTour";
+import { BankTourProvider } from "./bankTour/BankTourProvider";
 
 import { getAllPools, harvestAllPools } from "web3/bank";
 import { fetchRewards } from "web3/gemLocker";
@@ -24,7 +25,6 @@ import BurnPearlModal from "./utils/BurnPearlModal";
 import { ExternalLinksBlock } from "./ExternalLinksBlock";
 import BigNumber from "bignumber.js";
 import { renderUsd } from "utils/number";
-import {GuidedTourButton} from "../../components/three/mapGuider/GuidedTourButton";
 
 const Bank = ({
   account: { address, isBSChain, isWeb3Installed, isConnected, gemBalance },
@@ -37,11 +37,12 @@ const Bank = ({
     window.localStorage.getItem("bankAssistantAcknowledged") === "true"
   );
   const [totalTVL, setTotalTVL] = useState(0);
+  const [isCharacterVisible, setIsCharacterVisible] = useState(true);
   const { isShowing, toggleModal } = useModal();
   const isNativeStaker =
     pools.length && pools.some((p) => p.isNative && +p.userDepositAmountInPool > 0);
 
-  const [bankTourInfo, setBankTourInfo] = useLocalStorage(BANK_TOUR_STORAGE_KEY);
+  const [bankTourInfo] = useLocalStorage(BANK_TOUR_STORAGE_KEY);
   const isBankTourPassed = bankTourInfo?.isCompleted;
 
   useAsync(async () => {
@@ -102,7 +103,10 @@ const Bank = ({
   }, [isWeb3Installed, isBSChain, isConnected]);
 
   return (
-    <>
+    <BankTourProvider
+      state={{ ...state, isConnected, updateCharacter, gemBalance, setIsCharacterVisible, isCharacterVisible }}
+      isPoolsLoaded={pools.length}
+    >
       <div className="bg-bank overflow-x-hidden">
         <Modal
           isShowing={isShowing}
@@ -126,24 +130,16 @@ const Bank = ({
           </div>
           <div className="py-4 flex flex-col">
             {pools &&
-              pools.map((pool, i) => <PoolItem id={i} key={i} pool={pool} toggleModal={toggleModal} />)}
+              pools.map((pool, i) => (
+                <PoolItem id={i} key={i} pool={pool} toggleModal={toggleModal} />
+              ))}
           </div>
         </div>
       </div>
 
       {/* chat character   */}
-      <Character name="tanja" forceTop />
-      {!isBankTourPassed && pools.length && (
-        <BankTour
-          info={bankTourInfo}
-          setInfo={setBankTourInfo}
-          state={{ ...state, isConnected, gemBalance }}
-        />
-      )}
-      {isBankTourPassed && (
-        <GuidedTourButton setIsGuidedTourPassed={() => setBankTourInfo(null)} />
-      )}
-    </>
+      {isCharacterVisible && <Character name="tanja" forceTop />}
+    </BankTourProvider>
   );
 };
 

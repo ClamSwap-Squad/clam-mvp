@@ -43,19 +43,10 @@ const PoolItem = ({
   const { onConnect } = useWeb3Modal(state);
 
   const handleOpen = async () => {
-    let balances;
-    if (address) {
-      balances = await getBalancesFormatted(address, pool.lpToken, pool.isSingleStake);
-    }
-
-    const url = await exchangeUrl({
-      tokenAddress: pool.lpToken,
-      isSingleStake: pool.isSingleStake,
-    });
-    setUrlForExchange(url);
+    setUrlForExchange(pool.exchangeUrl);
 
     updateBank({
-      balances: balances,
+      balances: pool.balances,
       depositAmount: "0",
       withdrawAmount: "0",
       selectedPool: {
@@ -161,7 +152,10 @@ const PoolItem = ({
         </div>
 
         {isAdditionalInfoVisible && (
-          <div className="flex items-start justify-between p-4 border-t-2 border-gray-700 h-96">
+          <div
+            data-tour="Pool-data"
+            className="flex items-start justify-between p-4 border-t-2 border-gray-700 h-96"
+          >
             <div className="flex w-1/5">
               <PoolData urlForExchange={urlForExchange} tvl={pool.tvl} />
             </div>
