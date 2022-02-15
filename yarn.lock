@@ -2891,7 +2891,7 @@
   "resolved" "https://registry.npmjs.org/@react-types/shared/-/shared-3.10.1.tgz"
   "version" "3.10.1"
 
-"@reactour/mask@*", "@reactour/mask@^0.4.0":
+"@reactour/mask@*":
   "integrity" "sha512-yD2MPMtxSXJvlHaoIv0IScUZKtyeT0COnnfDJkf9fPHWAsx3vS5y+rLJFL2BltmtDeMfvDlem7Ac/59LYPF7Dg=="
   "resolved" "https://registry.npmjs.org/@reactour/mask/-/mask-0.4.0.tgz"
   "version" "0.4.0"
@@ -2915,7 +2915,7 @@
     "@reactour/popover" "*"
     "@reactour/utils" "*"
 
-"@reactour/utils@*", "@reactour/utils@^0.3.0":
+"@reactour/utils@*":
   "integrity" "sha512-3pukl5fY5ju9/4GUykiXbqIQAd2RWDBpo1XKTy9nWndqvn51hL31lGUVAnWakQ+qvJhTA2Jb3RvvHqcWW6ZvCA=="
   "resolved" "https://registry.npmjs.org/@reactour/utils/-/utils-0.3.0.tgz"
   "version" "0.3.0"
