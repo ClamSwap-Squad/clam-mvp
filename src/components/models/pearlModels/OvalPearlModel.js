@@ -3,6 +3,7 @@ import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { ImprovedNoise } from "three/examples/jsm/math/ImprovedNoise";
 
+/** Params for noise */
 const seed = 0;
 const noiseWidth = 0.015;
 const noiseHeight = 0.03;
@@ -14,13 +15,6 @@ const getNoise = (vertice) =>
     seed + vertice.z / noiseWidth
   );
 
-console.log(
-  getNoise({
-    x: 0.01,
-    y: 0.02,
-    z: 0.03,
-  })
-)
 export default function Model(props) {
   const group = useRef();
   const { nodes, materials } = useGLTF("/pearl-models/Pearl_oval.glb");
