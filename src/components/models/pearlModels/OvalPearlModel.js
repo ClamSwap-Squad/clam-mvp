@@ -1,6 +1,26 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useGLTF } from "@react-three/drei";
+import * as THREE from "three";
+import { ImprovedNoise } from "three/examples/jsm/math/ImprovedNoise";
 
+const seed = 0;
+const noiseWidth = 0.015;
+const noiseHeight = 0.03;
+
+const getNoise = (vertice) =>
+  ImprovedNoise().noise(
+    seed + vertice.x / noiseWidth,
+    seed + vertice.y / noiseWidth,
+    seed + vertice.z / noiseWidth
+  );
+
+console.log(
+  getNoise({
+    x: 0.01,
+    y: 0.02,
+    z: 0.03,
+  })
+)
 export default function Model(props) {
   const group = useRef();
   const { nodes, materials } = useGLTF("/pearl-models/Pearl_oval.glb");
@@ -18,9 +38,51 @@ export default function Model(props) {
     backGlowMaterial,
   } = props;
 
+  const [noiseGeometry, setNoiseGeometry] = useState(null);
+
+  useEffect(() => {
+    const clonedGeometry = nodes.Oval.geometry.clone();
+    const position = clonedGeometry.getAttribute("position");
+
+    const vector = new THREE.Vector3();
+    const vertices = [];
+    for (let i = 0, l = position.count; i < l; i++) {
+      vector.fromBufferAttribute(position, i);
+      vector.applyMatrix4(nodes.Oval.matrixWorld);
+      vertices.push(vector.clone());
+    }
+
+    const noiseMap = vertices.map(getNoise),
+      noiseMax = Math.max(...noiseMap),
+      noiseMin = -Math.min(...noiseMap);
+
+    for (const v in vertices) {
+      if (noiseMap[v] > 0) {
+        vertices[v]
+          .elevation = noiseMap[v] / noiseMax;
+      } else {
+        vertices[v]
+          .elevation = noiseMap[v] / noiseMin;
+      }
+      vertices[v]
+        .multiplyScalar(1 + vertices[v].elevation * noiseHeight);
+    }
+
+    const newPosition = [];
+    for (const vert of vertices) {
+      newPosition.push(vert.x, vert.y, vert.z);
+    }
+
+    clonedGeometry.attributes.position.array = clonedGeometry.attributes.position.array.map(
+      (val, i) => newPosition[i]
+    );
+
+    setNoiseGeometry(clonedGeometry);
+  }, []);
+
   return (
     <group ref={group} {...props}>
-      <mesh geometry={nodes.Oval.geometry} material={materials.Pearl}>
+      <mesh geometry={noiseGeometry} material={materials.Pearl}>
         <meshStandardMaterial
           {...materials.Pearl}
           map={map}
@@ -31,7 +93,7 @@ export default function Model(props) {
           emissive={emissive}
           color={color}
           roughness={roughness}
-          onBeforeCompile={onBeforeCompile}
+          //onBeforeCompile={onBeforeCompile}
         />
       </mesh>
       {glowMaterial && (
