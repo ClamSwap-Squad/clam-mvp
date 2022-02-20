@@ -3,6 +3,8 @@ import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { ImprovedNoise } from "three/examples/jsm/math/ImprovedNoise";
 
+import { usePearlNoiseGeometry } from "../../../hooks/usePearlNoiseGeometry";
+
 /** Params for noise */
 const seed = 0;
 const noiseWidth = 0.015;
@@ -27,52 +29,16 @@ export default function Model(props) {
     emissive,
     emissiveIntensity,
     roughness,
-    onBeforeCompile,
     glowMaterial,
     backGlowMaterial,
+    surface,
   } = props;
 
-  const [noiseGeometry, setNoiseGeometry] = useState(null);
+  const noiseGeometry = usePearlNoiseGeometry(nodes.Oval, surface);
 
-  useEffect(() => {
-    const clonedGeometry = nodes.Oval.geometry.clone();
-    const position = clonedGeometry.getAttribute("position");
-
-    const vector = new THREE.Vector3();
-    const vertices = [];
-    for (let i = 0, l = position.count; i < l; i++) {
-      vector.fromBufferAttribute(position, i);
-      vector.applyMatrix4(nodes.Oval.matrixWorld);
-      vertices.push(vector.clone());
-    }
-
-    const noiseMap = vertices.map(getNoise),
-      noiseMax = Math.max(...noiseMap),
-      noiseMin = -Math.min(...noiseMap);
-
-    for (const v in vertices) {
-      if (noiseMap[v] > 0) {
-        vertices[v]
-          .elevation = noiseMap[v] / noiseMax;
-      } else {
-        vertices[v]
-          .elevation = noiseMap[v] / noiseMin;
-      }
-      vertices[v]
-        .multiplyScalar(1 + vertices[v].elevation * noiseHeight);
-    }
-
-    const newPosition = [];
-    for (const vert of vertices) {
-      newPosition.push(vert.x, vert.y, vert.z);
-    }
-
-    clonedGeometry.attributes.position.array = clonedGeometry.attributes.position.array.map(
-      (val, i) => newPosition[i]
-    );
-
-    setNoiseGeometry(clonedGeometry);
-  }, []);
+  if (!noiseGeometry) {
+    return null;
+  }
 
   return (
     <group ref={group} {...props}>
@@ -87,7 +53,6 @@ export default function Model(props) {
           emissive={emissive}
           color={color}
           roughness={roughness}
-          //onBeforeCompile={onBeforeCompile}
         />
       </mesh>
       {glowMaterial && (

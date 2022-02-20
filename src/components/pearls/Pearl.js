@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useThree } from "@react-three/fiber";
-import { useTexture, Html } from "@react-three/drei";
+import { useTexture } from "@react-three/drei";
 import convert from "color-convert";
 
 import { PEARLS_SHAPES } from "../../constants/ui/pearls";
@@ -10,9 +10,7 @@ import DropPearlModel from "../models/pearlModels/DropPearlModel";
 import OvalPearlModel from "../models/pearlModels/OvalPearlModel";
 import RingedPearlModel from "../models/pearlModels/RingedPearlModel";
 import RoundPearlModel from "../models/pearlModels/RoundPearlModel";
-import { getOnBeforeCompile } from "../../shaders/noise-material";
 import { getGlowMaterial } from "../../shaders/glow";
-import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter";
 
 import {
   updateMap,
@@ -43,15 +41,13 @@ export const Pearl = (props) => {
   const emissiveIntensity = getEmissiveIntensity(bodyColorHSV, overtoneColorHSV, lustre);
   const roughness = 0.2 + ((100 - lustre) / 100) * 0.15;
   const scaleFactor = (size / 100) * 0.5 + 0.5;
-  const { gl: canvasGl, scene } = useThree();
+  const { gl: canvasGl } = useThree();
 
   const { map, envMap, emissiveMap } = useTexture({
     map: "/pearl-models/patterns/ice-texture-final-7.jpg",
     envMap: `/pearl-models/patterns/${envMapFile}`,
     emissiveMap: `/pearl-models/patterns/${emissiveMapFile}`,
   });
-
-  const onBeforeCompile = useCallback(getOnBeforeCompile(surface), [surface]);
 
   const { camera } = useThree();
   camera.layers.enable(1);
@@ -98,57 +94,21 @@ export const Pearl = (props) => {
     }
   };
 
-  const handleSave = () => {
-    function download() {
-      const exporter = new GLTFExporter();
-      exporter.parse(
-        scene,
-        (result) => {
-          saveArrayBuffer(result, 'scene.glb');
-        },
-        { binary: true }
-      );
-    }
-
-    function saveArrayBuffer(buffer, filename) {
-      save(new Blob([buffer], { type: 'application/octet-stream' }), filename);
-    }
-
-    const link = document.createElement('a');
-    link.style.display = 'none';
-    document.body.appendChild(link); // Firefox workaround, see #6594
-
-    function save(blob, filename) {
-      link.href = URL.createObjectURL(blob);
-      link.download = filename;
-      link.click();
-
-      // URL.revokeObjectURL( url ); breaks Firefox...
-    }
-
-    download();
-  };
-
   return (
-    <>
-      {/*<Html>
-        <button onClick={handleSave}>Click</button>
-      </Html>*/}
-      <group position={[0, 0.001, 0]} scale={4 * scaleFactor}>
-        <PearlComponent
-          map={map}
-          envMap={envMap}
-          emissiveMap={emissiveMap}
-          onBeforeCompile={onBeforeCompile}
-          envMapIntensity={1.2}
-          color={color}
-          emissive={emissive}
-          emissiveIntensity={emissiveIntensity}
-          roughness={roughness}
-          glowMaterial={glowMaterial ? glowMaterial : undefined}
-          backGlowMaterial={backGlowMaterial}
-        />
-      </group>
-    </>
+    <group position={[0, 0.001, 0]} scale={4 * scaleFactor}>
+      <PearlComponent
+        map={map}
+        envMap={envMap}
+        emissiveMap={emissiveMap}
+        envMapIntensity={1.2}
+        color={color}
+        emissive={emissive}
+        emissiveIntensity={emissiveIntensity}
+        roughness={roughness}
+        glowMaterial={glowMaterial ? glowMaterial : undefined}
+        backGlowMaterial={backGlowMaterial}
+        surface={surface}
+      />
+    </group>
   );
 };
