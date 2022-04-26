@@ -2,15 +2,27 @@ import dnaDecoderAbi from "./abi/DNADecoder.json";
 import { dnaDecoderAddress } from "../constants/constants";
 import { contractFactory } from "./index";
 
+const dnaDecoder = contractFactory({
+  abi: dnaDecoderAbi,
+  address: dnaDecoderAddress,
+});
+
 export const getDNADecoded = async (dna) => {
-  const dnaDecoder = contractFactory({
-    abi: dnaDecoderAbi,
-    address: dnaDecoderAddress,
-  });
+
   const traits = await dnaDecoder.methods.getDNADecoded(dna).call();
 
   return traits;
 };
+
+export const getClamGradesData = async () => {
+  const clamGradesData = await dnaDecoder.methods.getClamGradesData().call();
+  return clamGradesData;
+}
+
+export const getClamGradesList = async () => {
+  const clamGradesList = await dnaDecoder.methods.getClamGradesList().call();
+  return clamGradesList;
+}
 
 export const prepGetDnaDecodedMulticall = (dnas) => {
   const contractCalls = [];

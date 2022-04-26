@@ -38,6 +38,7 @@ import { getUsdPriceOfToken } from "web3/pancakeRouter";
 import { getMintedThisWeek, getClamsPerWeek } from "web3/clamShop";
 import { stakePrice } from "web3/pearlFarm";
 import { clamShopAddress, gemTokenAddress, BUSD } from "constants/constants";
+import {getClamGradesData, getClamGradesList} from "web3/dnaDecoder";
 import { actions } from "store/redux";
 import { ACTIONS, CATEGORIES } from "constants/googleAnalytics";
 
@@ -85,16 +86,32 @@ const ClamBuyModal = ({
 
   useEffect(() => {
     const fetchData = async () => {
-      const [_gemPrice, _clamPrice, _lockedGemV1, _lockedGemV2, _clamsPerWeek, _mintedThisWeek] = await Promise.all(
+      const [_gemPrice, _lockedGemV1, _lockedGemV2, _clamsPerWeek, _mintedThisWeek, _gradesData, _gradesList] = await Promise.all(
         [
           getUsdPriceOfToken(gemTokenAddress, BUSD),
-          getPrice(),
           getVestedGem(),
           getVestedGemV2(),
           getClamsPerWeek(),
-          getMintedThisWeek()
+          getMintedThisWeek(),
+          getClamGradesData(),
+          getClamGradesList()
         ]
       );
+      console.log(_gradesData);
+      console.log(_gradesList);
+      const _grades = [];
+      _gradesData.forEach((item, i) => {
+        _grades[_gradesList[i]] = {
+          price: _gradesData[i][0],
+          pearlPrice: _gradesData[i][1],
+          minSize: _gradesData[i][2],
+          maxSize: _gradesData[i][3],
+          minLifespan: _gradesData[i][4],
+          maxLifespan: _gradesData[i][5],
+          baseShell: _gradesData[i][6]
+        }
+      });
+      console.log(_grades);
       const _clamPriceBnb = await getClamPriceBnb(_clamPrice);
       setClamPrice(_clamPrice);
       setLockedGem(_lockedGemV1 + _lockedGemV2);

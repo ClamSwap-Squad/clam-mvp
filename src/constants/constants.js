@@ -4,8 +4,8 @@ import testnetAddresses from "./testnet";
 // this sets addresses of testnet when running locally. Change this if mainnet addresses are desired
 const addresses =
   process.env.NODE_ENV === "development" || window.location.hostname === "clam-island-beta.web.app"
-    ? mainnetAddresses
-    : mainnetAddresses;
+    ? testnetAddresses
+    : testnetAddresses;
 
 export const ClamIslandChain = {
   BSC: 56,
@@ -23,6 +23,8 @@ export const clamClaimersAddress = "0xDaF219f41931B4833A71B9D08881491010246691";
 export const zeroHash = "0x0000000000000000000000000000000000000000000000000000000000000000";
 
 export const communityRewardsAddress = "0x6684C3Fb0a85cE9B05187c770c4aa6A824Ed590C";
+
+export const zapAddress = "0x25AE8E764b0c8318c093d8eFdd03000b442bb56a";
 
 export const {
   shellTokenAddress,
@@ -47,5 +49,4 @@ export const {
   multicallAddress,
   wBNB,
   BUSD,
-  zapAddress,
 } = addresses;
