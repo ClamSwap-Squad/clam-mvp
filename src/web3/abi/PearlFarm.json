@@ -201,6 +201,19 @@
 		"anonymous": false,
 		"inputs": [
 			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "gemOracle",
+				"type": "address"
+			}
+		],
+		"name": "SetGemOracle",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
 				"indexed": false,
 				"internalType": "address",
 				"name": "treasury",
@@ -324,6 +337,19 @@
 		"name": "collectPearl",
 		"outputs": [],
 		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "dnaDecoder",
+		"outputs": [
+			{
+				"internalType": "contract IDNADecoder",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
