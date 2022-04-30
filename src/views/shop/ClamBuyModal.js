@@ -35,7 +35,7 @@ import { infiniteApproveSpending } from "web3/gem";
 import { getVestedGem } from "web3/gemLocker";
 import { getVestedGem as getVestedGemV2 } from "web3/gemLockerV2";
 import { getUsdPriceOfToken } from "web3/pancakeRouter";
-import { getMintedThisWeek, getClamsPerWeek } from "web3/clamShop";
+import { getMintedThisWeek, getClamsPerWeek, getUpdatedPrice, getUpdatedPearlPrice } from "web3/clamShop";
 import { stakePrice } from "web3/pearlFarm";
 import { clamShopAddress, gemTokenAddress, BUSD } from "constants/constants";
 import {getClamGradesData, getClamGradesList} from "web3/dnaDecoder";
@@ -79,6 +79,10 @@ const ClamBuyModal = ({
   const [clamsPerWeek, setClamsPerWeek] = useState("...");
   const [minPearlProductionTime, setMinPearlProductionTime] = useState("...");
   const [maxPearlProductionTime, setMaxPearlProductionTime] = useState("...");
+  const [gradesData, setGradesData] = useState([]);
+  const [gradesList, setGradesList] = useState([]);
+  const [selectedGrade, setSelectedGrade] = useState("");
+  const [selectedGradeData, setSelectedGradeData] = useState({});
   const [pearlPrice, setPearlPrice] = useState("...");
   const [clamPriceBnb, setClamPriceBnb] = useState(0);
   const [buyWithGem, setBuyWithGem] = useState(false);
@@ -99,6 +103,7 @@ const ClamBuyModal = ({
       );
       console.log(_gradesData);
       console.log(_gradesList);
+      setGradesList([..._gradesList].reverse());
       const _grades = [];
       _gradesData.forEach((item, i) => {
         _grades[_gradesList[i]] = {
@@ -112,12 +117,17 @@ const ClamBuyModal = ({
         }
       });
       console.log(_grades);
-      const _clamPriceBnb = await getClamPriceBnb(_clamPrice);
-      setClamPrice(_clamPrice);
+      setGradesData(_grades);
+      console.log(gradesData);
+      console.log(selectedGrade);
+      setSelectedGrade("f");
+      //const _clamPriceBnb = await getClamPriceBnb(_clamPrice);
+      //setClamPrice(_clamPrice);
       setLockedGem(_lockedGemV1 + _lockedGemV2);
       setClamsPerWeek(_clamsPerWeek);
+      console.log(clamsPerWeek);
       setMintedThisWeek(_mintedThisWeek);
-      setClamPriceBnb(_clamPriceBnb);
+      //setClamPriceBnb(_clamPriceBnb);
 
       const getPearlProductionTime = async () => {
         const [minTime, maxTime] = await Promise.all([
@@ -130,16 +140,16 @@ const ClamBuyModal = ({
 
       getPearlProductionTime();
 
-      const getPearlPrice = async () => {
-        const pearlPrice = await stakePrice();
-        setPearlPrice(formatNumberToLocale(pearlPrice, 2, true));
-      };
+      //const getPearlPrice = async () => {
+      //  const pearlPrice = await stakePrice();
+      //  setPearlPrice(formatNumberToLocale(pearlPrice, 2, true));
+      //};
 
-      getPearlPrice();
+      //getPearlPrice();
 
-      const _clamUsdPrice = new BigNumber(_clamPrice).multipliedBy(_gemPrice).div(1e18); // remove 18 decimals once
+      //const _clamUsdPrice = new BigNumber(_clamPrice).multipliedBy(_gemPrice).div(1e18); // remove 18 decimals once
 
-      setClamUsdPrice(_clamUsdPrice);
+      //setClamUsdPrice(_clamUsdPrice);
 
       if (address) {
         const clamToCollect = await checkHasClamToCollect(address);
@@ -149,7 +159,26 @@ const ClamBuyModal = ({
       }
     };
     fetchData();
+
   }, []);
+
+  useEffect(() => {
+    if(gradesData[selectedGrade] !== undefined) {
+      setSelectedGradeData(gradesData[selectedGrade]);
+      setClamUsdPrice(gradesData[selectedGrade].price);
+      const updateData = async() => {
+        const _clamPrice = await getUpdatedPrice(selectedGrade);
+        setClamPrice(_clamPrice);
+        console.log("clamPrice: " + _clamPrice);
+        const _clamPriceBnb = await getClamPriceBnb(_clamPrice);
+        console.log("clamPriceBNB: " + _clamPriceBnb);
+
+        setClamPriceBnb(_clamPriceBnb);
+      }
+      updateData();
+
+    };
+  }, [selectedGrade]);
 
   useEffect(() => {
     if (buyWithGem) {
@@ -234,11 +263,22 @@ const ClamBuyModal = ({
                   icon={faExternalLinkAlt}
                 />
               </a>
+
             ) : (
               <span className="text-yellow-400 text-center">Wallet not connected</span>
             )}
           </div>
 
+          <div className="flex flex-row gap-4 items-center justify-center">
+            <div>
+              Grade:
+            </div>
+            <div className="tabs tabs-boxed">
+              {gradesList.map((item, key) => {
+                return <button type="button" key={key} className={selectedGrade != item ? "tab uppercase" : "tab uppercase tab-active"}>{item}</button>
+              })}
+            </div>
+          </div>
           {/* input */}
           <div className="bg-white border-2 shadow rounded-xl">
             <div className="px-2 py-2">
@@ -284,7 +324,7 @@ const ClamBuyModal = ({
                               ? "... BNB"
                               : `${renderNumber(+formatEther(clamPriceBnb), 2)} BNB`}
                             {!buyWithGem && (
-                              <button data-tip="80% of BNB price is used to purchase GEM, the other 20% is sent to treasury. BNB price may be more than USD equivalent price displayed below due to slippage on conversion to GEM.">
+                              <button type="button" data-tip="80% of BNB price is used to purchase GEM, the other 20% is sent to treasury. BNB price may be more than USD equivalent price displayed below due to slippage on conversion to GEM.">
                                 <FontAwesomeIcon className="ml-1" icon={faInfoCircle} />
                               </button>
                             )}
@@ -328,7 +368,7 @@ const ClamBuyModal = ({
 
           {/* output */}
           <div className="flex flex-row justify-between items-center">
-            <video autoPlay playsinline loop className="w-1/3">
+            <video autoPlay playsInline loop className="w-1/3">
             <source src="https://clam-island-public.s3.us-east-2.amazonaws.com/clam-preview.mp4" type="video/mp4" />
             </video>
             <div className="w-full ml-4 grid">

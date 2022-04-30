@@ -132,7 +132,8 @@ const testnetPools = {
     isSingleStake: true,
     isNative: true,
   },
-  "0xC5080b85bd6F7e926730892D2ED7dE24D574F4D2": {
+  //0xC5080b85bd6F7e926730892D2ED7dE24D574F4D2
+  "0x5ab5850110087912b536d659190fb30b037b7b7e": {
     name: `GEM - BNB`,
     images: [
       `${process.env.PUBLIC_URL}/favicon/android-chrome-192x192.png`,
