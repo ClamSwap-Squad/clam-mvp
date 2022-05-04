@@ -17,6 +17,7 @@ import { getPearlsMaxBoostTime } from "utils/getPearlsMaxBoostTime";
 import { secondsToFormattedTime } from "utils/time";
 import { takeSnapshot } from "utils/takeSnapshot";
 import { getClamIncubationTime } from "web3/clam";
+import { getClamGradeData } from "web3/dnaDecoder";
 import { getCurrentBlockTimestamp } from "web3/index";
 import { getPearlDataByIds } from "web3/shared";
 
@@ -47,7 +48,7 @@ export default ({
   dna,
   dnaDecoded,
   pearlBoost,
-  clamDataValues: { pearlProductionCapacity, pearlsProduced, birthTime },
+  clamDataValues: { pearlProductionCapacity, pearlsProduced, birthTime, grade, gemPrice },
   clamValueInShellToken,
   pearlValueInShellToken,
   onClickNext,
@@ -69,6 +70,8 @@ export default ({
   const [remainingPearlProductionTime, setRemainingPearlProductionTime] = useState(0);
   const [isTakingSnapshot, setIsTakingSnapshot] = useState(false);
   const remainingFormattedTime = secondsToFormattedTime(remainingPearlProductionTime);
+  const [clamGradeData, setClamGradeData] = useState({});
+  const [roi, setROI] = useState("...");
   useInterval(() => {
     const updatedProducedPearlsYieldTimers = producedPearlsYieldTimers.map((time) => {
       const remainingTime = time - 1000;
@@ -109,13 +112,33 @@ export default ({
 
   useEffect(() => {
     const initClamView = async () => {
-      const [incubationTime, currentBlockTimestamp, pearls, remainingPearlProductionTime] =
+      const [incubationTime, currentBlockTimestamp, pearls, remainingPearlProductionTime, _clamGradeData] =
         await Promise.all([
           getClamIncubationTime(),
           getCurrentBlockTimestamp(),
           getPearlDataByIds(producedPearlIds),
           getRemainingPearlProductionTime(clamId),
+          getClamGradeData(grade),
         ]);
+
+      setClamGradeData({
+        price: _clamGradeData[0],
+        pearlPrice: _clamGradeData[1],
+        minSize: _clamGradeData[2],
+        maxSize: _clamGradeData[3],
+        minLifespan: _clamGradeData[4],
+        maxLifespan: _clamGradeData[5],
+        baseShell: _clamGradeData[6]
+      });
+
+      setROI(
+        formatNumberToLocale(
+          +(((pearlBoost * 1.8 - 1) * +pearlProductionCapacity * +_clamGradeData[1] - +_clamGradeData[0])) /
+          +(+_clamGradeData[0] + +pearlProductionCapacity * +_clamGradeData[1] ) * 100,
+          2
+        )
+      );
+
       if (isFarmView) {
         setRemainingPearlProductionTime(remainingPearlProductionTime);
       }
@@ -201,6 +224,9 @@ export default ({
             <div className="flex justify-between items-center py-2">
               <div className="flex items-center">
                 <div className="badge badge-success mr-2">#{clamId}</div>
+                {grade != "" && (
+                  <div className="badge badge-info mr-2">Grade {grade.toUpperCase()}</div>
+                )}
                 <div className="text-green-400 text-bold">{get(dnaDecoded, "rarity")}</div>
               </div>
               <div className="flex gap-2">
@@ -232,6 +258,12 @@ export default ({
                   }
                 >
                   <CardStat
+                    label="GEM Cost"
+                    value={
+                      gemPrice == "" ? "Unknown" : formatNumberToLocale(gemPrice, 2, true)
+                    }
+                  />
+                  <CardStat
                     label="Pearls remaining / Lifespan"
                     value={
                       (+pearlProductionCapacity - +pearlsProduced).toString() +
@@ -254,26 +286,20 @@ export default ({
                     label={
                       <>
                         Indicative GEM ROI / APR&nbsp;
-                        <button data-tip='<p class="mb-4">Indicative ROI is calculated based on an average Pearl boost of 2x, assuming Pearl production price is fixed at 1/10 Clam price and all Pearls are exchanged for max yield. Your actual ROI will vary.</p><p>Indicative APR represents annualised returns based on the indicative ROI and the average time it would take to farm all Pearls, exchange them for GEM and receive the 30-day stream for max yield.</p>'>
+                        <button data-tip='<p class="mb-4">Indicative ROI is calculated based on an average GEM returns per Pearl without any regard for GEM price fluctuations, and assuming all Pearls are exchanged for max yield. Your actual ROI will vary.</p><p>Indicative APR represents annualised returns based on the indicative ROI and the average time it would take to farm all Pearls, exchange them for GEM and receive the 30-day stream for max yield.</p>'>
                           <FontAwesomeIcon icon={faInfoCircle} />
                         </button>
                       </>
                     }
                     value={
-                      formatNumberToLocale(
-                        (((pearlBoost * 2 - 1) * pearlProductionCapacity - 10) /
-                          (10 + +pearlProductionCapacity)) *
-                          100,
-                        2
-                      ) +
-                      "% / " +
-                      formatNumberToLocale(
-                        (((((pearlBoost * 2 - 1) * pearlProductionCapacity - 10) /
-                          (10 + +pearlProductionCapacity)) *
-                          100) /
-                          ((40 * +pearlProductionCapacity) / 24 + 18 + 30)) *
-                          365,
-                        2
+                      roi + "% / " +
+
+                      (!isNaN(roi) ?
+                        formatNumberToLocale(
+                          +roi / ((32 * +pearlProductionCapacity) / 24 + 18 + 30) * 365,
+                        2)
+                      :
+                        "..."
                       ) +
                       "%"
                     }

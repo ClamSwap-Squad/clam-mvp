@@ -14,6 +14,16 @@ export const getDNADecoded = async (dna) => {
   return traits;
 };
 
+export const getClamGradeData = async (grade) => {
+  try {
+    const clamGradeData = await dnaDecoder.methods.getClamGrade(grade).call();
+    return clamGradeData;
+  } catch (e) {
+    return [];
+  }
+
+}
+
 export const getClamGradesData = async () => {
   const clamGradesData = await dnaDecoder.methods.getClamGradesData().call();
   return clamGradesData;

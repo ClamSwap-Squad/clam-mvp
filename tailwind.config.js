@@ -76,6 +76,10 @@ module.exports = {
         border: "0 0 1px rgba(0, 0, 0, 1)",
         button: "0 2px 3px black",
       },
+      boxShadow: {
+        card: "0 0 10px 6px rgba(25, 140, 229, 0.2)",
+        cardHover: "0 0 10px 10px rgba(25, 140, 229, 0.2)",
+      },
       spacing: {
         "4%": "4%",
       },

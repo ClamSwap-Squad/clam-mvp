@@ -1,5 +1,6 @@
 import clamNFTAbi from "./abi/Clam.json";
 import clamShopAbi from "./abi/ClamShop.json";
+import { getUpdatedPrice } from "./clamShop";
 import { clamNFTAddress, clamShopAddress } from "../constants/constants";
 import { contractFactory } from "./index";
 import { getOracleFee } from "./rng";
@@ -59,7 +60,7 @@ export const getClamByIndex = async (account, index) => {
   return value;
 };
 
-export const buyClam = async (account) => {
+export const buyClam = async (account, grade) => {
   if (!account) {
     throw new Error("There is no account connected!");
   }
@@ -72,7 +73,7 @@ export const buyClam = async (account) => {
   const oracleFee = await getOracleFee();
   const amount = Number(oracleFee);
 
-  const method = clamShop.methods.buyClam();
+  const method = clamShop.methods.buyClam(grade);
 
   const gasEstimation = await method.estimateGas({
     from: account,
@@ -98,7 +99,7 @@ export const buyClam = async (account) => {
     });
 };
 
-export const buyClamWithVestedTokens = async (account) => {
+export const buyClamWithVestedTokens = async (account, grade) => {
   if (!account) {
     throw new Error("There is no account connected!");
   }
@@ -111,7 +112,7 @@ export const buyClamWithVestedTokens = async (account) => {
   const oracleFee = await getOracleFee();
   const amount = Number(oracleFee);
 
-  const method = clamShop.methods.buyClamWithVestedTokens();
+  const method = clamShop.methods.buyClamWithVestedTokens(grade);
 
   const gasEstimation = await method.estimateGas({
     from: account,
@@ -137,7 +138,7 @@ export const buyClamWithVestedTokens = async (account) => {
     });
 };
 
-export const buyClamWithBnb = async (account) => {
+export const buyClamWithBnb = async (account, grade) => {
   if (!account) {
     throw new Error("There is no account connected!");
   }
@@ -147,12 +148,12 @@ export const buyClamWithBnb = async (account) => {
     address: clamShopAddress,
   });
 
-  const price = await getPrice();
+  const price = await getUpdatedPrice(grade);
   const clamPriceBnb = await getClamPriceBnb(price);
   const oracleFee = await getOracleFee();
   const amount = new BigNumber(clamPriceBnb).plus(new BigNumber(oracleFee)).toString();
 
-  const method = clamShop.methods.buyClamWithBnb();
+  const method = clamShop.methods.buyClamWithBnb(grade);
 
   const gasEstimation = await method.estimateGas({
     from: account,
@@ -393,6 +394,8 @@ export const decodeClamDataFromMulticall = (values, tokenIds) => {
             producedPearlIds: "uint256[]",
             gemBoost: "uint256",
             pearlBoostM: "uint256",
+            grade: "string",
+            gemPrice: "uint256"
           },
         },
         values[index]
