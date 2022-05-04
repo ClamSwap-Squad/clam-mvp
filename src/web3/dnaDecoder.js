@@ -15,13 +15,13 @@ export const getDNADecoded = async (dna) => {
 };
 
 export const getClamGradeData = async (grade) => {
-  try {
+  const isClamGradeValid = await dnaDecoder.methods.isClamGradeValid(grade).call();
+  if(isClamGradeValid) {
     const clamGradeData = await dnaDecoder.methods.getClamGrade(grade).call();
     return clamGradeData;
-  } catch (e) {
+  } else {
     return [];
   }
-
 }
 
 export const getClamGradesData = async () => {

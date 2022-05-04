@@ -164,6 +164,11 @@ const ClamBuyModal = ({
   }, []);
 
   useEffect(() => {
+    if(buyWithGem) {
+      setClamPrice(0);
+    } else {
+      setClamPriceBnb(0);
+    }
     if(gradesData[selectedGrade] !== undefined) {
       setSelectedGradeData(gradesData[selectedGrade]);
       setClamUsdPrice(gradesData[selectedGrade].price);
@@ -188,19 +193,26 @@ const ClamBuyModal = ({
       const balanceBN = new BigNumber(parseEther(gemBalance).toString());
       const lockedBN = new BigNumber(lockedGem * 1e18);
       const totalBN = balanceBN.plus(lockedBN);
+      if(clamPrice == 0) {
+        setCanBuy(false);
+      } else {
+        setCanBuy(totalBN.isGreaterThanOrEqualTo(new BigNumber(clamPrice)));
+      }
 
-      setCanBuy(totalBN.isGreaterThanOrEqualTo(new BigNumber(clamPrice)));
     } else {
       const balanceBN = new BigNumber(parseEther(bnbBalance).toString());
-
-      setCanBuy(balanceBN.isGreaterThanOrEqualTo(new BigNumber(clamPriceBnb)));
+      if(clamPriceBnb == 0) {
+        setCanBuy(false);
+      } else {
+        setCanBuy(balanceBN.isGreaterThanOrEqualTo(new BigNumber(clamPriceBnb)));
+      }
     }
 
     //already has rng
     if (!!clamToCollect && clamToCollect != zeroHash) {
       setModalToShow("collect");
     }
-  }, [gemBalance, clamPrice, lockedGem, clamToCollect, buyWithGem]);
+  }, [gemBalance, clamPrice, clamPriceBnb, lockedGem, clamToCollect, buyWithGem]);
 
   const onSubmit = async () => {
     if (new BigNumber(lockedGem).gt(0) && buyWithGem) {

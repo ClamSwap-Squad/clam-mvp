@@ -112,6 +112,7 @@ export default ({
 
   useEffect(() => {
     const initClamView = async () => {
+      setROI("...");
       const [incubationTime, currentBlockTimestamp, pearls, remainingPearlProductionTime, _clamGradeData] =
         await Promise.all([
           getClamIncubationTime(),
@@ -121,23 +122,35 @@ export default ({
           getClamGradeData(grade),
         ]);
 
-      setClamGradeData({
-        price: _clamGradeData[0],
-        pearlPrice: _clamGradeData[1],
-        minSize: _clamGradeData[2],
-        maxSize: _clamGradeData[3],
-        minLifespan: _clamGradeData[4],
-        maxLifespan: _clamGradeData[5],
-        baseShell: _clamGradeData[6]
-      });
+      if(_clamGradeData.length > 0) {
+        setClamGradeData({
+          price: _clamGradeData[0],
+          pearlPrice: _clamGradeData[1],
+          minSize: _clamGradeData[2],
+          maxSize: _clamGradeData[3],
+          minLifespan: _clamGradeData[4],
+          maxLifespan: _clamGradeData[5],
+          baseShell: _clamGradeData[6]
+        });
 
-      setROI(
-        formatNumberToLocale(
-          +(((pearlBoost * 1.8 - 1) * +pearlProductionCapacity * +_clamGradeData[1] - +_clamGradeData[0])) /
-          +(+_clamGradeData[0] + +pearlProductionCapacity * +_clamGradeData[1] ) * 100,
-          2
-        )
-      );
+        setROI(
+          formatNumberToLocale(
+            +(((pearlBoost * 1.8 - 1) * +pearlProductionCapacity * +_clamGradeData[1] - +_clamGradeData[0])) /
+            +(+_clamGradeData[0] + +pearlProductionCapacity * +_clamGradeData[1] ) * 100,
+            2
+          )
+        );
+      } else {
+        setROI(
+          formatNumberToLocale(
+            (((pearlBoost * 2 - 1) * pearlProductionCapacity - 10) /
+              (10 + +pearlProductionCapacity)) *
+              100,
+            2
+          )
+        );
+      }
+
 
       if (isFarmView) {
         setRemainingPearlProductionTime(remainingPearlProductionTime);
@@ -260,7 +273,7 @@ export default ({
                   <CardStat
                     label="GEM Cost"
                     value={
-                      gemPrice == "" ? "Unknown" : formatNumberToLocale(gemPrice, 2, true)
+                      gemPrice == 0 ? "Unknown" : formatNumberToLocale(gemPrice, 2, true)
                     }
                   />
                   <CardStat
