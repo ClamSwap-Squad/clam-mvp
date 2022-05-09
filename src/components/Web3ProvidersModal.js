@@ -27,6 +27,18 @@ const web3Modal = new Web3Modal({
     //     description: "Home-BrowserWallet",
     //   },
     // },
+    "custom-injected": {
+        display: {
+          logo: "https://cdn.bitkeep.vip/u_b_69b66a00-a046-11ec-a3eb-f758fa002ae8.png",
+          name: "BitKeep",
+          description: "Bitkeep Wallet",
+        },
+        package: connectors.injected,
+        connector: async (ProviderPackage: any, options: any) => {
+          const provider = new ProviderPackage(options);
+          return provider;
+        },
+    },
     walletconnect: {
       package: WalletConnectProvider,
       options: {
@@ -70,6 +82,8 @@ const web3Modal = new Web3Modal({
     },
   },
 });
+
+web3Modal.userOptions.unshift(web3Modal.userOptions.splice(2, 1)[0]);
 
 export function useWeb3Modal({
   resetAccount,
