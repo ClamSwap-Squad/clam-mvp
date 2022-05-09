@@ -1,6 +1,7 @@
 import pearlFarmAbi from "./abi/PearlFarm.json";
+import clamShopAbi from "./abi/ClamShop.json";
 import { contractFactory } from "./index";
-import { pearlFarmAddress } from "../constants/constants";
+import { pearlFarmAddress, clamShopAddress } from "../constants/constants";
 import { getAccount } from "./shared";
 import { getOracleFee } from "./rng";
 
@@ -10,8 +11,14 @@ const pearlFarm = () =>
     address: pearlFarmAddress,
   });
 
-export const stakePrice = async () => {
-  return await pearlFarm().methods.getUpdatedPearlPrice().call();
+const clamShop = () =>
+  contractFactory({
+    abi: clamShopAbi,
+    address: clamShopAddress,
+  });
+
+export const stakePrice = async (grade) => {
+  return await clamShop().methods.getUpdatedPearlPrice(grade).call();
 };
 
 export const getStakedClamIds = async (account) => {

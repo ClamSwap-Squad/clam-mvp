@@ -1,7 +1,8 @@
 import clamNFTAbi from "./abi/Clam.json";
 import clamShopAbi from "./abi/ClamShop.json";
+import dnaDecoderAbi from "./abi/DNADecoder.json";
 import { getUpdatedPrice } from "./clamShop";
-import { clamNFTAddress, clamShopAddress } from "../constants/constants";
+import { clamNFTAddress, clamShopAddress, dnaDecoderAddress } from "../constants/constants";
 import { contractFactory } from "./index";
 import { getOracleFee } from "./rng";
 import { getRNGFromHashRequest } from "./rng";
@@ -406,13 +407,21 @@ export const decodeClamDataFromMulticall = (values, tokenIds) => {
   return result;
 };
 
-export const getClamValueInShellToken = async () => {
+export const getClamValueInShellToken = async (grade) => {
   const clamNft = contractFactory({
     abi: clamNFTAbi,
     address: clamNFTAddress,
   });
 
-  return clamNft.methods.clamPriceForShell().call();
+  const dnaDecoder = contractFactory({
+    abi: dnaDecoderAbi,
+    address: dnaDecoderAddress,
+  });
+
+  if(grade) {
+    return await dnaDecoder.methods.getShellForClamGrade(grade).call();
+  }
+    return await clamNft.methods.clamPriceForShell().call();
 };
 
 export const getPearlValueInShellToken = async () => {

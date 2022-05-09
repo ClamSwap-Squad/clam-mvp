@@ -93,6 +93,16 @@ export const decodeGetDnaDecodedFromMulticall = (values, tokenIds) => {
   return result;
 };
 
+export const getPriceForClamGrade = async (grade) => {
+  const result = await dnaDecoder.methods.getPriceForClamGrade(grade).call();
+  return result;
+}
+
+export const getPearlPriceForClamGrade = async (grade) => {
+  const result = await dnaDecoder.methods.getPearlPriceForClamGrade(grade).call();
+  return result;
+}
+
 export default {
   getDNADecoded,
   prepGetDnaDecodedMulticall,

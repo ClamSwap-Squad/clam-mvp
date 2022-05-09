@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { approveContractForMaxUintErc721 } from "../../web3/bep20";
 import { getAllowance, infiniteApproveSpending, getBalance } from "../../web3/gem";
 import { exchangeClam, clamBonusData } from "../../web3/clamExchange";
+import { getPriceForClamGrade, getPearlPriceForClamGrade } from "../../web3/dnaDecoder"
 import { clamExchangeAddress, clamNFTAddress, pearlFarmAddress } from "../../constants/constants";
 import ReactTooltip from "react-tooltip";
 import {
@@ -49,6 +50,8 @@ export const ClamItem = ({
 
   const [isClamDeposited, setIsClamDeposited] = useState(false);
 
+  const [pearlPrice, setPearlPrice] = useState(0);
+
   useEffect(() => {
     const init = async () => {
       try {
@@ -64,6 +67,12 @@ export const ClamItem = ({
             setInsufficientGem(true);
           }
         }
+        if(clamDataValues.gemPrice) {
+          const pearlPriceUSD = await getPearlPriceForClamGrade(clamDataValues.grade);
+          const clamPriceUSD = await getPriceForClamGrade(clamDataValues.grade);
+          setPearlPrice(formatNumberToLocale(+clamDataValues.gemPrice * +pearlPriceUSD / +clamPriceUSD, 2, true));
+        }
+
       } catch (err) {
         updateAccount({ error: err.message });
       }
@@ -155,6 +164,9 @@ export const ClamItem = ({
 
         <div className="flex justify-between px-4 py-2">
           <div className=" badge badge-success">#{tokenId}</div>
+          { clamDataValues.grade && (
+            <div className=" badge badge-info">Grade {clamDataValues.grade.toUpperCase()}</div>
+          )}
           <div className="text-green-400 text-bold">{dnaDecoded.rarity}</div>
         </div>
 
@@ -165,7 +177,13 @@ export const ClamItem = ({
                 <div className="bg-gray-50 flex flex-row justify-between sm:gap-4 p-2">
                   <dt className="text-sm font-medium text-gray-500">Pearl ETA</dt>
                   <dd className="mt-1 text-sm text-gray-900 sm:mt-0">
-                    {secondsToFormattedTime(remainingTime)}
+                    {remainingTime > 0 ? secondsToFormattedTime(remainingTime) : "Unknown"}
+                  </dd>
+                </div>
+                <div className="bg-gray-50 flex flex-row justify-between sm:gap-4 p-2">
+                  <dt className="text-sm font-medium text-gray-500">Pearl Cost</dt>
+                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0">
+                    {pearlPrice > 0 ? pearlPrice + " GEM" : "Unknown"}
                   </dd>
                 </div>
                 <div className="bg-gray-100 flex flex-row justify-between sm:gap-4 p-2">
