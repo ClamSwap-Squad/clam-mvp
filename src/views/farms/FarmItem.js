@@ -22,6 +22,8 @@ import { canCurrentlyProducePearl, canStillProducePearls } from "web3/clam";
 import { tokenOfOwnerByIndex, accountPearlBalance } from "web3/pearl";
 import { formatFromWei, getOwnedPearls } from "web3/shared";
 import { pearlFarmAddress, zeroHash } from "constants/constants";
+import { getPriceForClamGrade, getPearlPriceForClamGrade } from "web3/dnaDecoder";
+import { getUpdatedPrice } from "web3/clamShop";
 
 import {
   pearlCollectSuccess,
@@ -35,6 +37,8 @@ import {
 import ActionButton from "views/bank/utils/ActionButton";
 import BigNumber from "bignumber.js";
 import { renderNumber } from "utils/number";
+
+BigNumber.config({ ROUNDING_MODE: BigNumber.ROUND_FLOOR });
 
 const FarmItem = ({
   clamId,
@@ -100,11 +104,21 @@ const FarmItem = ({
         const canStillProduce = await canStillProducePearls(clamId);
         setCanStillProducePearl(canStillProduce);
 
-        const pPrice = await stakePrice(); // price as string
-        setPearlPrice(pPrice);
+        if(parseFloat(clamDataValues.gemPrice)) {
+          console.log(clamDataValues);
+          const pearlPriceUSD = await getPearlPriceForClamGrade(clamDataValues.grade);
+          const clamPriceUSD = await getPriceForClamGrade(clamDataValues.grade);
+          const clamPriceAsBigNumber = new BigNumber(clamDataValues.gemPrice);
+          setPearlPrice(clamPriceAsBigNumber.times(+pearlPriceUSD).div(+clamPriceUSD).dp(0));
+        } else {
+          const updatedClamPrice = await getUpdatedPrice("d");
+          const clamPriceAsBigNumber = new BigNumber(updatedClamPrice);
+          console.log(updatedClamPrice);
+          setPearlPrice(clamPriceAsBigNumber.div(10).dp(0));
+        }
 
         // set up for GEM approval comparison check
-        const pPriceAsBigNumber = new BigNumber(pPrice);
+        const pPriceAsBigNumber = new BigNumber(pearlPrice.toString());
         const gemAllowance = await getAllowance(address, pearlFarmAddress).then(
           (v) => new BigNumber(v)
         );
@@ -174,7 +188,7 @@ const FarmItem = ({
       pearlGemPrompt(
         {
           updateCharacter,
-          pearlPrice: renderNumber(+formatFromWei(pearlPrice), 3),
+          pearlPrice: renderNumber(+formatFromWei(pearlPrice.toString()), 3),
           gems: isLegacyPearl ? renderNumber(+formatFromWei(gems), 3) : "",
         },
         async () => {

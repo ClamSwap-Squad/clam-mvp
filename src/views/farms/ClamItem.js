@@ -67,7 +67,7 @@ export const ClamItem = ({
             setInsufficientGem(true);
           }
         }
-        if(clamDataValues.gemPrice) {
+        if(parseFloat(clamDataValues.gemPrice)) {
           const pearlPriceUSD = await getPearlPriceForClamGrade(clamDataValues.grade);
           const clamPriceUSD = await getPriceForClamGrade(clamDataValues.grade);
           setPearlPrice(formatNumberToLocale(+clamDataValues.gemPrice * +pearlPriceUSD / +clamPriceUSD, 2, true));
@@ -177,13 +177,25 @@ export const ClamItem = ({
                 <div className="bg-gray-50 flex flex-row justify-between sm:gap-4 p-2">
                   <dt className="text-sm font-medium text-gray-500">Pearl ETA</dt>
                   <dd className="mt-1 text-sm text-gray-900 sm:mt-0">
-                    {remainingTime > 0 ? secondsToFormattedTime(remainingTime) : "Unknown"}
+                    {(remainingTime > 0 ?
+                      secondsToFormattedTime(remainingTime) :
+                      (<span>
+                        Unknown&nbsp;
+                        <button type="button" data-tip="Next Pearl ETA not known until after a Clam is deposited in the Farm for the first time">
+                          <FontAwesomeIcon icon={faInfoCircle} />
+                        </button>
+                      </span>))}
                   </dd>
                 </div>
                 <div className="bg-gray-50 flex flex-row justify-between sm:gap-4 p-2">
                   <dt className="text-sm font-medium text-gray-500">Pearl Cost</dt>
                   <dd className="mt-1 text-sm text-gray-900 sm:mt-0">
-                    {pearlPrice > 0 ? pearlPrice + " GEM" : "Unknown"}
+                    {pearlPrice > 0 ? pearlPrice + " GEM" : (<span>
+                      Unknown&nbsp;
+                      <button type="button" data-tip="This is an older generation Clam with production price in GEM determined at the time of collecting a produced Pearl">
+                        <FontAwesomeIcon icon={faInfoCircle} />
+                      </button>
+                    </span>)}
                   </dd>
                 </div>
                 <div className="bg-gray-100 flex flex-row justify-between sm:gap-4 p-2">
@@ -197,7 +209,7 @@ export const ClamItem = ({
                 <div className="bg-gray-50 flex flex-row justify-between sm:gap-4 p-2">
                   <dt className="text-sm font-medium text-gray-500">
                     Clam boost&nbsp;
-                    <button data-tip="Applied as a boost multiplier when calculating the GEM yield for each Pearl produced by this Clam.">
+                    <button type="button" data-tip="Applied as a boost multiplier when calculating the GEM yield for each Pearl produced by this Clam.">
                       <FontAwesomeIcon icon={faInfoCircle} />
                     </button>
                   </dt>
