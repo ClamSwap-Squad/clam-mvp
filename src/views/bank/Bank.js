@@ -24,6 +24,7 @@ import BigNumber from "bignumber.js";
 import { renderUsd } from "utils/number";
 
 import BottomMenu from './BottomMenu';
+import Exchange from "./Exchange";
 
 const Bank = ({
   account: { address, isBSChain, isWeb3Installed, isConnected },
@@ -157,6 +158,27 @@ const Bank = ({
               </>
             )
           }
+          
+          {
+            mTitle == "Exchange" ? (
+              <>
+                <div className="w-full lg:w-7/10 mx-auto relative z-10 mt-24 px-2 mb-6 md:px-4%">
+                  <div className="flex justify-center">
+                    <PageTitle title={mTitle} />
+                  </div>
+      
+                  <div className="mt-1">
+                    <Exchange />
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+              
+              </>
+            )
+          }
+
           <div className="mt-24">
 
           </div>
