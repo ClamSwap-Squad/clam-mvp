@@ -38,7 +38,7 @@ const Bank = ({
   const [totalTVL, setTotalTVL] = useState(0);
   const { isShowing, toggleModal } = useModal();
 
-  const [mTitle, setMTitle] = useState('Yield Pools');
+  const [mTitle, setMTitle] = useState('Exchange');
 
   const isNativeStaker =
     pools.length && pools.some((p) => p.isNative && +p.userDepositAmountInPool > 0);
@@ -168,7 +168,7 @@ const Bank = ({
                   </div>
       
                   <div className="mt-1">
-                    <Exchange />
+                    <Exchange address={address} />
                   </div>
                 </div>
               </>
