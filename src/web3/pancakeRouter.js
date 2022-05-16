@@ -33,6 +33,15 @@ export const getUsdValueOfPair = async (lpToken) => {
   return p0.plus(p1).toString();
 };
 
+export const getQuote = async (amountA, reserveA, reserveB) => {
+  console.log('getQuote', parseEther(amountA), reserveA, reserveB);
+  if( amountA > 0 && reserveA && reserveB ) {
+    const amountB = await router().methods.quote(parseEther(amountA), reserveA, reserveB).call();
+    return formatEther(amountB);
+  }
+  return 0;
+};
+
 export const getUsdPriceOfToken = async (tokenAddress, baseCurrency = "BNB") => {
   const base = getBaseCurrency(baseCurrency);
   const path = tokenAddress === base ? [tokenAddress, BUSD] : [tokenAddress, base, BUSD];

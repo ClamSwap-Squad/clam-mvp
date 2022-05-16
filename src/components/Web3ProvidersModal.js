@@ -276,7 +276,7 @@ const Web3ProvidersModal = ({
   .map(({ title, icon, url }) => ({ title, icon, url }))
   .value();
 
-  console.log("NAV_ROUTES1", NAV_ROUTES);
+  // console.log("NAV_ROUTES1", NAV_ROUTES);
 
   const { onConnect, onDisconnect } = useWeb3Modal({
     resetAccount,
@@ -288,7 +288,7 @@ const Web3ProvidersModal = ({
   const [mStatus, setMStatus] = useState(false);
 
   useAsync(async () => {
-    console.log("on init check for web3");
+    // console.log("on init check for web3");
     // only auto connect if web3modal has been selected and wallet is unlocked
     if (window.ethereum.selectedAddress && web3Modal.cachedProvider) {
       onConnect();

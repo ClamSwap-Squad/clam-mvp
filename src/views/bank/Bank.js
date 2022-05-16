@@ -24,7 +24,7 @@ import BigNumber from "bignumber.js";
 import { renderUsd } from "utils/number";
 
 import BottomMenu from './BottomMenu';
-import Exchange from "./Exchange";
+import { ExchangeToken } from "./ExchangeToken";
 
 const Bank = ({
   account: { address, isBSChain, isWeb3Installed, isConnected },
@@ -37,7 +37,7 @@ const Bank = ({
   );
   const [totalTVL, setTotalTVL] = useState(0);
   const { isShowing, toggleModal } = useModal();
-
+  
   const [mTitle, setMTitle] = useState('Exchange');
 
   const isNativeStaker =
@@ -162,15 +162,15 @@ const Bank = ({
           {
             mTitle == "Exchange" ? (
               <>
-                <div className="w-full lg:w-7/10 mx-auto relative z-10 mt-24 px-2 mb-6 md:px-4%">
+                <div className="w-full  lg:w-7/10 mx-auto relative z-10 mt-24 px-2 mb-6 md:px-4%">
                   <div className="flex justify-center">
                     <PageTitle title={mTitle} />
                   </div>
       
                   <div className="mt-1">
-                    <Exchange address={address} />
+                    <ExchangeToken address={address}/>
                   </div>
-                </div>
+                </div>                
               </>
             ) : (
               <>
