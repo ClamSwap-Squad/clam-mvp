@@ -4,6 +4,10 @@ import { pancakeRouterAddress, wBNB, BUSD } from "../constants/constants";
 import { contractFactory } from "./index";
 import { getLPTokens, getReserves } from "./pancakePair";
 import BigNumber from "bignumber.js";
+import { getAccount, MaxUint256 } from "./shared";
+
+
+import { ChainId, Token, TokenAmount, Pair, TradeType, Route, Percent, Trade } from '@pancakeswap/sdk'
 
 const router = () =>
   contractFactory({
@@ -34,7 +38,6 @@ export const getUsdValueOfPair = async (lpToken) => {
 };
 
 export const getQuote = async (amountA, reserveA, reserveB) => {
-  console.log('getQuote', parseEther(amountA), reserveA, reserveB);
   if( amountA > 0 && reserveA && reserveB ) {
     const amountB = await router().methods.quote(parseEther(amountA), reserveA, reserveB).call();
     return formatEther(amountB);
@@ -50,6 +53,54 @@ export const getUsdPriceOfToken = async (tokenAddress, baseCurrency = "BNB") => 
 
   return formatEther(price);
 };
+
+export const swap = async (iToken, oToken, iAmount, oAmount ) => {
+  console.log("swap", iToken, oToken, iAmount);
+  const account = getAccount();
+
+  const path = [iToken.address, oToken.address]
+  const deadline = Math.floor(Date.now() / 1000) + 60 * 20 // 20 minutes from the current Unix time
+
+  if(iToken.address == wBNB) {
+    console.log("swapExactETHForTokens");
+    await router().methods
+      .swapExactETHForTokens( parseEther(oAmount), path, account, deadline )
+      .send({
+        from: account,
+        value: parseEther(iAmount) 
+      }).then( async (receipt) => {
+        return "Success";
+
+      }).catch((err) => {
+        return "false";
+      });
+  }
+  else if (oToken.address == wBNB) {
+    console.log("swapExactTokensForETH");
+    await router().methods
+      .swapExactTokensForETH( parseEther(iAmount), parseEther(oAmount), path, account, deadline )
+      .send({
+        from: account
+      }).then( async (receipt) => {
+        return "Success";
+
+      }).catch((err) => {
+        return "false";
+      });
+  } else {
+    console.log("swapExactTokensForTokens");
+    await router().methods
+      .swapExactTokensForTokens( parseEther(iAmount), parseEther(oAmount), path, account, deadline )
+      .send({
+        from: account
+      }).then( async (receipt) => {
+        return "Success";
+
+      }).catch((err) => {
+        return "false";
+      });
+  }
+}
 
 const getAmountsOut = async (amount, path) => {
   return await router().methods.getAmountsOut(amount, path).call();
