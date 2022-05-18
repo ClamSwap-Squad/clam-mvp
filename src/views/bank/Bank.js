@@ -24,7 +24,7 @@ import BigNumber from "bignumber.js";
 import { renderUsd } from "utils/number";
 
 import BottomMenu from './BottomMenu';
-import { ExchangeToken } from "./ExchangeToken";
+import ExchangeToken from "./ExchangeToken";
 
 const Bank = ({
   account: { address, isBSChain, isWeb3Installed, isConnected },
@@ -168,7 +168,7 @@ const Bank = ({
                   </div>
       
                   <div className="mt-1">
-                    <ExchangeToken address={address}/>
+                    <ExchangeToken address={address} />
                   </div>
                 </div>                
               </>

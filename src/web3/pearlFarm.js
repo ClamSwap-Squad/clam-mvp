@@ -28,7 +28,7 @@ export const stakeClam = async (clamId) => {
   const method = pearlFarm().methods.stakeClam(clamId);
   const gasEstimation = await method.estimateGas({ from: account });
 
-  await method.send({ from: account, gas: Math.floor(gasEstimation*1.2) });
+  await method.send({ from: account, gas: Math.floor( gasEstimation * 1.2 ) });
 };
 
 export const stakeClamAgain = async (clamId) => {

@@ -6,7 +6,8 @@ import { faExchangeAlt } from "@fortawesome/free-solid-svg-icons";
 import { Modal, useModal } from "components/Modal";
 
 import { Onramper } from "./Onramper";
-import { Exchange } from "./exchange-tab";
+
+import Exchange from "./exchange-tab";
 import "./tokenExchange.css";
 
 const TABS = {

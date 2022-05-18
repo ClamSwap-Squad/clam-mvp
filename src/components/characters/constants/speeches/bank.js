@@ -127,6 +127,18 @@ export const BANK_SPEECH = {
       dismiss: true,
       skip: false,
     },
+    swap_success: {
+      text: "Your swap successed.",
+      next: false,
+      dismiss: true,
+      skip: false,
+    },
+    swap_error: {
+      text: "Your swap failed.",
+      next: false,
+      dismiss: true,
+      skip: false,
+    },
   },
 };
 

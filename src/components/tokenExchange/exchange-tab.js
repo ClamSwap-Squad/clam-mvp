@@ -1,4 +1,6 @@
 import React, {useState, useEffect} from "react";
+import { connect } from "redux-zero/react";
+import { actions } from "store/redux";
 import { formatEther, parseEther } from "@ethersproject/units";
 import Web3 from 'web3';
 
@@ -10,9 +12,11 @@ import {
     BUSD,
     pancakeRouterAddress
 } from "constants/constants";
-import { getQuote, swap } from "web3/pancakeRouter";
+import { getQuote, swap, getAmountsOutn } from "web3/pancakeRouter";
 
-export const Exchange = ({address}) => {
+import { onSwapTxn, onSwapSuccess, onSwapError } from './../../views/bank/character/Exchange';
+
+const Exchange = ({address, updateCharacter, updateAccount}) => {
 
     const [isTokenSelectShowing, toggleTokenSelectModal] = useState(false);
     const [selectToken, setSelectToken] = useState("input");
@@ -21,6 +25,8 @@ export const Exchange = ({address}) => {
     const [iTokenBalance, setITokenBalance] = useState(0);
     const [oTokenBalance, setOTokenBalance] = useState(0);
     const [allowanceAmount, setAllowanceAmount] = useState(0);
+
+    const [isLoading, setLoading] = useState(false);
 
     let logoURI = "";
 
@@ -67,7 +73,7 @@ export const Exchange = ({address}) => {
 
     useEffect(async () => {
         if( iAmount && iToken && oToken ) {
-            const _oAmount = await getQuote(iAmount, iToken.address, oToken.address);
+            const _oAmount = await getAmountsOutn(iAmount, iToken.address, oToken.address);
             setOAmount(_oAmount);
         }
     }, [iAmount, iToken, oToken])
@@ -76,7 +82,7 @@ export const Exchange = ({address}) => {
         // Get Out Amount in every 3 seconds.
         setInterval(async () => {
             if( iAmount && iToken && oToken ) {
-                const _oAmount = await getQuote(iAmount, iToken.address, oToken.address);
+                const _oAmount = await getAmountsOutn(iAmount, iToken.address, oToken.address);
                 setOAmount(_oAmount);
             }
         }, 3000)
@@ -104,14 +110,7 @@ export const Exchange = ({address}) => {
             logoURI: `${process.env.PUBLIC_URL}/favicon/android-chrome-192x192.png`,
             name: "SHELL",
             symbol: "SHELL",
-        },
-        {
-            address: BUSD,
-            decimals: 18,
-            logoURI: "https://pancake.kiemtienonline360.com/images/coins/0x78867bbeef44f2326bf8ddd1941a4439382ef2a7.png",
-            name: "BUSD",
-            symbol: "BUSD",
-        },
+        }
     ];
 
   
@@ -144,12 +143,23 @@ export const Exchange = ({address}) => {
 
     const getAllowanceAmount = async (_tokenAddr) => {
         const _amount = await allowance(iToken.address, address, pancakeRouterAddress);
-        console.log("allowance amount", _amount);
         return _amount;
     }
 
     const exchange = async () => {
-        await swap(iToken, oToken, iAmount, oAmount);
+        setLoading(true);
+
+        console.log('updateCharacter', updateCharacter);
+        onSwapTxn(updateCharacter);
+        try {
+            await swap(iToken, oToken, iAmount, oAmount);
+            onSwapSuccess(updateCharacter);
+        } catch (error) {
+            updateAccount({ error: error.message });
+            onSwapError(updateCharacter);
+        }
+
+        setLoading(false);
     }
 
     const approve_token = async () => {
@@ -235,7 +245,7 @@ export const Exchange = ({address}) => {
                                 type='text' 
                                 className='h-8 bg-transparent px-3 outline-0' 
                                 style={{outline: "none"}} 
-                                value={ oAmount > 0 ? parseFloat(oAmount).toFixed(5) : 0 }
+                                value={ oAmount > 0 ? parseFloat(oAmount) : 0 }
                                 onChange={(e) => setOAmount(e.target.value)}
                             />
                             <button 
@@ -261,9 +271,12 @@ export const Exchange = ({address}) => {
                             <button 
                                 className='btn btn-primary w-full mt-2' 
                                 onClick={exchange}
+                                disabled={isLoading || !address}
                             >
-                                Exchange
-                            </button>
+                                {
+                                    isLoading ? "Loading..." : "Exchange"
+                                }
+                            </button>   
                         </>
                     ) : (
                         <>
@@ -285,14 +298,14 @@ export const Exchange = ({address}) => {
                         <p>Select a token</p>
                         <span className="text-2xl font-black" onClick={() => toggleTokenSelectModal(false)}>&times;</span>
                     </div>
-                    <div className='mt-4'>
+                    {/* <div className='mt-4'>
                         <input 
                             type='text' 
                             className='w-full h-12 rounded-xl outline-0 text-sm border p-3 border-black' 
                             placeholder='Search name or paste address' 
                             style={{outline: "none"}} 
                         />
-                    </div>
+                    </div> */}
                     <div className='mt-4'>
 
                         { tokenlist && tokenlist.map((row, i) => (
@@ -309,3 +322,6 @@ export const Exchange = ({address}) => {
         </>
     )
 };
+
+const mapToProps = (state) => state;
+export default connect(mapToProps, actions)(Exchange);

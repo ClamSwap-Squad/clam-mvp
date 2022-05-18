@@ -1,17 +1,21 @@
 import React, {useState, useEffect} from "react";
+import { connect } from "redux-zero/react";
+import { actions } from "store/redux";
+
+
 import { Modal, useModal } from "components/Modal";
 import { Onramper } from "components/tokenExchange/Onramper";
-import { Exchange } from "components/tokenExchange/exchange-tab";
+import Exchange from "components/tokenExchange/exchange-tab";
 import cn from "classnames";
 
 
-const TABS = {
-  buy: "buy",
-  exchange: "exchange",
-};
+const ExchangeToken = ({address, updateCharacter}) => {
 
-export const ExchangeToken = ({address}) => {
-
+  const TABS = {
+    buy: "buy",
+    exchange: "exchange",
+  };
+  
   const [selectedTab, setSelectedTab] = useState(TABS.buy);
   const isBuy = selectedTab === TABS.buy;
   const isExchange = selectedTab === TABS.exchange;
@@ -54,5 +58,8 @@ export const ExchangeToken = ({address}) => {
         </div>
       </div>
     </>
-  )
+  );
 };
+
+const mapToProps = (state) => state;
+export default connect(mapToProps, actions)(ExchangeToken);
