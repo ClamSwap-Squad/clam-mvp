@@ -192,11 +192,13 @@ const ClamBuyModal = ({
     if (buyWithGem) {
       const balanceBN = new BigNumber(parseEther(gemBalance).toString());
       const lockedBN = new BigNumber(lockedGem * 1e18);
-      const totalBN = balanceBN.plus(lockedBN);
+      const clamPriceBN = new BigNumber(clamPrice);
+      const usableLockedBN = lockedBN.isGreaterThanOrEqualTo(clamPriceBN.div(2)) ? clamPriceBN.div(2) : lockedBN;
+      const totalBN = balanceBN.plus(usableLockedBN);
       if(clamPrice == 0) {
         setCanBuy(false);
       } else {
-        setCanBuy(totalBN.isGreaterThanOrEqualTo(new BigNumber(clamPrice)));
+        setCanBuy(totalBN.isGreaterThanOrEqualTo(clamPriceBN));
       }
 
     } else {

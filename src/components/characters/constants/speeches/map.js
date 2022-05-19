@@ -16,7 +16,7 @@ export const MAP_SPEECH = {
       hideable: false,
     },
     step3: {
-      text: "Ok, feel free to explore by yourself in that case. I recommend that you start with getting some $GEM, the Clam Island currency, from the Bank. If you have any questions, Janet in the Infocenter will be able to help you out.",
+      text: "Ok, feel free to explore by yourself in that case. I recommend that you start with getting some GEM, the Clam Island currency, from the Bank. If you have any questions, Janet in the Infocenter will be able to help you out.",
       skip: false,
       hideable: false,
     },
@@ -36,12 +36,12 @@ export const MAP_SPEECH = {
       hideable: false,
     },
     step7: {
-      text: "This is the Clam Island Bank. This is where you can buy the local currency, $GEM, or the governance token, $SHELL.",
+      text: "This is the Clam Island Bank. This is where you can buy the local currency, GEM, or the governance token, SHELL.",
       skip: false,
       hideable: false,
     },
     step8: {
-      text: "You can also invest funds into a range of investment pools, and some of them will not require any $GEM or $SHELL. Tanja, our resident banker, will guide you through the process.",
+      text: "You can also invest funds into a range of investment pools, and some of them will not require any GEM or SHELL. Tanja, our resident banker, will guide you through the process.",
       skip: false,
       hideable: false,
     },
@@ -66,7 +66,7 @@ export const MAP_SPEECH = {
       hideable: false,
     },
     step13: {
-      text: "You can also ask Diego to harvest a live Clam bought more than 48 hours ago for $SHELL tokens. This process will destroy your Clam though, so choose wisely!",
+      text: "You can also ask Diego to harvest a live Clam bought more than 48 hours ago for SHELL tokens. This process will destroy your Clam though, so choose wisely!",
       skip: false,
       hideable: false,
     },
@@ -76,7 +76,7 @@ export const MAP_SPEECH = {
       hideable: false,
     },
     step15: {
-      text: "You will also soon be able to inspect any Clam or Pearl on Clam Island from within the comfort of the Saferoom - this feature is currently under construction.",
+      text: "You can also inspect any Clam or Pearl belonging to anyone else on Clam Island from within the comfort of the Saferoom.",
       skip: false,
       hideable: false,
     },
@@ -91,17 +91,17 @@ export const MAP_SPEECH = {
       hideable: false,
     },
     step18: {
-      text: "Pearls can be used to boost your investment returns in the Bank, or they can simply be collected and traded.",
+      text: "Pearls can be redeemed for yield in the Bank, or they can simply be collected and traded.",
       skip: false,
       hideable: false,
     },
     step19: {
-      text: "Clams can also boost your investment returns in the Bank. If you want to dive in to the details, you can find out more on our Medium page.",
+      text: "If you want to dive in to the details, you can find out more on our Medium page.",
       skip: false,
       hideable: false,
     },
     step20: {
-      text: "I hope you enjoyed the tour! If you want to start exploring for yourself, I recommend that you start with the Bank and get some $GEM to spend at the Shop.",
+      text: "I hope you enjoyed the tour! If you want to start exploring for yourself, I recommend that you start with the Bank and get some GEM to spend at the Shop.",
       skip: false,
       hideable: false,
     },

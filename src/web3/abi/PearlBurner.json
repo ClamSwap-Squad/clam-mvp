@@ -259,6 +259,11 @@
 				"internalType": "bool",
 				"name": "_forfeitPearl",
 				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "_maxYield",
+				"type": "bool"
 			}
 		],
 		"name": "burnPearl",

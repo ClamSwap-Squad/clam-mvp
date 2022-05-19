@@ -63,18 +63,18 @@ const PearlInfo = ({
         updateCharacter,
         maxBoostIn ? bonusRewardHalf : bonusRewardFormatted,
         maxBoostIn ? bonusRewardQuarter : bonusRewardHalf,
-        async () => await executeBurnPearl(false),
-        async () => await executeBurnPearl(true)
+        async () => await executeBurnPearl(false, maxBoostIn ? false : true),
+        async () => await executeBurnPearl(true, maxBoostIn ? false : true)
       );
     });
   };
 
-  const executeBurnPearl = async (forfeit) => {
+  const executeBurnPearl = async (forfeit, maxYield) => {
     try {
       setInTx(true);
       onDepositHarvestTxn(updateCharacter);
 
-      await burnPearl(pearl.pearlId, forfeit);
+      await burnPearl(pearl.pearlId, forfeit, maxYield);
 
       //toast.success("Your pearl has been burned!");
       onBurnPearlSuccess(
