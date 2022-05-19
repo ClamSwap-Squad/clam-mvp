@@ -818,6 +818,19 @@
 	{
 		"inputs": [
 			{
+				"internalType": "address",
+				"name": "_gemToken",
+				"type": "address"
+			}
+		],
+		"name": "setGemToken",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "uint256",
 				"name": "_maxBurn",
 				"type": "uint256"
