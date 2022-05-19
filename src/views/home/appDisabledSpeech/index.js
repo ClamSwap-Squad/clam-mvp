@@ -12,7 +12,7 @@ const AppDisabledSpeech = ({ updateCharacter }) => {
         text: "More Info",
         alt: {
           action: "url",
-          destination: "https://clamisland.medium.com/arcidae-update-the-details-5d030683072f",
+          destination: "https://clamisland.medium.com/clam-island-bivalvia-update-d34839c679a4",
         },
       },
     });
