@@ -41,6 +41,11 @@ export const approve = async (address, spender, amount) => {
   });
 }
 
+export const getTokenInfo = async (address) => {
+  const token = contractFactory({ abi: BEP20ABI, address });
+  console.log('web3 bep20 token', token);
+}
+
 export const approveContractForMaxUintErc721 = async (tokenAddress, contractAddress) => {
   const account = getAccount();
   const token = contractFactory({ abi: ERC721ABI, address: tokenAddress });

@@ -10,13 +10,17 @@ import {
     shellTokenAddress,
     wBNB,
     BUSD,
-    pancakeRouterAddress
+    pancakeRouterAddress,
+    tokens,
+    serializeTokens
 } from "constants/constants";
 import { getQuote, swap, getAmountsOutn } from "web3/pancakeRouter";
 
 import { onSwapTxn, onSwapSuccess, onSwapError } from './../../views/bank/character/Exchange';
 
-const Exchange = ({address, updateCharacter, updateAccount}) => {
+let logoURI = "";
+
+const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }, updateCharacter, updateAccount}) => {
 
     const [isTokenSelectShowing, toggleTokenSelectModal] = useState(false);
     const [selectToken, setSelectToken] = useState("input");
@@ -25,34 +29,26 @@ const Exchange = ({address, updateCharacter, updateAccount}) => {
     const [iTokenBalance, setITokenBalance] = useState(0);
     const [oTokenBalance, setOTokenBalance] = useState(0);
     const [allowanceAmount, setAllowanceAmount] = useState(0);
+    const [tokenSearch, setTokenSearch] = useState("");
 
     const [isLoading, setLoading] = useState(false);
 
-    let logoURI = "";
 
+    if(process.env.NODE_ENV === "development") {
+        logoURI = "https://pancake.kiemtienonline360.com/images/coins/";
+    } else {
+        logoURI = "https://pancakeswap.finance/images/tokens/";
+    }
+    
     useEffect(() => {
-        if(process.env.NODE_ENV === "development") {
-            logoURI = "https://pancake.kiemtienonline360.com/images/coins/";
-        } else {
-            logoURI = "https://pancakeswap.finance/images/tokens/";
-        }
+        
+        console.log("exchange-tab tokens", tokens.wbnb);
+        console.log("exchange-tab logoURI", logoURI);
     }, [])
 
-    const [iToken, setIToken] = useState({
-        address: wBNB,
-        decimals: 18,
-        logoURI: `https://pancake.kiemtienonline360.com/images/coins/0xae13d989dac2f0debff460ac112a837c89baa7cd.png`,
-        name: "BNB",
-        symbol: "BNB",
-    });
+    const [iToken, setIToken] = useState(serializeTokens[0]);
 
-    const [oToken, setOToken] = useState({
-        address: gemTokenAddress,
-        decimals: 18,
-        logoURI: `${process.env.PUBLIC_URL}/favicon/android-chrome-192x192.png`,
-        name: "GEM",
-        symbol: "GEM",
-    });
+    const [oToken, setOToken] = useState(serializeTokens[1]);
 
     useEffect(async () => {
         if(iToken && address) {
@@ -88,31 +84,11 @@ const Exchange = ({address, updateCharacter, updateAccount}) => {
         }, 3000)
     }, [])
 
-
-    const tokenlist = [
-        {
-            address: wBNB,
-            decimals: 18,
-            logoURI: "https://pancake.kiemtienonline360.com/images/coins/0xae13d989dac2f0debff460ac112a837c89baa7cd.png",
-            name: "BNB",
-            symbol: "BNB",
-        },
-        {
-            address: gemTokenAddress,
-            decimals: 18,
-            logoURI: `${process.env.PUBLIC_URL}/favicon/android-chrome-192x192.png`,
-            name: "GEM",
-            symbol: "GEM",
-        },
-        {
-            address: shellTokenAddress,
-            decimals: 18,
-            logoURI: `${process.env.PUBLIC_URL}/favicon/android-chrome-192x192.png`,
-            name: "SHELL",
-            symbol: "SHELL",
-        }
-    ];
-
+    useEffect(() => {
+        // Check ethereum address
+        
+        // web3.utils.isAddress(address)
+    }, [tokenSearch])
   
     const setTokenData = async (row) => {
         if(selectToken == "input") {
@@ -298,24 +274,51 @@ const Exchange = ({address, updateCharacter, updateAccount}) => {
                         <p>Select a token</p>
                         <span className="text-2xl font-black" onClick={() => toggleTokenSelectModal(false)}>&times;</span>
                     </div>
-                    {/* <div className='mt-4'>
+                    <div className='mt-4'>
                         <input 
                             type='text' 
                             className='w-full h-12 rounded-xl outline-0 text-sm border p-3 border-black' 
-                            placeholder='Search name or paste address' 
+                            placeholder='Search name or paste address'
                             style={{outline: "none"}} 
+                            value={tokenSearch}
+                            onChange={(e) => setTokenSearch(e.target.value)}
                         />
-                    </div> */}
+                    </div>
                     <div className='mt-4'>
+                        
+                        { serializeTokens && serializeTokens.map((row, i) => {
+                            if(tokenSearch) {
+                                if( row.address.toLowerCase() == tokenSearch.toLowerCase() || row.symbol.toLowerCase().indexOf(tokenSearch.toLowerCase()) >= 0 ) { }
+                                else return ;
+                            }
 
-                        { tokenlist && tokenlist.map((row, i) => (
-                            <div className='mt-4 flex gap-2 items-center' key={i} onClick={() => setTokenData(row)}>
-                                <img className="h-8" alt={row.symbol} src={row.logoURI} /> 
-                                <div>
-                                    <p className='text-md'>{row.symbol}</p>
+                            return (
+                                <div className='mt-4 flex gap-2 items-center' key={i} onClick={() => setTokenData(row)}>
+                                    <img className="h-8" alt={row.symbol} src={row.logoURI} /> 
+                                    <div>
+                                        <p className='text-md'>{row.symbol}</p>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            )
+                        })}
+                        
+                        { tokens && tokens.map((row, i) => {
+                            if(i>3) return ;
+                            if(tokenSearch) {
+                                if( row.address.toLowerCase() == tokenSearch.toLowerCase() || row.symbol.toLowerCase().indexOf(tokenSearch.toLowerCase()) >= 0 ) { }
+                                else return ;
+                            }
+                            row.logoURI = logoURI + row.address.toLowerCase() + ".png";
+                            return (
+                                <div className='mt-4 flex gap-2 items-center' key={i} onClick={() => setTokenData(row)}>
+                                    <img className="h-8" alt={row.symbol} src={row.logoURI} /> 
+                                    <div>
+                                        <p className='text-md'>{row.symbol}</p>
+                                    </div>
+                                </div>
+                            )
+                        })}
+                        
                     </div>
                 </div>
             </div>
