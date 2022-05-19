@@ -15,8 +15,12 @@ export const getPearlsMaxBoostTime = ({
     !currentBoostColour ||
     (shape === currentBoostShape && colour === currentBoostColour)
   ) {
+    console.log('zero');
     return 0;
   }
+
+
+
 
   const pearlTrait = `${shape} ${colour}`;
   const boostPearlTrait = `${currentBoostShape} ${currentBoostColour}`;
@@ -30,7 +34,6 @@ export const getPearlsMaxBoostTime = ({
   }
   const startOfWeekMs = +startOfWeek * 1000;
   const nextWeek = moment(startOfWeekMs).add(period, "s");
-  const remainingMs = nextWeek.diff(moment()) + traitsDiff * period * 1000;
-
+  const remainingMs = period * 1000 - moment().diff(startOfWeekMs) % (period * 1000) + traitsDiff * period * 1000;
   return remainingMs >= 0 ? remainingMs : 0;
 };

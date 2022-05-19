@@ -122,6 +122,7 @@ export default (props) => {
     });
 
     setMaxBoostIn(calculatedMaxBoostIn);
+    console.log(boostColor + ' ' + boostShape + ' Period: ' + boostPeriodInSeconds + ' startofweek: ' + boostPeriodStart);
   }, [dnaDecoded, boostColor, boostShape, boostPeriodInSeconds, boostPeriodStart]);
 
   return (

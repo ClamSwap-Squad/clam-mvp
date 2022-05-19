@@ -86,6 +86,7 @@ const PearlInfo = ({
     } catch (err) {
       onDepositHarvestError(updateCharacter);
       updateAccount({ error: err.message });
+      console.log(err);
       setInTx(false);
     }
   };

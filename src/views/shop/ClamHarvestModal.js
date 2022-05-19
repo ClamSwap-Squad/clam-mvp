@@ -34,9 +34,24 @@ import {
 
 const formatShell = (value) => (value ? formatUnits(String(value), 18) : "0");
 
-const ClamItem = ({ clam, clamValueInShellToken, pearlValueInShellToken, harvestClam }) => {
+const ClamItem = ({ clam, pearlValueInShellToken, harvestClam }) => {
   const { tokenId, img } = clam;
   const { pearlProductionCapacity, pearlsProduced } = clam.clamDataValues;
+  const [clamValueInShellToken, setClamValueInShellToken] = useState("0");
+
+  useEffect(() => {
+
+    const fetchData = async () => {
+      if(clam.clamDataValues.grade) {
+        setClamValueInShellToken(await getClamValueInShellToken(clam.clamDataValues.grade));
+      } else {
+        setClamValueInShellToken(await getClamValueInShellToken());
+      }
+
+    }
+    fetchData();
+  })
+
   const harvestableShell =
     +clamValueInShellToken > 0
       ? +clamValueInShellToken + +pearlsProduced * +pearlValueInShellToken
@@ -62,7 +77,7 @@ const ClamItem = ({ clam, clamValueInShellToken, pearlValueInShellToken, harvest
                     <div className="flex flex-row w-full justify-between">
                       <dt className="text-sm font-medium text-gray-500">$SHELL</dt>
                       <dd className="mt-1 text-sm text-gray-900 sm:mt-0">
-                        {formatShell(harvestableShell)}
+                        {harvestableShell > 0 ? formatShell(harvestableShell) : "..."}
                       </dd>
                     </div>
                   </div>
@@ -135,7 +150,6 @@ const ClamHarvestModal = ({
   const [isLoading, setIsLoading] = useState(true);
   const [clams, setClams] = useState([]);
   const [message, setMessage] = useState("Loading...");
-  const [clamValueInShellToken, setClamValueInShellToken] = useState("0");
   const [pearlValueInShellToken, setPearlValueInShellToken] = useState("0");
 
   const { isShowing, toggleModal } = useModal({ show: true });
@@ -203,7 +217,6 @@ const ClamHarvestModal = ({
         setIsLoading(false);
       }
 
-      setClamValueInShellToken(await getClamValueInShellToken());
       setPearlValueInShellToken(await getPearlValueInShellToken());
     } catch (error) {
       console.log({ error });
@@ -254,7 +267,6 @@ const ClamHarvestModal = ({
                           key={i}
                           clam={clam}
                           harvestClam={harvestClam}
-                          clamValueInShellToken={clamValueInShellToken}
                           pearlValueInShellToken={pearlValueInShellToken}
                         />
                       )

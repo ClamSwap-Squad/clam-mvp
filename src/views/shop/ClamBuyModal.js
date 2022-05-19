@@ -359,7 +359,7 @@ const ClamBuyModal = ({
             <div className="px-2 py-2">
               <div className="flex flex-col">
                 <div className="flex justify-between items-center my-2">
-                  <div className="text-lg font-semibold">Price of {selectedGrade.toUpperCase()} Grade Clam</div>
+                  <div className="text-lg font-semibold">Price of Grade {selectedGrade.toUpperCase()} Clam</div>
                   <div onClick={() => setBuyWithGem(!buyWithGem)}>
                     <label className="label cursor-pointer p-0">
                       <span className="label-text">Buy with {buyWithGem ? "GEM" : "BNB"}</span>

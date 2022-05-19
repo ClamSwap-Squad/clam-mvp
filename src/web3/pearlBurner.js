@@ -17,6 +17,12 @@ export const color = async () => {
   return await pearlBurner().methods.colour().call();
 };
 
+export const getCurrentShapeAndColour = async () => {
+  const shapeAndColourIndex = await pearlBurner().methods.getCurrentShapeAndColourIndex().call();
+  console.log(shapeAndColourIndex);
+  return await pearlBurner().methods.getShapeAndColourByIndex(shapeAndColourIndex[0], shapeAndColourIndex[1]).call();
+}
+
 export const periodStart = async () => {
   return await pearlBurner().methods.periodStart().call();
 };

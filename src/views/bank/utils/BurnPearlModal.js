@@ -4,7 +4,7 @@ import { connect } from "redux-zero/react";
 import moment from "moment";
 import { actions } from "store/redux";
 import { formatMsToDuration } from "utils/time";
-import { color, shape, periodStart, periodInSeconds, periodCheckpoint } from "web3/pearlBurner";
+import { color, shape, periodStart, periodInSeconds, periodCheckpoint, getCurrentShapeAndColour } from "web3/pearlBurner";
 import { getGemPrice } from "web3/gemOracle";
 import { useTimer } from "hooks/useTimer";
 import { getPearlsMaxBoostTime } from "utils/getPearlsMaxBoostTime";
@@ -32,22 +32,27 @@ const BurnPearlModal = (props) => {
   const [gemPriceUSD, setGemPriceUSD] = useState(1);
   const [sortOrderPearls = {}] = useLocalStorage(SORT_ORDER_PEARLS_KEY);
 
+  const updateShapeAndColour = async () => {
+    setBoostedShape("Loading...");
+    setBoostedColor("Loading...");
+    const currentShapeAndColour = await getCurrentShapeAndColour();
+    const _shape = currentShapeAndColour[0];
+    const _color = currentShapeAndColour[1];
+    setBoostedShape(_shape);
+    setBoostedColor(_color);
+  }
+
   const calculateTimeLeft = () => {
     if (startOfWeek === "") return "calculating...";
 
     const startOfWeekMs = +startOfWeek * 1000;
-    const nextWeek = moment(startOfWeekMs).add(periodInSecs, "s");
-    const remainingMs = nextWeek.diff(moment());
-
+    const remainingMs = periodInSecs * 1000 - moment().diff(startOfWeekMs) % (periodInSecs * 1000);
     const duration = formatMsToDuration(remainingMs);
 
     return duration;
   };
 
   const { timeLeft } = useTimer(calculateTimeLeft);
-  const handlePeriodCheckpoint = async () => {
-    await periodCheckpoint();
-  };
 
   useAsync(async () => {
     try {
@@ -58,8 +63,10 @@ const BurnPearlModal = (props) => {
       );
       setPearls(sortedOwnedPearls);
 
-      const _shape = await shape();
-      const _color = await color();
+      const currentShapeAndColour = await getCurrentShapeAndColour();
+
+      const _shape = currentShapeAndColour[0];
+      const _color = currentShapeAndColour[1];
       setBoostedShape(_shape);
       setBoostedColor(_color);
 
@@ -68,6 +75,16 @@ const BurnPearlModal = (props) => {
 
       const periodInSecs = await periodInSeconds();
       setPeriodInSecs(periodInSecs);
+
+      const startOfWeekMs = +start * 1000;
+      const remainingMs = periodInSecs * 1000 - moment().diff(startOfWeekMs) % (periodInSecs * 1000);
+
+      setTimeout(() => {
+        updateShapeAndColour();
+        setInterval(() => {
+          updateShapeAndColour();
+        }, periodInSecs * 1000);
+      }, remainingMs+5000);
 
       const gemPrice = await getGemPrice();
       setGemPriceUSD(gemPrice);
@@ -122,15 +139,7 @@ const BurnPearlModal = (props) => {
       <div className="w-full p-4 flex justify-between">
         <div className="flex flex-col w-3/5">
           <span className="font-aristotelica-bold text-xl">Traits for Max GEM Yield</span>
-          {timeLeft.includes("-") ? (
-            <div>
-              <button onClick={handlePeriodCheckpoint} className="btn btn-outline btn-primary">
-                Update Pearl Boost Traits
-              </button>
-            </div>
-          ) : (
             <span className="text-gray-500">Changes in: {timeLeft}</span>
-          )}
         </div>
         <div className="flex flex-col w-2/5 items-end">
           <div>
