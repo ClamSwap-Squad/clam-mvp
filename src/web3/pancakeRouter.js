@@ -6,6 +6,8 @@ import { getLPTokens, getReserves } from "./pancakePair";
 import BigNumber from "bignumber.js";
 import { getAccount } from "./shared";
 
+import { ChainId, Token, TokenAmount, Pair, TradeType, Trade, Route } from '@pancakeswap/sdk'
+
 const router = () =>
   contractFactory({
     abi: pancakeRouterAbi,
@@ -55,12 +57,28 @@ export const getQuote = async (amountA, reserveA, reserveB) => {
   return 0;
 };
 
-export const getAmountsOutn = async (amountIn, iTokenAddress, oTokenAddress) => {
+export const getTokenAmountFromOtherToken = async (amountIn, iTokenAddress, oTokenAddress) => {
   if( amountIn > 0 && iTokenAddress && oTokenAddress ) {
-    const path = [iTokenAddress, oTokenAddress];
-    const result = await getAmountsOut(parseEther(amountIn), path);
-    const price = result[result.length - 1];
-    return formatEther(price);
+    
+    try {
+      
+      const path = [iTokenAddress, oTokenAddress];
+      const result = await getAmountsOut(parseEther(amountIn), path);
+      const price = result[result.length - 1];
+      console.log('aaaaaaaaaaa price', formatEther(price));
+      return formatEther(price);
+      
+    } catch (error) {
+
+      const path = [iTokenAddress, wBNB, oTokenAddress];
+      const result = await getAmountsOut(parseEther(amountIn), path);
+      const price = result[result.length - 1];
+      console.log('ddddddddddd price', formatEther(price));
+
+      return formatEther(price);
+      
+    }
+
   }
 
   return 0;
@@ -69,6 +87,7 @@ export const getAmountsOutn = async (amountIn, iTokenAddress, oTokenAddress) => 
 export const getUsdPriceOfToken = async (tokenAddress, baseCurrency = "BNB") => {
   const base = getBaseCurrency(baseCurrency);
   const path = tokenAddress === base ? [tokenAddress, BUSD] : [tokenAddress, base, BUSD];
+  // console.log(path);
   const result = await getAmountsOut(parseEther("1"), path);
   const price = result[result.length - 1];
 
@@ -81,6 +100,24 @@ export const swap = async (iToken, oToken, iAmount, oAmount ) => {
 
   const path = [iToken.address, oToken.address]
   const deadline = Math.floor(Date.now() / 1000) + 60 * 20 // 20 minutes from the current Unix time
+
+
+
+  // const _iToken = new Token(iToken.chainId, iToken.address, iToken.decimals, iToken.symbol, iToken.name);
+  // console.log('swap in router _iToken', _iToken);
+
+  // const _oTOken = new Token(iToken.chainId, oToken.address, oToken.decimals, oToken.symbol, oToken.name)
+  // console.log('swap in router _oTOken', _oTOken);
+
+  // const _pair = new Pair(new TokenAmount(_iToken, parseEther(iAmount) ), new TokenAmount(_oTOken, parseEther(oAmount)))
+  // console.log('swap in router _pair', _pair);
+
+  // const _route = new Route([_pair], _iToken)
+  // console.log('swap in router _route', _route);
+
+  // const trade = new Trade(_route, new TokenAmount(_iToken, parseEther(iAmount)), TradeType.EXACT_INPUT);
+  // console.log('swap in router trade', trade);
+
 
   if(iToken.address == wBNB) {
     console.log("swapExactETHForTokens");

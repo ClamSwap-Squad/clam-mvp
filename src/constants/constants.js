@@ -53,6 +53,7 @@ export const {
   gemOracleAddress,
   clamExchangeAddress,
   pancakeRouterAddress,
+  pancakeFactoryAddress,
   multicallAddress,
   wBNB,
   BUSD,
@@ -68,6 +69,7 @@ export const serializeTokens = [
     logoURI: "https://pancake.kiemtienonline360.com/images/coins/0xae13d989dac2f0debff460ac112a837c89baa7cd.png",
     name: "BNB",
     symbol: "BNB",
+    chainId: ClamIslandChain.BSC_TESTNET
   },
   {
     address: gemTokenAddress,
@@ -75,6 +77,7 @@ export const serializeTokens = [
     logoURI: `${process.env.PUBLIC_URL}/favicon/android-chrome-192x192.png`,
     name: "GEM",
     symbol: "GEM",
+    chainId: ClamIslandChain.BSC_TESTNET
   },
   {
     address: shellTokenAddress,
@@ -82,6 +85,7 @@ export const serializeTokens = [
     logoURI: `${process.env.PUBLIC_URL}/favicon/android-chrome-192x192.png`,
     name: "SHELL",
     symbol: "SHELL",
+    chainId: ClamIslandChain.BSC_TESTNET
   }
 ];
     

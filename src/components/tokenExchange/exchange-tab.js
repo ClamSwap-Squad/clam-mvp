@@ -4,7 +4,7 @@ import { actions } from "store/redux";
 import { formatEther, parseEther } from "@ethersproject/units";
 import Web3 from 'web3';
 
-import { balanceOf, allowance } from "web3/bep20";
+import { balanceOf, allowance, getTokenInfo } from "web3/bep20";
 import {
     gemTokenAddress,
     shellTokenAddress,
@@ -14,7 +14,7 @@ import {
     tokens,
     serializeTokens
 } from "constants/constants";
-import { getQuote, swap, getAmountsOutn } from "web3/pancakeRouter";
+import { getQuote, swap, getTokenAmountFromOtherToken, getUsdPriceOfToken } from "web3/pancakeRouter";
 
 import { onSwapTxn, onSwapSuccess, onSwapError } from './../../views/bank/character/Exchange';
 
@@ -30,6 +30,7 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
     const [oTokenBalance, setOTokenBalance] = useState(0);
     const [allowanceAmount, setAllowanceAmount] = useState(0);
     const [tokenSearch, setTokenSearch] = useState("");
+    const [searchedToken, setSearchedToken] = useState({});
 
     const [isLoading, setLoading] = useState(false);
 
@@ -69,7 +70,7 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
 
     useEffect(async () => {
         if( iAmount && iToken && oToken ) {
-            const _oAmount = await getAmountsOutn(iAmount, iToken.address, oToken.address);
+            const _oAmount = await getTokenAmountFromOtherToken(iAmount, iToken.address, oToken.address);
             setOAmount(_oAmount);
         }
     }, [iAmount, iToken, oToken])
@@ -78,16 +79,30 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
         // Get Out Amount in every 3 seconds.
         setInterval(async () => {
             if( iAmount && iToken && oToken ) {
-                const _oAmount = await getAmountsOutn(iAmount, iToken.address, oToken.address);
+                const _oAmount = await getTokenAmountFromOtherToken(iAmount, iToken.address, oToken.address);
                 setOAmount(_oAmount);
             }
         }, 3000)
     }, [])
 
-    useEffect(() => {
-        // Check ethereum address
-        
-        // web3.utils.isAddress(address)
+    useEffect(async () => {
+        const _isAddress = web3.utils.isAddress(tokenSearch);
+        if(_isAddress) {
+            try {
+                const _tokeninfo = await getTokenInfo(tokenSearch);
+                for (let i = 0; i < tokens.length; i++) {
+                    if(tokens[i].address == _tokeninfo.address) return;
+                }
+                for (let i = 0; i < serializeTokens.length; i++) {
+                    if(serializeTokens[i].address == _tokeninfo.address) return;
+                }
+                _tokeninfo.logoURI = "/assets/custom_token.png";
+                setSearchedToken(_tokeninfo);
+            } catch (error) {
+                setSearchedToken({});
+                console.log("check token error", error);
+            }
+        }
     }, [tokenSearch])
   
     const setTokenData = async (row) => {
@@ -124,8 +139,6 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
 
     const exchange = async () => {
         setLoading(true);
-
-        console.log('updateCharacter', updateCharacter);
         onSwapTxn(updateCharacter);
         try {
             await swap(iToken, oToken, iAmount, oAmount);
@@ -178,14 +191,14 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
                         <div className='flex justify-between'>
                             <input 
                                 type='text' 
-                                className='h-8 bg-transparent px-3 outline-0' 
+                                className='h-8 bg-transparent px-3 outline-0 w-full' 
                                 style={{outline: "none"}} 
                                 value={iAmount}
                                 onChange={(e) => setIAmount(e.target.value)}
                             />
                             <button 
                                 className='flex justify-end items-center rounded-2xl gap-2 tokenSelect p-2 h-8'
-                                onClick={() => { setSelectToken("input"); toggleTokenSelectModal(true); }}
+                                onClick={() => { setSelectToken("input"); setTokenSearch(""); toggleTokenSelectModal(true); }}
                             >
                                 <img className="h-6" alt={iToken.symbol} src={iToken.logoURI} /> 
                                 <p className='text-md'>{iToken.symbol}</p>
@@ -219,14 +232,14 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
                         <div className='flex justify-between'>
                             <input 
                                 type='text' 
-                                className='h-8 bg-transparent px-3 outline-0' 
+                                className='h-8 bg-transparent px-3 outline-0 w-full' 
                                 style={{outline: "none"}} 
                                 value={ oAmount > 0 ? parseFloat(oAmount) : 0 }
                                 onChange={(e) => setOAmount(e.target.value)}
                             />
                             <button 
                                 className='flex justify-end items-center rounded-2xl gap-2 tokenSelect p-2 h-8' 
-                                onClick={() => { setSelectToken("output"); toggleTokenSelectModal(true); }}
+                                onClick={() => { setSelectToken("output"); setTokenSearch(""); toggleTokenSelectModal(true); }}
                             >
                                 <img className="h-6" alt={oToken.symbol} src={oToken.logoURI} /> 
                                 <p className='text-md'>{oToken.symbol}</p>
@@ -318,7 +331,16 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
                                 </div>
                             )
                         })}
-                        
+
+                        { searchedToken && (
+                            <div className='mt-4 flex gap-2 items-center' onClick={() => setTokenData(searchedToken)}>
+                                <img className="h-8" alt={searchedToken.symbol} src={searchedToken.logoURI} /> 
+                                <div>
+                                    <p className='text-md'>{searchedToken.symbol}</p>
+                                </div>
+                            </div>
+                        )}
+
                     </div>
                 </div>
             </div>

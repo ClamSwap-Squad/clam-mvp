@@ -43,7 +43,19 @@ export const approve = async (address, spender, amount) => {
 
 export const getTokenInfo = async (address) => {
   const token = contractFactory({ abi: BEP20ABI, address });
-  console.log('web3 bep20 token', token);
+  
+  const name = await token.methods.name().call();
+  const symbol = await token.methods.symbol().call();
+  const decimals = await token.methods.decimals().call();
+
+  const tokenInfo = {
+    name: name,
+    symbol: symbol,
+    address: address,
+    decimals: decimals
+  }
+
+  return tokenInfo;
 }
 
 export const approveContractForMaxUintErc721 = async (tokenAddress, contractAddress) => {
