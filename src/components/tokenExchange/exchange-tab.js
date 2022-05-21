@@ -17,6 +17,7 @@ import {
 import { getQuote, swap, getTokenAmountFromOtherToken, getUsdPriceOfToken } from "web3/pancakeRouter";
 
 import { onSwapTxn, onSwapSuccess, onSwapError } from './../../views/bank/character/Exchange';
+import SwapSetting from "./SwapSetting";
 
 let logoURI = "";
 
@@ -31,8 +32,10 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
     const [allowanceAmount, setAllowanceAmount] = useState(0);
     const [tokenSearch, setTokenSearch] = useState("");
     const [searchedToken, setSearchedToken] = useState({});
-
+    const [slippage, setSlipage] = useState(0.5);
+    const [deadline, setDeadline] = useState(20);
     const [isLoading, setLoading] = useState(false);
+
 
 
     if(process.env.NODE_ENV === "development") {
@@ -141,8 +144,14 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
         setLoading(true);
         onSwapTxn(updateCharacter);
         try {
-            await swap(iToken, oToken, iAmount, oAmount);
+            await swap(iToken, oToken, iAmount, oAmount, slippage, deadline);
             onSwapSuccess(updateCharacter);
+
+            setIAmount(0);
+            setOAmount(0);
+
+            setITokenBalance(await getTokenBalance(iToken.address));
+            setOTokenBalance(await getTokenBalance(oToken.address));
         } catch (error) {
             updateAccount({ error: error.message });
             onSwapError(updateCharacter);
@@ -186,6 +195,16 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
         
         <>
             <div>
+
+                <div className="flex justify-end mb-2 mx-2">
+                    <SwapSetting 
+                        slippage={slippage} 
+                        setSlipage={setSlipage}
+                        deadline={deadline}
+                        setDeadline={setDeadline}
+                    />
+                </div>
+
                 <div className='text-sm'>
                     <div className='bg-gray-100 rounded-lg p-4'>
                         <div className='flex justify-between'>
@@ -280,7 +299,7 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
                 }
 
             </div>
-            
+
             <div id="myModal" className={`n-modal ${ isTokenSelectShowing ? "block" : "none" }`}>
                 <div className="n-modal-content">
                     <div className='flex justify-between mt-2 items-center'>
@@ -297,7 +316,7 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
                             onChange={(e) => setTokenSearch(e.target.value)}
                         />
                     </div>
-                    <div className='mt-4'>
+                    <div className='mt-4 overflow-auto' style={{maxHeight: "300px"}}>
                         
                         { serializeTokens && serializeTokens.map((row, i) => {
                             if(tokenSearch) {
