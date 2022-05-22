@@ -11,6 +11,7 @@ import { useMemo } from 'react'
 import flatMap from 'lodash/flatMap'
 import { Interface } from '@ethersproject/abi'
 import IPancakePairABI from './abi/IPancakePair.json'
+import BN from "bn.js";
 
 const PAIR_INTERFACE = new Interface(IPancakePairABI)
 
@@ -262,6 +263,7 @@ function useMultipleContractSingleData(
   options,
 ) {
   const fragment = contractInterface.getFunction(methodName);
+
   const callData = fragment && isValidMethodArgs(callInputs)
         ? contractInterface.encodeFunctionData(fragment, callInputs)
         : undefined;
@@ -278,13 +280,97 @@ function useMultipleContractSingleData(
         : [];
 
   const results = useCallsData(calls, options)
+  // const results = [];
 
-  const { cache } = useSWRConfig()
+  // const { cache } = useSWRConfig()
 
-  const currentBlockNumber = cache.get('blockNumber')
-  return results.map((result) => toCallState(result, contractInterface, fragment, currentBlockNumber));
+  // const currentBlockNumber = cache.get('blockNumber')
+  // return results.map((result) => toCallState(result, contractInterface, fragment, currentBlockNumber));
 }
 
+// the lowest level call for subscribing to contract data
+function useCallsData(calls, options) {
+  const chainId = 97;
+  // const callResults = useSelector((state) => state.multicall.callResults);
+  
+
+  console.log('callResults', callResults)
+
+  // const dispatch = useDispatch<AppDispatch>()
+
+  // const serializedCallKeys: string = useMemo(
+  //   () =>
+  //     JSON.stringify(
+  //       calls
+  //         ?.filter((c): c is Call => Boolean(c))
+  //         ?.map(toCallKey)
+  //         ?.sort() ?? [],
+  //     ),
+  //   [calls],
+  // )
+
+  // // update listeners when there is an actual change that persists for at least 100ms
+  // useEffect(() => {
+  //   const callKeys: string[] = JSON.parse(serializedCallKeys)
+  //   if (!chainId || callKeys.length === 0) return undefined
+  //   // eslint-disable-next-line @typescript-eslint/no-shadow
+  //   const calls = callKeys.map((key) => parseCallKey(key))
+  //   dispatch(
+  //     addMulticallListeners({
+  //       chainId,
+  //       calls,
+  //       options,
+  //     }),
+  //   )
+
+  //   return () => {
+  //     dispatch(
+  //       removeMulticallListeners({
+  //         chainId,
+  //         calls,
+  //         options,
+  //       }),
+  //     )
+  //   }
+  // }, [chainId, dispatch, options, serializedCallKeys])
+
+  // return useMemo(
+  //   () =>
+  //     calls.map<CallResult>((call) => {
+  //       if (!chainId || !call) return INVALID_RESULT
+
+  //       const result = callResults[chainId]?.[toCallKey(call)]
+  //       let data
+  //       if (result?.data && result?.data !== '0x') {
+  //         // eslint-disable-next-line prefer-destructuring
+  //         data = result.data
+  //       }
+
+  //       return { valid: true, data, blockNumber: result?.blockNumber }
+  //     }),
+  //   [callResults, calls, chainId],
+  // )
+}
+
+
+// export const getMulticallContract = () => {
+//   return getContract(MultiCallAbi, getMulticallAddress(), simpleRpcProvider) as Multicall
+// }
+
+// const multicall = async (abi, calls) => {
+//   const multi = getMulticallContract()
+//   const itf = new Interface(abi)
+
+//   const calldata = calls.map((call) => ({
+//     target: call.address.toLowerCase(),
+//     callData: itf.encodeFunctionData(call.name, call.params),
+//   }))
+//   const { returnData } = await multi.aggregate(calldata)
+
+//   const res = returnData.map((call, i) => itf.decodeFunctionResult(calls[i].name, call))
+
+//   return res
+// }
 
 function isValidMethodArgs(x) {
   return (
@@ -293,53 +379,98 @@ function isValidMethodArgs(x) {
   )
 }
 
+export const getTrade = async (iToken, oToken, iAmount, oAmount, slippage, _deadline) => {
 
-export const swap = async (iToken, oToken, iAmount, oAmount, slippage, _deadline ) => {
-  console.log("swap", iToken, oToken, iAmount);
-  const account = getAccount();
+}
 
-  let path;
-  const deadline = Math.floor(Date.now() / 1000) + 60 * _deadline // 20 minutes from the current Unix time
-
+const getPath = async (ATokenAddress, BTokenAddress) => {
+  let path = null;
+  
   try {
       
-    path = [iToken.address, oToken.address];
-    const result = await getAmountsOut(parseEther(iAmount), path);
+    path = [ATokenAddress, BTokenAddress];
+    const result = await getAmountsOut(parseEther("1"), path);
     const price = result[result.length - 1];
-    console.log('aaaaaaaaaaa price', formatEther(price));
+    // console.log('aaaaaaaaaaa price', formatEther(price));
 
-    
+    return path;
   } catch (error) {
 
-    path = [iToken.address, wBNB, oToken.address];
-    const result = await getAmountsOut(parseEther(iAmount), path);
+    path = [ATokenAddress, wBNB, BTokenAddress];
+    const result = await getAmountsOut(parseEther("1"), path);
     const price = result[result.length - 1];
-    console.log('ddddddddddd price', formatEther(price));
-    
+    // console.log('ddddddddddd price', formatEther(price));
+
+    return path;
   }
 
-    
+}
+
+
+export const getGasEstimation = async (iToken, oToken, iAmount, oAmount, slippage, _deadline ) => {
+  const account = getAccount();
+  const path = await getPath(iToken.address, oToken.address);
+  const deadline = Math.floor(Date.now() / 1000) + 60 * _deadline // 20 minutes from the current Unix time
+  const amountOutMin = parseEther((oAmount * (1 - (slippage / 100))).toString());
+
+  if(iToken.address == wBNB) {
+    const method = router().methods.swapExactETHForTokens( amountOutMin, path, account, deadline );
+    const gasEstimation = await method.estimateGas({
+      from: account,
+      value: parseEther(iAmount),
+    });
+    return gasEstimation;
+  }
+  else if (oToken.address == wBNB) {
+    const method = router().methods.swapExactTokensForETH( parseEther(iAmount), amountOutMin, path, account, deadline )
+    const gasEstimation = await method.estimateGas({
+      from: account
+    });
+    return gasEstimation;
+  } else {
+    console.log("asdfasdf");
+    const method = router().methods.swapExactTokensForTokens( parseEther(iAmount), amountOutMin, path, account, deadline )
+    const gasEstimation = await method.estimateGas({
+      from: account
+    });
+    return gasEstimation;
+  }
+};
+
+export const calculateGasMargin = (value) => {
+  return new BN(value).mul(new BN(120)).div(new BN(100));
+}
+
+export const swap = async (iToken, oToken, iAmount, oAmount, slippage, _deadline ) => {
+  console.log("swap", iToken, oToken, iAmount, oAmount, slippage,_deadline);
+  const account = getAccount();
+
+  let path = await getPath(iToken.address, oToken.address);
   console.log('path', path);
 
+  const deadline = Math.floor(Date.now() / 1000) + 60 * _deadline // 20 minutes from the current Unix time
+
   // const amountOutMin = parseEther( (oAmount * (100 - slippage)).toString() ) ;
-  const amountOutMin = parseEther(oAmount);
-  console.log(parseEther(oAmount));
-  console.log(amountOutMin);
+  const amountOutMin = parseEther((oAmount * (1 - (slippage / 100))).toString());
 
-  const _iToken = new Token(iToken.chainId, iToken.address, iToken.decimals, iToken.symbol, iToken.name);
-  console.log('swap in router _iToken', _iToken);
+  console.log('amountOutMin', amountOutMin);
 
-  const _oTOken = new Token(iToken.chainId, oToken.address, oToken.decimals, oToken.symbol, oToken.name)
-  console.log('swap in router _oTOken', _oTOken);
+  // const _iToken = new Token(iToken.chainId, iToken.address, iToken.decimals, iToken.symbol, iToken.name);
+  // console.log('swap in router _iToken', _iToken);
 
-  const _pair = new Pair(new TokenAmount(_iToken, parseEther(iAmount) ), new TokenAmount(_oTOken, parseEther(oAmount)))
-  console.log('swap in router _pair', _pair);
+  // const _oTOken = new Token(iToken.chainId, oToken.address, oToken.decimals, oToken.symbol, oToken.name)
+  // console.log('swap in router _oTOken', _oTOken);
 
-  const _route = new Route([_pair], _iToken)
-  console.log('swap in router _route', _route);
+  // console.log('swap in router _iAmount', iAmount);
+  // console.log('swap in router oAmount', oAmount);
+  // const _pair = new Pair(new TokenAmount(_iToken, parseEther(iAmount) ), new TokenAmount(_oTOken, parseEther(oAmount)))
+  // console.log('swap in router _pair', _pair);
 
-  const trade = new Trade(_route, new TokenAmount(_iToken, parseEther(iAmount)), TradeType.EXACT_INPUT);
-  console.log('swap in router trade', trade);
+  // const _route = new Route([_pair], _iToken)
+  // console.log('swap in router _route', _route);
+
+  // const trade = new Trade(_route, new TokenAmount(_iToken, parseEther(iAmount)), TradeType.EXACT_INPUT);
+  // console.log('swap in router trade', trade);
 
   // const allowedPairs = useAllCommonPairs(_iToken, _oTOken)
   // console.log(allowedPairs, "Allowed Pairs");  
@@ -350,11 +481,22 @@ export const swap = async (iToken, oToken, iAmount, oAmount, slippage, _deadline
 
   if(iToken.address == wBNB) {
     console.log("swapExactETHForTokens");
-    await router().methods
-      .swapExactETHForTokens( amountOutMin, path, account, deadline )
+
+    const method = router().methods.swapExactETHForTokens( amountOutMin, path, account, deadline );
+    console.log('method', method);
+
+    const gasEstimation = await method.estimateGas({
+      from: account,
+      value: parseEther(iAmount),
+    });
+
+    console.log("gasEstimation", gasEstimation)
+    
+    await method
       .send({
         from: account,
-        value: parseEther(iAmount) 
+        value: parseEther(iAmount),
+        gas: gasEstimation,
       })
       .once("", eventCallback);
   }
@@ -367,7 +509,6 @@ export const swap = async (iToken, oToken, iAmount, oAmount, slippage, _deadline
         from: account
       }).then( async (receipt) => {
         return "Success";
-
       }).catch((err) => {
         return "false";
       });

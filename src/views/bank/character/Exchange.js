@@ -9,7 +9,6 @@ export const onSwapTxn = (updateCharacter) => {
   });
 };
 
-
 export const onSwapSuccess = (updateCharacter) => {
   updateCharacter({
     name: "tanja",
@@ -22,6 +21,30 @@ export const onSwapError = (updateCharacter) => {
   updateCharacter({
     name: "tanja",
     action: "bank.swap_error.text",
+    button: false,
+  });
+};
+
+export const onApproveTxn = (updateCharacter) => {
+  updateCharacter({
+    name: "tanja",
+    action: "bank.process_approve_transaction.text",
+    button: false,
+  });
+};
+
+export const onApproveSuccess = (updateCharacter) => {
+  updateCharacter({
+    name: "tanja",
+    action: "bank.approve_success.text",
+    button: false,
+  });
+};
+
+export const onApproveError = (updateCharacter) => {
+  updateCharacter({
+    name: "tanja",
+    action: "bank.approve_error.text",
     button: false,
   });
 };

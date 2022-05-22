@@ -4,7 +4,7 @@ import { actions } from "store/redux";
 import { formatEther, parseEther } from "@ethersproject/units";
 import Web3 from 'web3';
 
-import { balanceOf, allowance, getTokenInfo } from "web3/bep20";
+import { balanceOf, allowance, getTokenInfo, approve } from "web3/bep20";
 import {
     gemTokenAddress,
     shellTokenAddress,
@@ -14,9 +14,16 @@ import {
     tokens,
     serializeTokens
 } from "constants/constants";
-import { getQuote, swap, getTokenAmountFromOtherToken, getUsdPriceOfToken } from "web3/pancakeRouter";
+import { getQuote, swap, getTokenAmountFromOtherToken, getUsdPriceOfToken, getTrade, getGasEstimation, calculateGasMargin } from "web3/pancakeRouter";
 
-import { onSwapTxn, onSwapSuccess, onSwapError } from './../../views/bank/character/Exchange';
+import { 
+    onSwapTxn, 
+    onSwapSuccess, 
+    onSwapError, 
+    onApproveTxn, 
+    onApproveSuccess, 
+    onApproveError 
+} from './../../views/bank/character/Exchange';
 import SwapSetting from "./SwapSetting";
 
 let logoURI = "";
@@ -76,6 +83,9 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
             const _oAmount = await getTokenAmountFromOtherToken(iAmount, iToken.address, oToken.address);
             setOAmount(_oAmount);
         }
+        else {
+            setOAmount(0)
+        }
     }, [iAmount, iToken, oToken])
 
     useEffect(() => {
@@ -88,6 +98,8 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
         }, 3000)
     }, [])
 
+
+    // Token Select Modal
     useEffect(async () => {
         const _isAddress = web3.utils.isAddress(tokenSearch);
         if(_isAddress) {
@@ -140,6 +152,23 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
         return _amount;
     }
 
+    const getTradeData = async () => {
+
+        const _result = await getTrade(iToken, oToken, iAmount, oAmount, slippage, deadline);
+        console.log('Trade Data', _result);
+    }
+
+    const setMax = async () => {
+        // Get Estimation Gas Fee
+        if(iToken.address == wBNB) {
+            const estimateGas = await getGasEstimation(iToken, oToken, "1", "1", slippage, deadline);
+            setIAmount( formatEther((iTokenBalance - estimateGas * 2 * 10 ** 10).toString()) );
+        }
+        else {
+            setIAmount( formatEther(iTokenBalance) );
+        }
+    }
+
     const exchange = async () => {
         setLoading(true);
         onSwapTxn(updateCharacter);
@@ -161,8 +190,25 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
     }
 
     const approve_token = async () => {
-        await approve(iToken.address, pancakeRouterAddress, iTokenBalance);
+        setLoading(true);
+
+        onApproveTxn(updateCharacter);
+        try {
+            await approve(iToken.address, pancakeRouterAddress, iTokenBalance);
+            onApproveSuccess(updateCharacter);
+
+            // Get Allowance Amount
+            const _allowalnceAmount = await getAllowanceAmount(iToken.address);
+            setAllowanceAmount(_allowalnceAmount);
+            
+        } catch (error) {
+            updateAccount({ error: error.message });
+            onApproveError(updateCharacter);
+        }
+
+        setLoading(false);
     }
+
 
     return (
         // <div className="w-full h-full flex flex-col items-center p-5">
@@ -209,11 +255,13 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
                     <div className='bg-gray-100 rounded-lg p-4'>
                         <div className='flex justify-between'>
                             <input 
-                                type='text' 
+                                type='number' 
                                 className='h-8 bg-transparent px-3 outline-0 w-full' 
                                 style={{outline: "none"}} 
                                 value={iAmount}
-                                onChange={(e) => setIAmount(e.target.value)}
+                                onChange={(e) => {
+                                    setIAmount(e.target.value)
+                                } }
                             />
                             <button 
                                 className='flex justify-end items-center rounded-2xl gap-2 tokenSelect p-2 h-8'
@@ -226,8 +274,8 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
                         </div>
                         <div className='flex justify-end mt-3'>
                             <div className='flex gap-3 items-center'>
-                                <p>Balance { iTokenBalance > 0 ? parseFloat(formatEther(iTokenBalance)).toFixed(2) : 0 }</p> 
-                                <p className='rounded-2xl text-xs px-1 maxtext cursor-pointer' onClick={() => setIAmount(parseFloat(Web3.utils.fromWei(iTokenBalance.toString(), 'ether')).toFixed(2)) }>MAX</p>
+                                <p>Balance { iTokenBalance > 0 ? Math.floor(parseFloat(formatEther(iTokenBalance)) * 100) / 100 : 0 }</p> 
+                                <p className='rounded-2xl text-xs px-1 maxtext cursor-pointer' onClick={() => setMax() }>MAX</p>
                             </div>
                         </div>
                     </div>
@@ -240,6 +288,10 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
                             const temp = iToken;
                             setIToken(oToken);
                             setOToken(temp);
+
+                            const tempAmount = oAmount;
+                            setOAmount(iAmount);
+                            setIAmount(tempAmount);
                         }}
                     >
                         &#x2193;
@@ -250,11 +302,12 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
                     <div className='bg-gray-100 rounded-lg p-4'>
                         <div className='flex justify-between'>
                             <input 
-                                type='text' 
+                                type='number' 
                                 className='h-8 bg-transparent px-3 outline-0 w-full' 
                                 style={{outline: "none"}} 
-                                value={ oAmount > 0 ? parseFloat(oAmount) : 0 }
+                                value={ oAmount > 0 ? parseFloat(oAmount).toFixed(5) : 0 }
                                 onChange={(e) => setOAmount(e.target.value)}
+                                disabled={'true'}
                             />
                             <button 
                                 className='flex justify-end items-center rounded-2xl gap-2 tokenSelect p-2 h-8' 
@@ -279,7 +332,7 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
                             <button 
                                 className='btn btn-primary w-full mt-2' 
                                 onClick={exchange}
-                                disabled={isLoading || !address}
+                                disabled={isLoading || !address || iAmount <=0 }
                             >
                                 {
                                     isLoading ? "Loading..." : "Exchange"
@@ -291,8 +344,11 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
                             <button 
                                 className='btn btn-primary w-full mt-2' 
                                 onClick={approve_token}
+                                disabled={isLoading || !address }
                             >
-                                Approve
+                                {
+                                    isLoading ? "Loading..." : "Approve"
+                                }
                             </button>
                         </>
                     )
@@ -300,6 +356,7 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
 
             </div>
 
+            {/* // Token Select Modal */}
             <div id="myModal" className={`n-modal ${ isTokenSelectShowing ? "block" : "none" }`}>
                 <div className="n-modal-content">
                     <div className='flex justify-between mt-2 items-center'>
