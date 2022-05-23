@@ -14,7 +14,16 @@ import {
     tokens,
     serializeTokens
 } from "constants/constants";
-import { getQuote, swap, getTokenAmountFromOtherToken, getUsdPriceOfToken, getTrade, getGasEstimation, calculateGasMargin } from "web3/pancakeRouter";
+import { 
+    getQuote, 
+    swap, 
+    getTokenAmountFromOtherToken, 
+    getUsdPriceOfToken, 
+    getTrade, 
+    getGasEstimation, 
+    calculateGasMargin,
+    getPriceImpactWithoutFee
+} from "web3/pancakeRouter";
 
 import { 
     onSwapTxn, 
@@ -42,6 +51,7 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
     const [slippage, setSlipage] = useState(0.5);
     const [deadline, setDeadline] = useState(20);
     const [isLoading, setLoading] = useState(false);
+    const [priceImpact, setPriceImpact] = useState();
 
 
 
@@ -80,8 +90,19 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
 
     useEffect(async () => {
         if( iAmount && iToken && oToken ) {
+            // Set oAmount from iAmount
             const _oAmount = await getTokenAmountFromOtherToken(iAmount, iToken.address, oToken.address);
             setOAmount(_oAmount);
+
+            // Get Price Impact
+            const { priceImpactWithoutFee } = await getPriceImpactWithoutFee(iToken, oToken, iAmount, _oAmount);
+            if(priceImpactWithoutFee) {
+                console.log('priceImpactWithoutFee',  priceImpactWithoutFee.toFixed(2));
+            }
+            else {
+                console.log('priceImpactWithoutFee______');
+            }
+            setPriceImpact( priceImpactWithoutFee );
         }
         else {
             setOAmount(0)
@@ -170,21 +191,21 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
     }
 
     const exchange = async () => {
-        setLoading(true);
-        onSwapTxn(updateCharacter);
-        try {
+        // setLoading(true);
+        // onSwapTxn(updateCharacter);
+        // try {
             await swap(iToken, oToken, iAmount, oAmount, slippage, deadline);
-            onSwapSuccess(updateCharacter);
+        //     onSwapSuccess(updateCharacter);
 
-            setIAmount(0);
-            setOAmount(0);
+        //     setIAmount(0);
+        //     setOAmount(0);
 
-            setITokenBalance(await getTokenBalance(iToken.address));
-            setOTokenBalance(await getTokenBalance(oToken.address));
-        } catch (error) {
-            updateAccount({ error: error.message });
-            onSwapError(updateCharacter);
-        }
+        //     setITokenBalance(await getTokenBalance(iToken.address));
+        //     setOTokenBalance(await getTokenBalance(oToken.address));
+        // } catch (error) {
+        //     updateAccount({ error: error.message });
+        //     onSwapError(updateCharacter);
+        // }
 
         setLoading(false);
     }
@@ -326,16 +347,25 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
                     </div>
                 </div>
 
+                <dic className="text-sm mt-2 text-right">
+                    <p>Price Impact: { priceImpact ? priceImpact.toFixed(2) : "0" }%</p>
+                    {/* <p>Minimum received: 12000 GEM</p> */}
+                </dic>
+
                 {
                     iToken.address == wBNB || allowanceAmount > 0 ? (
                         <>
                             <button 
                                 className='btn btn-primary w-full mt-2' 
                                 onClick={exchange}
-                                disabled={isLoading || !address || iAmount <=0 }
+                                disabled={
+                                    isLoading || !address || iAmount <=0 
+                                    // || !priceImpact || priceImpact.toFixed(2) > 15  
+                                }
                             >
                                 {
-                                    isLoading ? "Loading..." : "Exchange"
+                                    // priceImpact && priceImpact.toFixed(2) ? "Price Impact Too High" : 
+                                    isLoading ? "Loadding..." : "Exchange"    
                                 }
                             </button>   
                         </>

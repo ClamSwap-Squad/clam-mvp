@@ -6,7 +6,7 @@ import { getLPTokens, getReserves } from "./pancakePair";
 import BigNumber from "bignumber.js";
 import { getAccount } from "./shared";
 import { Currency, CurrencyAmount } from '@pancakeswap/sdk'
-import { ChainId, Token, TokenAmount, Pair, TradeType, Trade, Route, ETHER, WETH } from '@pancakeswap/sdk'
+import { ChainId, Token, TokenAmount, Pair, TradeType, Trade, Route, ETHER, WETH, Percent, JSBI } from '@pancakeswap/sdk'
 import { useMemo } from 'react'
 import flatMap from 'lodash/flatMap'
 import { Interface } from '@ethersproject/abi'
@@ -42,6 +42,11 @@ const getBaseCurrency = (token) => {
   }
 };
 
+const getAmountsOut = async (amount, path) => {
+  return await router().methods.getAmountsOut(amount, path).call();
+};
+
+
 export const getUsdValueOfPair = async (lpToken) => {
   const { 0: t0Supply, 1: t1Supply } = await getReserves(lpToken);
   const [token0, token1] = await getLPTokens(lpToken);
@@ -72,7 +77,7 @@ export const getTokenAmountFromOtherToken = async (amountIn, iTokenAddress, oTok
       const path = [iTokenAddress, oTokenAddress];
       const result = await getAmountsOut(parseEther(amountIn), path);
       const price = result[result.length - 1];
-      console.log('aaaaaaaaaaa price', formatEther(price));
+      // console.log('aaaaaaaaaaa price', formatEther(price));
       return formatEther(price);
       
     } catch (error) {
@@ -80,7 +85,7 @@ export const getTokenAmountFromOtherToken = async (amountIn, iTokenAddress, oTok
       const path = [iTokenAddress, wBNB, oTokenAddress];
       const result = await getAmountsOut(parseEther(amountIn), path);
       const price = result[result.length - 1];
-      console.log('ddddddddddd price', formatEther(price));
+      // console.log('ddddddddddd price', formatEther(price));
 
       return formatEther(price);
       
@@ -455,22 +460,25 @@ export const swap = async (iToken, oToken, iAmount, oAmount, slippage, _deadline
 
   console.log('amountOutMin', amountOutMin);
 
-  // const _iToken = new Token(iToken.chainId, iToken.address, iToken.decimals, iToken.symbol, iToken.name);
-  // console.log('swap in router _iToken', _iToken);
+  const _iToken = new Token(iToken.chainId, iToken.address, iToken.decimals, iToken.symbol, iToken.name);
+  console.log('swap in router _iToken', _iToken);
 
-  // const _oTOken = new Token(iToken.chainId, oToken.address, oToken.decimals, oToken.symbol, oToken.name)
-  // console.log('swap in router _oTOken', _oTOken);
+  const _oTOken = new Token(iToken.chainId, oToken.address, oToken.decimals, oToken.symbol, oToken.name)
+  console.log('swap in router _oTOken', _oTOken);
 
-  // console.log('swap in router _iAmount', iAmount);
-  // console.log('swap in router oAmount', oAmount);
-  // const _pair = new Pair(new TokenAmount(_iToken, parseEther(iAmount) ), new TokenAmount(_oTOken, parseEther(oAmount)))
-  // console.log('swap in router _pair', _pair);
+  console.log('swap in router _iAmount', iAmount);
+  console.log('swap in router oAmount', oAmount);
+  const _pair = new Pair(new TokenAmount(_iToken, parseEther(iAmount) ), new TokenAmount(_oTOken, parseEther(oAmount)))
+  console.log('swap in router _pair', _pair);
 
-  // const _route = new Route([_pair], _iToken)
-  // console.log('swap in router _route', _route);
+  const _route = new Route([_pair], _iToken)
+  console.log('swap in router _route', _route);
 
-  // const trade = new Trade(_route, new TokenAmount(_iToken, parseEther(iAmount)), TradeType.EXACT_INPUT);
-  // console.log('swap in router trade', trade);
+  const trade = new Trade(_route, new TokenAmount(_iToken, parseEther(iAmount)), TradeType.EXACT_INPUT);
+  console.log('swap in router trade', trade);
+
+  const {priceImpactWithoutFee, realizedLPFee } = computeTradePriceBreakdown(trade);
+  console.log("computeTradePriceBreakdown", priceImpactWithoutFee.toFixed(2));
 
   // const allowedPairs = useAllCommonPairs(_iToken, _oTOken)
   // console.log(allowedPairs, "Allowed Pairs");  
@@ -530,6 +538,56 @@ export const swap = async (iToken, oToken, iAmount, oAmount, slippage, _deadline
   }
 };
 
-const getAmountsOut = async (amount, path) => {
-  return await router().methods.getAmountsOut(amount, path).call();
-};
+export const getPriceImpactWithoutFee = async (iToken, oToken, iAmount, oAmount) => {
+  if(iToken && oToken && iAmount && oAmount) {
+    console.log("dddddddddddddd", iToken, oToken, iAmount, oAmount);
+    const _iToken = new Token(iToken.chainId, iToken.address, iToken.decimals, iToken.symbol, iToken.name);
+    const _oTOken = new Token(iToken.chainId, oToken.address, oToken.decimals, oToken.symbol, oToken.name)
+    const _pair = new Pair(new TokenAmount(_iToken, parseEther(iAmount) ), new TokenAmount(_oTOken, parseEther(oAmount)))
+    const _route = new Route([_pair], _iToken)
+    const trade = new Trade(_route, new TokenAmount(_iToken, parseEther(iAmount)), TradeType.EXACT_INPUT);
+    console.log('trade', trade);
+    const result = computeTradePriceBreakdown(trade);
+    return result;
+  }
+  return {
+    priceImpactWithoutFee: null,
+    realizedLPFee: null
+  }
+}
+
+const BASE_FEE = new Percent(JSBI.BigInt(25), JSBI.BigInt(10000));
+const ONE_HUNDRED_PERCENT = new Percent(JSBI.BigInt(10000), JSBI.BigInt(10000));
+const INPUT_FRACTION_AFTER_FEE = ONE_HUNDRED_PERCENT.subtract(BASE_FEE);
+
+// computes price breakdown for the trade
+const computeTradePriceBreakdown = (trade) => {
+  // for each hop in our trade, take away the x*y=k price impact from 0.3% fees
+  // e.g. for 3 tokens/2 hops: 1 - ((1 - .03) * (1-.03))
+  const realizedLPFee = !trade
+    ? undefined
+    : ONE_HUNDRED_PERCENT.subtract(
+        trade.route.pairs.reduce(
+          (currentFee) => currentFee.multiply(INPUT_FRACTION_AFTER_FEE),
+          ONE_HUNDRED_PERCENT,
+        ),
+      )
+
+  // remove lp fees from price impact
+  const priceImpactWithoutFeeFraction = trade && realizedLPFee ? trade.priceImpact.subtract(realizedLPFee) : undefined
+
+  // the x*y=k impact
+  const priceImpactWithoutFeePercent = priceImpactWithoutFeeFraction
+    ? new Percent(priceImpactWithoutFeeFraction?.numerator, priceImpactWithoutFeeFraction?.denominator)
+    : undefined
+
+  // the amount of the input that accrues to LPs
+  const realizedLPFeeAmount =
+    realizedLPFee &&
+    trade &&
+    (trade.inputAmount instanceof TokenAmount
+      ? new TokenAmount(trade.inputAmount.token, realizedLPFee.multiply(trade.inputAmount.raw).quotient)
+      : CurrencyAmount.ether(realizedLPFee.multiply(trade.inputAmount.raw).quotient))
+
+  return { priceImpactWithoutFee: priceImpactWithoutFeePercent, realizedLPFee: realizedLPFeeAmount }
+}
