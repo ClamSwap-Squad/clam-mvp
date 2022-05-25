@@ -70,6 +70,7 @@ export const ClamItem = ({
         if(parseFloat(clamDataValues.gemPrice)) {
           const pearlPriceUSD = await getPearlPriceForClamGrade(clamDataValues.grade);
           const clamPriceUSD = await getPriceForClamGrade(clamDataValues.grade);
+          console.log("pearl + clam price USD", pearlPriceUSD, clamPriceUSD);
           setPearlPrice(formatNumberToLocale(+clamDataValues.gemPrice * +pearlPriceUSD / +clamPriceUSD, 2, true));
         }
 
@@ -190,7 +191,7 @@ export const ClamItem = ({
                 <div className="bg-gray-50 flex flex-row justify-between sm:gap-4 p-2">
                   <dt className="text-sm font-medium text-gray-500">Pearl Cost</dt>
                   <dd className="mt-1 text-sm text-gray-900 sm:mt-0">
-                    {pearlPrice > 0 ? pearlPrice + " GEM" : (<span>
+                    {parseFloat(clamDataValues.gemPrice) > 0 ? pearlPrice + " GEM" : (<span>
                       Unknown&nbsp;
                       <button type="button" data-tip="This is an older generation Clam with production price in GEM determined at the time of collecting a produced Pearl">
                         <FontAwesomeIcon icon={faInfoCircle} />

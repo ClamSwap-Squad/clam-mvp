@@ -52,8 +52,8 @@ export const FARM_SPEECH = {
       skip: false,
     },
     pearlCollectGemprompt: {
-      text: ({ pearlPrice }) =>
-        `It costs ${pearlPrice} $GEM to collect the pearl. Do you want to proceed?`,
+      text: ({ pearlPriceFormatted }) =>
+        `It costs ${pearlPriceFormatted} $GEM to collect the pearl. Do you want to proceed?`,
       next: `purchase`,
       dismiss: false,
       suppressSpeechBubble: false,

@@ -301,7 +301,7 @@ const ClamBuyModal = ({
             </div>
           </div>
 
-          <div className="flex flex-row justify-between items-center pt-4">
+          <div className="flex flex-row justify-between items-center pt-4 w-[38rem]">
             <video autoPlay playsInline loop className="w-1/3">
             <source src="https://clam-island-public.s3.us-east-2.amazonaws.com/clam-preview.mp4" type="video/mp4" />
             </video>
@@ -334,11 +334,11 @@ const ClamBuyModal = ({
                     <FontAwesomeIcon icon={faInfoCircle} />
                   </button>
                 </span>
-                <span>{selectedGradeData.minLifespan * minPearlProductionTime + 30} to {selectedGradeData.maxLifespan * maxPearlProductionTime + 36 + 30} days</span>
+                <span>{Math.round(selectedGradeData.minLifespan * minPearlProductionTime / 24 + 30, 0)} to {Math.round(selectedGradeData.maxLifespan * maxPearlProductionTime / 24 + 36 + 30, 0)} days</span>
               </div>
               <div className="w-full flex flex-row justify-between">
                 <span>&nbsp;</span>
-                <span className="text-gray-400 text-xs">Average {(parseFloat(selectedGradeData.minLifespan) + parseFloat(selectedGradeData.maxLifespan)) / 2 * (minPearlProductionTime + maxPearlProductionTime) / 2 + 18 + 30} days</span>
+                <span className="text-gray-400 text-xs">Average {Math.round((parseFloat(selectedGradeData.minLifespan) / 24 + parseFloat(selectedGradeData.maxLifespan) / 24) / 2 * (minPearlProductionTime + maxPearlProductionTime) / 24 / 2 + 18 + 30, 0)} days</span>
               </div>
               <div className="w-full flex flex-row justify-between">
                 <span>

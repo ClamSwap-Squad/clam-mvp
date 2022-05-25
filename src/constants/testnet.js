@@ -14,11 +14,12 @@ export default {
   clamLotteryAddress: "0x574DCc6A88987BB754Fa1da9b53524a804142E64",
   clamShopAddress: "0x2E477e8f7E7da4D18D38aE0D0752A3a3b4038b7e",
   pearlFarmAddress: "0x9d50b0640CFaa0DA9A427409A74f3a9b9Faf55B5",
+  communityRewardsAddress: "0x5A11EEcee855B172aD0F4AdbB3b4505Be29ECCba",
   pearlHuntAddress: "0x4D96B949B49DFA43F4ef8b85060C0Ee118A9BA94",
   gemOracleAddress: "0x364aF36F53089061cEB09db52CB63A2E6aAb6B3D",
   clamExchangeAddress: "0xCc706B214F7fD7c82E5D36B2e7116Beb9Be71745",
   // third party addresses
-  pancakeRouterAddress: "0x9Ac64Cc6e4415144C455BD8E4837Fea55603e5c3",
+  pancakeRouterAddress: "0x9ac64cc6e4415144c455bd8e4837fea55603e5c3",
   wBNB: "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
   BUSD: "0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee",
   multicallAddress: "0x28d387c0405Fb8eE7bBeB92A6D783A8436076487",

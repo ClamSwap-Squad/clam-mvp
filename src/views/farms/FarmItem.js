@@ -118,12 +118,12 @@ const FarmItem = ({
         }
 
         // set up for GEM approval comparison check
-        const pPriceAsBigNumber = new BigNumber(pearlPrice.toString());
+        //const pPriceAsBigNumber = new BigNumber(pearlPrice.toString());
         const gemAllowance = await getAllowance(address, pearlFarmAddress).then(
           (v) => new BigNumber(v)
         );
 
-        setGemApproved(pPriceAsBigNumber.lt(gemAllowance));
+        setGemApproved(new BigNumber(pearlPrice.toString()).lt(gemAllowance));
       } catch (err) {
         updateAccount({ error: err.message });
       }
@@ -188,7 +188,7 @@ const FarmItem = ({
       pearlGemPrompt(
         {
           updateCharacter,
-          pearlPrice: renderNumber(+formatFromWei(pearlPrice.toString()), 3),
+          pearlPriceFormatted: renderNumber(+formatFromWei(pearlPrice.toString()), 3),
           gems: isLegacyPearl ? renderNumber(+formatFromWei(gems), 3) : "",
         },
         async () => {
@@ -201,9 +201,9 @@ const FarmItem = ({
               const gemBalance = await getBalance(address).then((v) => new BigNumber(v)); // from string to BN
               if (gemBalance.lt(pearlPrice))
                 throw new Error(
-                  `You need at least ${formatFromWei(pearlPrice)} GEM to collect Pearl`
+                  `You need at least ${renderNumber(+formatFromWei(pearlPrice.toString()), 3)} GEM to collect Pearl`
                 );
-
+              console.log("gemBalance lt passed");
               if (!gemApproved) {
                 setButtonText("Approving GEM...");
                 await infiniteApproveSpending(address, pearlFarmAddress, pearlPrice);
@@ -251,11 +251,12 @@ const FarmItem = ({
             setInTx(false);
             setButtonText("Collect Pearl");
             setAction("collect");
-            const errorMsg = JSON.parse(err.message.split("\n").slice(1).join(""));
+            console.log(err);
+            //const errorMsg = JSON.parse(err.message.split("\n").slice(1).join(""));
             toast.error(
               <>
                 <p>There was an error collecting your pearl.</p>
-                <p>{errorMsg.message}</p>
+                <p>{err.message}</p>
               </>
             );
           }
