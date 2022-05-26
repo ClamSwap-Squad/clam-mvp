@@ -158,7 +158,7 @@ export const ClamItem = ({
   return (
     <>
       <ReactTooltip className="max-w-xl" />
-<<<<<<< HEAD
+{/* <<<<<<< HEAD */}
 
 
         <div className="div_lg">
@@ -200,7 +200,7 @@ export const ClamItem = ({
                       <dd className="mt-1 text-sm text-gray-900 sm:mt-0">{pearlBoost}</dd>
                     </div>
                   </dl>
-=======
+{/* =======
       <div className="card bg-white shadow-lg overflow-visible w-full border-4 border-gray-50 hover:border-4 hover:border-blue-200 ">
         <figure>
           <img className="h-64  w-full object-cover" src={img} alt="" />
@@ -258,7 +258,7 @@ export const ClamItem = ({
                     </button>
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900 sm:mt-0">{pearlBoost}</dd>
->>>>>>> origin/master
+>>>>>>> origin/master */}
                 </div>
               </div>
 

@@ -17,7 +17,7 @@ import Navbar from "components/Navbar";
 import { color, periodInSeconds, periodStart, shape } from "../web3/pearlBurner";
 import { getClamValueInShellToken, getPearlValueInShellToken } from "../web3/clam";
 
-<<<<<<< HEAD
+// <<<<<<< HEAD
 import clamIcon from "assets/clam-icon.png";
 import open from "assets/m-open.png";
 import close from "assets/m-close.png";
@@ -25,9 +25,9 @@ import close from "assets/m-close.png";
 
 import _ from "lodash";
 import ROUTES from "../router";
-=======
+// =======
 import BnbIcon from "assets/bnb-icon.png";
->>>>>>> origin/master
+// >>>>>>> origin/master
 
 let web3;
 
