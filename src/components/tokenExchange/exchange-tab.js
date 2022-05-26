@@ -347,10 +347,10 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
                     </div>
                 </div>
 
-                <dic className="text-sm mt-2 text-right">
-                    <p>Price Impact: { priceImpact ? priceImpact.toFixed(2) : "0" }%</p>
+                <div className="text-sm mt-2 text-right px-3">
+                    <p>Slippage: { slippage }%</p>
                     {/* <p>Minimum received: 12000 GEM</p> */}
-                </dic>
+                </div>
 
                 {
                     iToken.address == wBNB || allowanceAmount > 0 ? (
