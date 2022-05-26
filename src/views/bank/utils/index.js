@@ -44,7 +44,7 @@ export const getBalancesFormatted = async (account, lpToken, isSingleStake) => {
 };
 
 // POOL DATA component
-export const PoolData = ({ urlForExchange, tvl }) => {
+export const PoolData = ({ urlForExchange, tvl, tokenAddress }) => {
   const [tvlFmtd, setTVL] = useState("");
 
   useEffect(() => {
@@ -85,6 +85,7 @@ export const PoolData = ({ urlForExchange, tvl }) => {
           </div>
         </div>
       </div>
+{/* <<<<<<< HEAD */}
       <div className="div_sm">
         <div className="w-full px-2 mt-2 text-center">
           <div className="flex flex-row justify-center">
@@ -106,6 +107,27 @@ export const PoolData = ({ urlForExchange, tvl }) => {
           </div>
         </div>
 
+{/* =======
+      <div className="flex">
+        <a
+          href={`https://bscscan.com/address/${tokenAddress}`}
+          target="_blank"
+          className="text-gray-500 font-semibold underline"
+          rel="noreferrer"
+        >
+          BSC Scan
+        </a>
+      </div>
+      <div className="flex">
+        <a
+          href={urlForExchange}
+          target="_blank"
+          className="text-gray-500 font-semibold underline"
+          rel="noreferrer"
+        >
+          Get Token
+        </a>
+>>>>>>> origin/master */}
       </div>
     
     </>

@@ -17,6 +17,7 @@ import Navbar from "components/Navbar";
 import { color, periodInSeconds, periodStart, shape } from "../web3/pearlBurner";
 import { getClamValueInShellToken, getPearlValueInShellToken } from "../web3/clam";
 
+<<<<<<< HEAD
 import clamIcon from "assets/clam-icon.png";
 import open from "assets/m-open.png";
 import close from "assets/m-close.png";
@@ -24,6 +25,9 @@ import close from "assets/m-close.png";
 
 import _ from "lodash";
 import ROUTES from "../router";
+=======
+import BnbIcon from "assets/bnb-icon.png";
+>>>>>>> origin/master
 
 let web3;
 
@@ -39,6 +43,18 @@ const web3Modal = new Web3Modal({
     //     description: "Home-BrowserWallet",
     //   },
     // },
+    "custom-injected": {
+        display: {
+          logo: "https://cdn.bitkeep.vip/u_b_69b66a00-a046-11ec-a3eb-f758fa002ae8.png",
+          name: "BitKeep",
+          description: "Bitkeep Wallet",
+        },
+        package: connectors.injected,
+        connector: async (ProviderPackage: any, options: any) => {
+          const provider = new ProviderPackage(options);
+          return provider;
+        },
+    },
     walletconnect: {
       package: WalletConnectProvider,
       options: {
@@ -71,7 +87,7 @@ const web3Modal = new Web3Modal({
       display: {
         name: "Binance",
         description: "Binance Chain Wallet",
-        logo: "https://zeroheight-uploads.s3-accelerate.amazonaws.com/10130f38006eb6d73d4bb2?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAJXTVUC4XZENV3LPQ%2F20211105%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20211105T140330Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=20a675ead3a7d80efacbfc5c7f8120c45037550fa6f9793280d7790c4add8af3",
+        logo: BnbIcon,
       },
       package: "binance",
       connector: async (ProviderPackage, options) => {
@@ -82,6 +98,8 @@ const web3Modal = new Web3Modal({
     },
   },
 });
+
+web3Modal.userOptions.unshift(web3Modal.userOptions.splice(2, 1)[0]);
 
 export function useWeb3Modal({
   resetAccount,

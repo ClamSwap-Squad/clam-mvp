@@ -35,9 +35,10 @@ import { infiniteApproveSpending } from "web3/gem";
 import { getVestedGem } from "web3/gemLocker";
 import { getVestedGem as getVestedGemV2 } from "web3/gemLockerV2";
 import { getUsdPriceOfToken } from "web3/pancakeRouter";
-import { getMintedThisWeek, getClamsPerWeek } from "web3/clamShop";
+import { getMintedThisWeek, getClamsPerWeek, getUpdatedPrice, getUpdatedPearlPrice } from "web3/clamShop";
 import { stakePrice } from "web3/pearlFarm";
 import { clamShopAddress, gemTokenAddress, BUSD } from "constants/constants";
+import {getClamGradesData, getClamGradesList} from "web3/dnaDecoder";
 import { actions } from "store/redux";
 import { ACTIONS, CATEGORIES } from "constants/googleAnalytics";
 
@@ -78,6 +79,10 @@ const ClamBuyModal = ({
   const [clamsPerWeek, setClamsPerWeek] = useState("...");
   const [minPearlProductionTime, setMinPearlProductionTime] = useState("...");
   const [maxPearlProductionTime, setMaxPearlProductionTime] = useState("...");
+  const [gradesData, setGradesData] = useState([]);
+  const [gradesList, setGradesList] = useState([]);
+  const [selectedGrade, setSelectedGrade] = useState("...");
+  const [selectedGradeData, setSelectedGradeData] = useState({});
   const [pearlPrice, setPearlPrice] = useState("...");
   const [clamPriceBnb, setClamPriceBnb] = useState(0);
   const [buyWithGem, setBuyWithGem] = useState(false);
@@ -85,44 +90,67 @@ const ClamBuyModal = ({
 
   useEffect(() => {
     const fetchData = async () => {
-      const [_gemPrice, _clamPrice, _lockedGemV1, _lockedGemV2, _clamsPerWeek, _mintedThisWeek] = await Promise.all(
+      const [_gemPrice, _lockedGemV1, _lockedGemV2, _clamsPerWeek, _mintedThisWeek, _gradesData, _gradesList] = await Promise.all(
         [
           getUsdPriceOfToken(gemTokenAddress, BUSD),
-          getPrice(),
           getVestedGem(),
           getVestedGemV2(),
           getClamsPerWeek(),
-          getMintedThisWeek()
+          getMintedThisWeek(),
+          getClamGradesData(),
+          getClamGradesList()
         ]
       );
-      const _clamPriceBnb = await getClamPriceBnb(_clamPrice);
-      setClamPrice(_clamPrice);
+      console.log(_gradesData);
+      console.log(_gradesList);
+      setGradesList([..._gradesList].reverse());
+      const _grades = [];
+      _gradesData.forEach((item, i) => {
+        _grades[_gradesList[i]] = {
+          price: _gradesData[i][0],
+          pearlPrice: _gradesData[i][1],
+          minSize: _gradesData[i][2],
+          maxSize: _gradesData[i][3],
+          minLifespan: _gradesData[i][4],
+          maxLifespan: _gradesData[i][5],
+          baseShell: _gradesData[i][6]
+        }
+      });
+      console.log(_grades);
+      setGradesData(_grades);
+      console.log(gradesData);
+      console.log(selectedGrade);
+      setSelectedGrade("f");
+      //const _clamPriceBnb = await getClamPriceBnb(_clamPrice);
+      //setClamPrice(_clamPrice);
       setLockedGem(_lockedGemV1 + _lockedGemV2);
       setClamsPerWeek(_clamsPerWeek);
+      console.log(clamsPerWeek);
       setMintedThisWeek(_mintedThisWeek);
-      setClamPriceBnb(_clamPriceBnb);
+      //setClamPriceBnb(_clamPriceBnb);
 
       const getPearlProductionTime = async () => {
         const [minTime, maxTime] = await Promise.all([
           getMinPearlProductionDelay(),
           getMaxPearlProductionDelay(),
         ]);
+        //console.log("productionTime: " + minTime + " " + maxTime);
         setMinPearlProductionTime(minTime / 3600);
         setMaxPearlProductionTime(maxTime / 3600);
       };
 
       getPearlProductionTime();
 
-      const getPearlPrice = async () => {
-        const pearlPrice = await stakePrice();
-        setPearlPrice(formatNumberToLocale(pearlPrice, 2, true));
-      };
+      //const getPearlPrice = async () => {
+      //  const pearlPrice = await stakePrice();
+      //  setPearlPrice(formatNumberToLocale(pearlPrice, 2, true));
+      //};
 
-      getPearlPrice();
+      //getPearlPrice();
 
-      const _clamUsdPrice = new BigNumber(_clamPrice).multipliedBy(_gemPrice).div(1e18); // remove 18 decimals once
+      //const _clamUsdPrice = new BigNumber(_clamPrice).multipliedBy(_gemPrice).div(1e18); // remove 18 decimals once
 
-      setClamUsdPrice(_clamUsdPrice);
+      //setClamUsdPrice(_clamUsdPrice);
 
       if (address) {
         const clamToCollect = await checkHasClamToCollect(address);
@@ -132,29 +160,64 @@ const ClamBuyModal = ({
       }
     };
     fetchData();
+
   }, []);
+
+  useEffect(() => {
+    if(buyWithGem) {
+      setClamPrice(0);
+    } else {
+      setClamPriceBnb(0);
+    }
+    if(gradesData[selectedGrade] !== undefined) {
+      setSelectedGradeData(gradesData[selectedGrade]);
+      setClamUsdPrice(gradesData[selectedGrade].price);
+      const updateData = async() => {
+        const _clamPrice = await getUpdatedPrice(selectedGrade);
+        setClamPrice(_clamPrice);
+        console.log("clamPrice: " + _clamPrice);
+        const _clamPriceBnb = await getClamPriceBnb(_clamPrice);
+        console.log("clamPriceBNB: " + _clamPriceBnb);
+        setClamPriceBnb(_clamPriceBnb);
+        const _pearlPrice = await getUpdatedPearlPrice(selectedGrade);
+        setPearlPrice(_pearlPrice);
+        console.log("pearlPrice: " + _pearlPrice / 1e18);
+      }
+      updateData();
+
+    };
+  }, [selectedGrade]);
 
   useEffect(() => {
     if (buyWithGem) {
       const balanceBN = new BigNumber(parseEther(gemBalance).toString());
       const lockedBN = new BigNumber(lockedGem * 1e18);
-      const totalBN = balanceBN.plus(lockedBN);
+      const clamPriceBN = new BigNumber(clamPrice);
+      const usableLockedBN = lockedBN.isGreaterThanOrEqualTo(clamPriceBN.div(2)) ? clamPriceBN.div(2) : lockedBN;
+      const totalBN = balanceBN.plus(usableLockedBN);
+      if(clamPrice == 0) {
+        setCanBuy(false);
+      } else {
+        setCanBuy(totalBN.isGreaterThanOrEqualTo(clamPriceBN));
+      }
 
-      setCanBuy(totalBN.isGreaterThanOrEqualTo(new BigNumber(clamPrice)));
     } else {
       const balanceBN = new BigNumber(parseEther(bnbBalance).toString());
-
-      setCanBuy(balanceBN.isGreaterThanOrEqualTo(new BigNumber(clamPriceBnb)));
+      if(clamPriceBnb == 0) {
+        setCanBuy(false);
+      } else {
+        setCanBuy(balanceBN.isGreaterThanOrEqualTo(new BigNumber(clamPriceBnb)));
+      }
     }
 
     //already has rng
     if (!!clamToCollect && clamToCollect != zeroHash) {
       setModalToShow("collect");
     }
-  }, [gemBalance, clamPrice, lockedGem, clamToCollect, buyWithGem]);
+  }, [gemBalance, clamPrice, clamPriceBnb, lockedGem, clamToCollect, buyWithGem]);
 
   const onSubmit = async () => {
-    if (new BigNumber(lockedGem).gt(0)) {
+    if (new BigNumber(lockedGem).gt(0) && buyWithGem) {
       buyClamWithVested(
         { address, updateCharacter, gem: formatNumber(+lockedGem, 3) },
         async () => await executeBuy(true),
@@ -173,9 +236,9 @@ const ClamBuyModal = ({
     try {
       if (buyWithGem) {
         await infiniteApproveSpending(address, clamShopAddress, clamPrice);
-        withVested ? await buyClamWithVestedTokens(address) : await buyClam(address);
+        withVested ? await buyClamWithVestedTokens(address, selectedGrade) : await buyClam(address, selectedGrade);
       } else {
-        await buyClamWithBnb(address);
+        await buyClamWithBnb(address, selectedGrade);
       }
 
       buyClamSuccess({ updateCharacter }); // character speaks
@@ -183,7 +246,7 @@ const ClamBuyModal = ({
       ReactGA.event({
         action: ACTIONS.boughtClam,
         category: CATEGORIES.shop,
-        value: parseFloat(clamUsdPrice),
+        value: parseFloat(selectedGradeData.price),
       });
       setIsLoading(false);
       setModalToShow("collect");
@@ -198,36 +261,107 @@ const ClamBuyModal = ({
   return (
     <>
       <ReactTooltip html={true} className="max-w-xl" />
-      <Card>
-        <form onSubmit={handleSubmit(onSubmit)} style={{maxWidth: "600px"}}>
-          <div className="flex flex-col mb-4">
-            <h2 className="text-blue-700 text-center font-semibold text-3xl mb-2">Get Clams</h2>
+      <Card maxHeight="100%">
+        <form onSubmit={handleSubmit(onSubmit)} className="px-8 py-4 relative">
+          <div className="flex flex-row justify-center items-center gap-6 mb-6">
+            <h2 className="text-blue-700 text-center font-semibold text-3xl mb-1">Buy Clam</h2>
+            <div className="right-8 absolute" onClick={() => setBuyWithGem(!buyWithGem)}>
+              <label className="label cursor-pointer p-0">
+                <span className="label-text text-xl text-gray-700">Use {buyWithGem ? "GEM" : "BNB"}</span>
+                <div
+                  className={clsx(
+                    "w-20 h-11 ml-4 rounded-full bg-white shadow-card hover:shadow-cardHover transition-all flex items-center px-1",
+                    !buyWithGem && "justify-end"
+                  )}
+                >
+                  {buyWithGem ? (
+                    <div
+                      className="rounded-full w-9 h-9 bg-contain"
+                      style={{ backgroundImage: `url(${ClamIcon})` }}
+                    />
+                  ) : (
+                    <div
+                      className="rounded-full w-9 h-9 bg-contain"
+                      style={{ backgroundImage: `url(${BnbIcon})` }}
+                    />
+                  )}
+                </div>
+              </label>
+            </div>
+          </div>
 
-            {address ? (
-              <a
-                className="text-gray-500 text-base underline text-center p-2"
-                href={getExplorerAddressLink(clamShopAddress, ChainId.BSC)}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <div className="truncate w-2/3 inline-block underline">{clamShopAddress}</div>
-                <FontAwesomeIcon
-                  className="absolute"
-                  style={{ marginTop: "2px" }}
-                  icon={faExternalLinkAlt}
-                />
-              </a>
-            ) : (
-              <span className="text-yellow-400 text-center">Wallet not connected</span>
-            )}
+          <div className="flex flex-row gap-4 items-center justify-between">
+            <div>
+              Select Grade:
+            </div>
+            <div className="tabs tabs-boxed">
+              {gradesList.map((item, key) => {
+                return <button type="button" key={key} onClick={() => {setSelectedGrade(item); setPearlPrice("...")}} className={selectedGrade != item ? "tab uppercase" : "tab uppercase tab-active"}>{item}</button>
+              })}
+            </div>
+          </div>
+
+          <div className="flex flex-row justify-between items-center pt-4 w-[38rem]">
+            <video autoPlay playsInline loop className="w-1/3">
+            <source src="https://clam-island-public.s3.us-east-2.amazonaws.com/clam-preview.mp4" type="video/mp4" />
+            </video>
+            <div className="w-full ml-4 grid gap-1">
+              <div className="w-full flex flex-row justify-between">
+                <span>Size</span>
+                <div>
+                  <span>{selectedGradeData.minSize} to {selectedGradeData.maxSize}</span>
+                  <span className="text-xs text-gray-400"> / 100</span>
+                </div>
+              </div>
+              <div className="w-full flex flex-row justify-between">
+                <span>Lifespan</span>
+                <div>
+                  <span>{selectedGradeData.minLifespan} to {selectedGradeData.maxLifespan}</span>
+                  <span className="text-xs text-gray-400"> / 15 Pearls</span>
+                </div>
+              </div>
+              <div className="w-full flex flex-row justify-between">
+                <span>Pearl Production Price</span>
+                <div>
+                  <span>{pearlPrice == "..." ? "..." : formatNumberToLocale(pearlPrice, 2, true) + " GEM"}</span>
+                  <span className="text-xs text-gray-400"> ≈ ${selectedGradeData.pearlPrice}</span>
+                </div>
+              </div>
+              <div className="w-full flex flex-row justify-between">
+                <span>
+                  Yield maturity&nbsp;
+                  <button data-tip="Assuming all Pearls produced are claimed for max GEM yield as early as possible. Max GEM yield may be claimed if a Pearl matches the Pearl traits in the Bank (rotated every 12 hours) and the 30-day yield stream option is selected.">
+                    <FontAwesomeIcon icon={faInfoCircle} />
+                  </button>
+                </span>
+                <span>{Math.round(selectedGradeData.minLifespan * minPearlProductionTime / 24 + 30, 0)} to {Math.round(selectedGradeData.maxLifespan * maxPearlProductionTime / 24 + 36 + 30, 0)} days</span>
+              </div>
+              <div className="w-full flex flex-row justify-between">
+                <span>&nbsp;</span>
+                <span className="text-gray-400 text-xs">Average {Math.round((parseFloat(selectedGradeData.minLifespan) / 24 + parseFloat(selectedGradeData.maxLifespan) / 24) / 2 * (minPearlProductionTime + maxPearlProductionTime) / 24 / 2 + 18 + 30, 0)} days</span>
+              </div>
+              <div className="w-full flex flex-row justify-between">
+                <span>
+                  Net GEM ROI&nbsp;
+                  <button type="button" data-tip="Assuming max GEM yield is claimed for all Pearls produced">
+                    <FontAwesomeIcon icon={faInfoCircle} />
+                  </button>
+                </span>
+                <span>-45% to {formatNumberToLocale(32000)}%</span>
+              </div>
+              <div className="w-full flex flex-row justify-between">
+                <span>&nbsp;</span>
+                <span className="text-gray-400 text-xs">Average 66%</span>
+              </div>
+            </div>
           </div>
 
           {/* input */}
-          <div className="bg-white border-2 shadow rounded-xl">
+          <div className="bg-white shadow-card rounded-xl p-4 my-6">
             <div className="px-2 py-2">
               <div className="flex flex-col">
                 <div className="flex justify-between items-center my-2">
-                  <div className="text-lg font-semibold">Price of Clam</div>
+                  <div className="text-lg font-semibold">Price of Grade {selectedGrade.toUpperCase()} Clam</div>
                   <div onClick={() => setBuyWithGem(!buyWithGem)}>
                     <label className="label cursor-pointer p-0">
                       <span className="label-text">Buy with {buyWithGem ? "GEM" : "BNB"}</span>
@@ -267,7 +401,7 @@ const ClamBuyModal = ({
                               ? "... BNB"
                               : `${renderNumber(+formatEther(clamPriceBnb), 2)} BNB`}
                             {!buyWithGem && (
-                              <button data-tip="80% of BNB price is used to purchase GEM, the other 20% is sent to treasury. BNB price may be more than USD equivalent price displayed below due to slippage on conversion to GEM.">
+                              <button type="button" data-tip="80% of BNB price is used to purchase GEM, the other 20% is sent to treasury. BNB price may be more than USD equivalent price displayed below due to slippage on conversion to GEM.">
                                 <FontAwesomeIcon className="ml-1" icon={faInfoCircle} />
                               </button>
                             )}
@@ -288,102 +422,19 @@ const ClamBuyModal = ({
                           <span>Vested:</span>
                           <span>{formatNumber(+lockedGem, 3)} GEM</span>
                         </div>
-                        <div className="flex justify-between">
-                          <span>1 CLAM =</span>
-                          <span>
-                            {buyWithGem
-                              ? `${renderNumber(+formatEther(clamPrice), 2)} GEM`
-                              : `${renderNumber(+formatEther(clamPriceBnb), 2)} BNB`}
-                          </span>
-                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="text-md font-semibold my-2">
-                  {mintedThisWeek} of {clamsPerWeek} available Clams purchased this week
+                <div className="text-md my-2 text-xs text-gray-400">
+                  {mintedThisWeek} Clams purchased this week
                 </div>
               </div>
             </div>
           </div>
 
-          <Divider />
-
           {/* output */}
-          <div className="flex flex-row justify-between items-center">
-            <video autoPlay playsinline loop className="w-1/3">
-            <source src="https://clam-island-public.s3.us-east-2.amazonaws.com/clam-preview.mp4" type="video/mp4" />
-            </video>
-            <div className="w-full ml-4 grid">
-              <div className="w-full flex flex-row justify-between">
-                <span>Lifespan</span>
-                <span>5-15 Pearls</span>
-              </div>
-              <div className="w-full flex flex-row justify-between">
-                <span>Pearl Production Time</span>
-                <span>{minPearlProductionTime + "-" + maxPearlProductionTime + " hrs"}</span>
-              </div>
-              <div className="w-full flex flex-row justify-between">
-                <span>Pearl Production Price</span>
-                <span>{pearlPrice + " GEM"}</span>
-              </div>
-              <div className="w-full flex flex-row justify-between">
-                <span>
-                  Clam Boost&nbsp;
-                  <button data-tip="Dependent on the traits of the Clam purchased. Applied as a multiplier to the GEM yield for every Pearl produced by a Clam, in addition to the Pearl Boost.">
-                    <FontAwesomeIcon icon={faInfoCircle} />
-                  </button>
-                </span>
-                <span>0.7-30x</span>
-              </div>
-              <div className="w-full flex flex-row justify-between">
-                <span>
-                  Pearl Boost&nbsp;
-                  <button data-tip="Dependent on the traits of the Pearl produced. Applied as a multiplier to the Pearl production price to give a GEM yield for the Pearl.">
-                    <FontAwesomeIcon icon={faInfoCircle} />
-                  </button>
-                </span>
-                <span>0.7-30x</span>
-              </div>
-              <div className="w-full flex flex-row justify-between">
-                <span>
-                  Net GEM ROI&nbsp;
-                  <button data-tip="Assuming fixed Pearl production price, Clam price and Pearl production price in GEM will fluctuate in practice">
-                    <FontAwesomeIcon icon={faInfoCircle} />
-                  </button>
-                </span>
-                <span>
-                  {renderNumber(
-                    ((+formatEther(clamPrice) * 0.7 * 0.7 - formatEther(clamPrice) * 2) /
-                      (formatEther(clamPrice) * 2)) *
-                      100,
-                    0
-                  ) +
-                    "% to " +
-                    renderNumber(
-                      ((+formatEther(clamPrice) * 30 * 30 - formatEther(clamPrice) * 2) /
-                        (formatEther(clamPrice) * 2)) *
-                        100,
-                      0
-                    ) +
-                    "%"}
-                </span>
-              </div>
-              <div className="w-full flex flex-row justify-between">
-                <span>&nbsp;</span>
-                <span className="text-gray-400 text-sm">
-                  {"(Average " +
-                    renderNumber(
-                      ((+formatEther(clamPrice) * 2 * 2 - formatEther(clamPrice) * 2) /
-                        (formatEther(clamPrice) * 2)) *
-                        100,
-                      0
-                    ) +
-                    "%)"}
-                </span>
-              </div>
-            </div>
-          </div>
+
 
           <div className="py-2 flex flex-col">
             {disableButton ? (

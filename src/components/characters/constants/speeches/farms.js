@@ -8,8 +8,7 @@ export const FARM_SPEECH = {
     },
 
     welcome_next: {
-      text: ({ gem }) =>
-        `It will just cost ${gem} $GEM to produce a Pearl, which is payable when you collect the produced Pearl. Remember that each Clam can only produce a specific number of Pearls before it dies!`,
+      text: `The $GEM cost to produce a Pearl depends on the grade of your Clam, and is payable when you collect the produced Pearl. Remember that each Clam can only produce a specific number of Pearls before it dies!`,
       dismiss: true,
       skip: true,
       hideable: true,
@@ -53,8 +52,8 @@ export const FARM_SPEECH = {
       skip: false,
     },
     pearlCollectGemprompt: {
-      text: ({ pearlPrice }) =>
-        `It costs ${pearlPrice} $GEM to collect the pearl. Do you want to proceed?`,
+      text: ({ pearlPriceFormatted }) =>
+        `It costs ${pearlPriceFormatted} $GEM to collect the pearl. Do you want to proceed?`,
       next: `purchase`,
       dismiss: false,
       suppressSpeechBubble: false,

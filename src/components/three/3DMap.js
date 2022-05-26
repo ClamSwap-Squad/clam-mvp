@@ -210,7 +210,7 @@ const Map3D = ({ isGuidedTourPassed, setIsGuidedTourPassed }) => {
 
     flyingSeagulls(tDelta);
     swimmingDolphins(tDelta);
-
+    //cameraControls.current.azimuthAngle += 20 * tDelta * THREE.MathUtils.DEG2RAD; // auto-rotate
     composer.render();
   };
 

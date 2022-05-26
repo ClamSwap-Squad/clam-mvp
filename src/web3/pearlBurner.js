@@ -17,6 +17,12 @@ export const color = async () => {
   return await pearlBurner().methods.colour().call();
 };
 
+export const getCurrentShapeAndColour = async () => {
+  const shapeAndColourIndex = await pearlBurner().methods.getCurrentShapeAndColourIndex().call();
+  console.log(shapeAndColourIndex);
+  return await pearlBurner().methods.getShapeAndColourByIndex(shapeAndColourIndex[0], shapeAndColourIndex[1]).call();
+}
+
 export const periodStart = async () => {
   return await pearlBurner().methods.periodStart().call();
 };
@@ -29,9 +35,10 @@ export const pearlLegacyBaseGemRewards = async () => {
   return await pearlBurner().methods.baseGemRewards().call();
 };
 
-export const burnPearl = async (pearlId, forfeitPearl) => {
+export const burnPearl = async (pearlId, forfeitPearl, maxYield) => {
   const account = getAccount();
-  const method = pearlBurner().methods.burnPearl(pearlId, forfeitPearl);
+  //console.log("burnPearl ", pearlId, forfeitPearl, maxYield);
+  const method = pearlBurner().methods.burnPearl(pearlId, forfeitPearl, maxYield);
   const gasEstimation = await method.estimateGas({ from: account });
 
   await method.send({ from: account, gas: gasEstimation });

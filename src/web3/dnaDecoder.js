@@ -2,15 +2,37 @@ import dnaDecoderAbi from "./abi/DNADecoder.json";
 import { dnaDecoderAddress } from "../constants/constants";
 import { contractFactory } from "./index";
 
+const dnaDecoder = contractFactory({
+  abi: dnaDecoderAbi,
+  address: dnaDecoderAddress,
+});
+
 export const getDNADecoded = async (dna) => {
-  const dnaDecoder = contractFactory({
-    abi: dnaDecoderAbi,
-    address: dnaDecoderAddress,
-  });
+
   const traits = await dnaDecoder.methods.getDNADecoded(dna).call();
 
   return traits;
 };
+
+export const getClamGradeData = async (grade) => {
+  const isClamGradeValid = await dnaDecoder.methods.isClamGradeValid(grade).call();
+  if(isClamGradeValid) {
+    const clamGradeData = await dnaDecoder.methods.getClamGrade(grade).call();
+    return clamGradeData;
+  } else {
+    return [];
+  }
+}
+
+export const getClamGradesData = async () => {
+  const clamGradesData = await dnaDecoder.methods.getClamGradesData().call();
+  return clamGradesData;
+}
+
+export const getClamGradesList = async () => {
+  const clamGradesList = await dnaDecoder.methods.getClamGradesList().call();
+  return clamGradesList;
+}
 
 export const prepGetDnaDecodedMulticall = (dnas) => {
   const contractCalls = [];
@@ -70,6 +92,16 @@ export const decodeGetDnaDecodedFromMulticall = (values, tokenIds) => {
 
   return result;
 };
+
+export const getPriceForClamGrade = async (grade) => {
+  const result = await dnaDecoder.methods.getPriceForClamGrade(grade).call();
+  return result;
+}
+
+export const getPearlPriceForClamGrade = async (grade) => {
+  const result = await dnaDecoder.methods.getPearlPriceForClamGrade(grade).call();
+  return result;
+}
 
 export default {
   getDNADecoded,

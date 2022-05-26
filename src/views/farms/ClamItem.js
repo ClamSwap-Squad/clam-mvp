@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { approveContractForMaxUintErc721 } from "../../web3/bep20";
 import { getAllowance, infiniteApproveSpending, getBalance } from "../../web3/gem";
 import { exchangeClam, clamBonusData } from "../../web3/clamExchange";
+import { getPriceForClamGrade, getPearlPriceForClamGrade } from "../../web3/dnaDecoder"
 import { clamExchangeAddress, clamNFTAddress, pearlFarmAddress } from "../../constants/constants";
 import ReactTooltip from "react-tooltip";
 import {
@@ -49,6 +50,8 @@ export const ClamItem = ({
 
   const [isClamDeposited, setIsClamDeposited] = useState(false);
 
+  const [pearlPrice, setPearlPrice] = useState(0);
+
   useEffect(() => {
     const init = async () => {
       try {
@@ -64,6 +67,13 @@ export const ClamItem = ({
             setInsufficientGem(true);
           }
         }
+        if(parseFloat(clamDataValues.gemPrice)) {
+          const pearlPriceUSD = await getPearlPriceForClamGrade(clamDataValues.grade);
+          const clamPriceUSD = await getPriceForClamGrade(clamDataValues.grade);
+          console.log("pearl + clam price USD", pearlPriceUSD, clamPriceUSD);
+          setPearlPrice(formatNumberToLocale(+clamDataValues.gemPrice * +pearlPriceUSD / +clamPriceUSD, 2, true));
+        }
+
       } catch (err) {
         updateAccount({ error: err.message });
       }
@@ -148,6 +158,7 @@ export const ClamItem = ({
   return (
     <>
       <ReactTooltip className="max-w-xl" />
+<<<<<<< HEAD
 
 
         <div className="div_lg">
@@ -189,6 +200,65 @@ export const ClamItem = ({
                       <dd className="mt-1 text-sm text-gray-900 sm:mt-0">{pearlBoost}</dd>
                     </div>
                   </dl>
+=======
+      <div className="card bg-white shadow-lg overflow-visible w-full border-4 border-gray-50 hover:border-4 hover:border-blue-200 ">
+        <figure>
+          <img className="h-64  w-full object-cover" src={img} alt="" />
+        </figure>
+
+        <div className="flex justify-between px-4 py-2">
+          <div className=" badge badge-success">#{tokenId}</div>
+          { clamDataValues.grade && (
+            <div className=" badge badge-info">Grade {clamDataValues.grade.toUpperCase()}</div>
+          )}
+          <div className="text-green-400 text-bold">{dnaDecoded.rarity}</div>
+        </div>
+
+        <div className="bg-white p-2 grid sm:gap-4">
+          <div className="block">
+            <div className="border rounded border-gray-200">
+              <dl>
+                <div className="bg-gray-50 flex flex-row justify-between sm:gap-4 p-2">
+                  <dt className="text-sm font-medium text-gray-500">Pearl ETA</dt>
+                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0">
+                    {(remainingTime > 0 ?
+                      secondsToFormattedTime(remainingTime) :
+                      (<span>
+                        Unknown&nbsp;
+                        <button type="button" data-tip="Next Pearl ETA not known until after a Clam is deposited in the Farm for the first time">
+                          <FontAwesomeIcon icon={faInfoCircle} />
+                        </button>
+                      </span>))}
+                  </dd>
+                </div>
+                <div className="bg-gray-50 flex flex-row justify-between sm:gap-4 p-2">
+                  <dt className="text-sm font-medium text-gray-500">Pearl Cost</dt>
+                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0">
+                    {parseFloat(clamDataValues.gemPrice) > 0 ? pearlPrice + " GEM" : (<span>
+                      Unknown&nbsp;
+                      <button type="button" data-tip="This is an older generation Clam with production price in GEM determined at the time of collecting a produced Pearl">
+                        <FontAwesomeIcon icon={faInfoCircle} />
+                      </button>
+                    </span>)}
+                  </dd>
+                </div>
+                <div className="bg-gray-100 flex flex-row justify-between sm:gap-4 p-2">
+                  <dt className="text-sm font-medium text-gray-500">Lifespan</dt>
+                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0">
+                    {+clamDataValues.pearlProductionCapacity - +clamDataValues.pearlsProduced}{" "}
+                    pearls remaining
+                  </dd>
+                </div>
+
+                <div className="bg-gray-50 flex flex-row justify-between sm:gap-4 p-2">
+                  <dt className="text-sm font-medium text-gray-500">
+                    Clam boost&nbsp;
+                    <button type="button" data-tip="Applied as a boost multiplier when calculating the GEM yield for each Pearl produced by this Clam.">
+                      <FontAwesomeIcon icon={faInfoCircle} />
+                    </button>
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0">{pearlBoost}</dd>
+>>>>>>> origin/master
                 </div>
               </div>
 

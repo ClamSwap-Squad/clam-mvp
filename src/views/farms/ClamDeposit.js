@@ -26,7 +26,9 @@ const ClamDeposit = ({
 
   useEffect(() => {
     const { order, value } = clamsSortOrder;
-    const sortedClams = getSortedClams(unsortedClams, value, order);
+    console.log(unsortedClams);
+    const availableClamsForDepositing = unsortedClams.filter((clam) => +clam.clamDataValues.pearlProductionCapacity - +clam.clamDataValues.pearlsProduced > 0);
+    const sortedClams = getSortedClams(availableClamsForDepositing, value, order);
     setClams(sortedClams);
   }, [unsortedClams, clamsSortOrder.order, clamsSortOrder.value]);
 

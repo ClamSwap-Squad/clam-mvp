@@ -82,6 +82,18 @@
 				"internalType": "uint256",
 				"name": "dna",
 				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "_grade",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "gemPrice",
+				"type": "uint256"
 			}
 		],
 		"name": "ClamMaximaMinted",
@@ -113,6 +125,18 @@
 				"indexed": false,
 				"internalType": "uint256",
 				"name": "dna",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "_grade",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "gemPrice",
 				"type": "uint256"
 			}
 		],
@@ -776,12 +800,22 @@
 					},
 					{
 						"internalType": "uint256",
-						"name": "gemBoost",
+						"name": "pearlBoostM",
 						"type": "uint256"
 					},
 					{
 						"internalType": "uint256",
-						"name": "pearlBoostM",
+						"name": "gemBoost",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "grade",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "gemPrice",
 						"type": "uint256"
 					}
 				],
@@ -1214,6 +1248,16 @@
 				"type": "uint256"
 			},
 			{
+				"internalType": "string",
+				"name": "_grade",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_gemPrice",
+				"type": "uint256"
+			},
+			{
 				"internalType": "bool",
 				"name": "isMaxima",
 				"type": "bool"
@@ -1237,6 +1281,16 @@
 				"type": "uint256"
 			},
 			{
+				"internalType": "string",
+				"name": "_grade",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_gemPrice",
+				"type": "uint256"
+			},
+			{
 				"internalType": "bool",
 				"name": "isMaxima",
 				"type": "bool"
@@ -1257,6 +1311,16 @@
 			{
 				"internalType": "uint256",
 				"name": "dna",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_grade",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_gemPrice",
 				"type": "uint256"
 			}
 		],
@@ -1360,6 +1424,11 @@
 				"internalType": "uint256",
 				"name": "_clamId",
 				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_grade",
+				"type": "string"
 			}
 		],
 		"name": "resetTraits",

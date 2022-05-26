@@ -17,6 +17,7 @@ import { getPearlsMaxBoostTime } from "utils/getPearlsMaxBoostTime";
 import { secondsToFormattedTime } from "utils/time";
 import { takeSnapshot } from "utils/takeSnapshot";
 import { getClamIncubationTime } from "web3/clam";
+import { getClamGradeData } from "web3/dnaDecoder";
 import { getCurrentBlockTimestamp } from "web3/index";
 import { getPearlDataByIds } from "web3/shared";
 
@@ -48,7 +49,8 @@ export default ({
   dna,
   dnaDecoded,
   pearlBoost,
-  clamDataValues: { pearlProductionCapacity, pearlsProduced, birthTime, pearlProductionStart },
+  clamDataValues: { pearlProductionCapacity, pearlsProduced, birthTime, grade, gemPrice, pearlProductionStart },
+
   clamValueInShellToken,
   pearlValueInShellToken,
   onClickNext,
@@ -73,17 +75,92 @@ export default ({
   const [remainingPearlProductionTime, setRemainingPearlProductionTime] = useState(0);
   const [isTakingSnapshot, setIsTakingSnapshot] = useState(false);
   const remainingFormattedTime = secondsToFormattedTime(remainingPearlProductionTime);
+// <<<<<<< HEAD
+// =======
+//   const [clamGradeData, setClamGradeData] = useState({});
+//   const [roi, setROI] = useState("...");
+//   useInterval(() => {
+//     const updatedProducedPearlsYieldTimers = producedPearlsYieldTimers.map((time) => {
+//       const remainingTime = time - 1000;
+//       if (remainingTime > 0) {
+//         return remainingTime;
+//       }
+
+//       return 0;
+//     });
+//     setProducedPearlsYieldTimers(updatedProducedPearlsYieldTimers);
+//     if (remainingPearlProductionTime > 0) {
+//       setRemainingPearlProductionTime(remainingPearlProductionTime - 1);
+//     }
+//   }, 1000);
+//   const harvestableShell =
+//     get(dnaDecoded, "shellShape") === "maxima"
+//       ? "N/A"
+//       : +clamValueInShellToken > 0
+//       ? +clamValueInShellToken + +pearlsProduced * +pearlValueInShellToken
+//       : "0";
+//   const formattedHarvestableShell =
+//     harvestableShell !== "N/A" ? formatShell(harvestableShell) : "N/A";
+//   const isFarmView = view === "farm";
+//   const isInspectorView = view === "inspector";
+
+//   const handleTakeSnapshot = () => {
+//     setIsTakingSnapshot(true);
+//   };
+
+//   useEffect(() => {
+//     if (isTakingSnapshot) {
+//       setTimeout(() => {
+//         const cb = () => setIsTakingSnapshot(false);
+//         takeSnapshot("clam-view", cb);
+//       }, 500);
+//     }
+//   }, [isTakingSnapshot]);
+// >>>>>>> origin/master
 
   
   useEffect(() => {
     const initClamView = async () => {
-      const [incubationTime, currentBlockTimestamp, pearls, remainingPearlProductionTime] =
+      setROI("...");
+      const [incubationTime, currentBlockTimestamp, pearls, remainingPearlProductionTime, _clamGradeData] =
         await Promise.all([
           getClamIncubationTime(),
           getCurrentBlockTimestamp(),
           getPearlDataByIds(producedPearlIds),
           getRemainingPearlProductionTime(clamId),
+          getClamGradeData(grade),
         ]);
+
+      if(_clamGradeData.length > 0) {
+        setClamGradeData({
+          price: _clamGradeData[0],
+          pearlPrice: _clamGradeData[1],
+          minSize: _clamGradeData[2],
+          maxSize: _clamGradeData[3],
+          minLifespan: _clamGradeData[4],
+          maxLifespan: _clamGradeData[5],
+          baseShell: _clamGradeData[6]
+        });
+
+        setROI(
+          formatNumberToLocale(
+            +(((pearlBoost * 1.8 - 1) * +pearlProductionCapacity * +_clamGradeData[1] - +_clamGradeData[0])) /
+            +(+_clamGradeData[0] + +pearlProductionCapacity * +_clamGradeData[1] ) * 100,
+            2
+          )
+        );
+      } else {
+        setROI(
+          formatNumberToLocale(
+            (((pearlBoost * 2 - 1) * pearlProductionCapacity - 10) /
+              (10 + +pearlProductionCapacity)) *
+              100,
+            2
+          )
+        );
+      }
+
+
       if (isFarmView) {
         setRemainingPearlProductionTime(remainingPearlProductionTime);
       }
@@ -153,12 +230,85 @@ export default ({
 
   return (
     <>
+{/* <<<<<<< HEAD */}
       <div className="div_lg">
         <ReactTooltip html={true} className="max-w-xl" />
         <div className="flex flex-col justify-between w-full relative">
           {isTakingSnapshot && (
             <div className="absolute w-full h-full z-10 min-w-[1024px]">
               <Skeleton animation="waves" variant="rect" height="100%" />
+{/* =======
+      <ReactTooltip html={true} className="max-w-xl" />
+      <div className="flex flex-col justify-between w-full relative">
+        {isTakingSnapshot && (
+          <div className="absolute w-full h-full z-10 min-w-[1024px]">
+            <Skeleton animation="waves" variant="rect" height="100%" />
+          </div>
+        )}
+        <div
+          id="clam-view"
+          className={
+            isTakingSnapshot
+              ? "flex justify-between flex-row pt-4 pl-4"
+              : "flex justify-between flex-col sm:flex-row"
+          }
+        >
+          <div className="grid">
+            {owner &&
+              (ownerAddress != pearlFarmAddress ? (
+                <div className="flex justify-center">
+                  <span>
+                    Owned by{" "}
+                    <a
+                      className=""
+                      target="_blank"
+                      rel="noreferrer"
+                      href={`https://bscscan.com/token/${clamNFTAddress}?a=${ownerAddress}#inventory`}
+                    >
+                      {owner} <FontAwesomeIcon icon={faExternalLinkAlt} className="ml-1" />
+                    </a>
+                  </span>
+                </div>
+              ) : (
+                <div className="flex justify-center">
+                  <span>Currently in Clam Farm</span>
+                </div>
+              ))}
+            <div className="w-[400px] h-[400px] relative">
+              <div
+                className={`absolute flex w-full h-full justify-center items-center z-20 bg-white bg-opacity-50 ${
+                  owner != "N/A" ? "hidden" : ""
+                }`}
+              >
+                <span className="text-3xl">Clam Harvested</span>
+              </div>
+              <Clam3DView
+                width={"100%"}
+                height={"100%"}
+                clamDna={dna}
+                decodedDna={dnaDecoded}
+                // clamTraits={clamTraits}
+              />
+            </div>
+            <div className="flex justify-between items-center py-2">
+              <div className="flex items-center">
+                <div className="badge badge-success mr-2">#{clamId}</div>
+                {grade != "" && (
+                  <div className="badge badge-info mr-2">Grade {grade.toUpperCase()}</div>
+                )}
+                <div className="text-green-400 text-bold">{get(dnaDecoded, "rarity")}</div>
+              </div>
+              <div className="flex gap-2">
+                <FontAwesomeIcon
+                  data-tip="Take a shareable snapshot"
+                  className="cursor-pointer"
+                  icon={faCamera}
+                  onClick={handleTakeSnapshot}
+                  size="lg"
+                />
+                <SocialMediaButtons assetId={clamId} assetName="Clam" />
+              </div>
+>>>>>>> origin/master */}
             </div>
           )}
           <div
@@ -196,6 +346,7 @@ export default ({
                     owner != "N/A" ? "hidden" : ""
                   }`}
                 >
+{/* <<<<<<< HEAD */}
                   <span className="text-3xl">Clam Harvested</span>
                 </div>
                 <Clam3DView
@@ -218,6 +369,32 @@ export default ({
                     icon={faCamera}
                     onClick={handleTakeSnapshot}
                     size="lg"
+// =======
+//                   <CardStat
+//                     label="GEM Cost"
+//                     value={
+//                       gemPrice == 0 ? "Unknown" : formatNumberToLocale(gemPrice, 2, true)
+//                     }
+//                   />
+//                   <CardStat
+//                     label="Pearls remaining / Lifespan"
+//                     value={
+//                       (+pearlProductionCapacity - +pearlsProduced).toString() +
+//                       " / " +
+//                       pearlProductionCapacity.toString()
+//                     }
+//                   />
+//                   <CardStat
+//                     label={
+//                       <>
+//                         Clam boost&nbsp;
+//                         <button data-tip="Applied as a multiplier to the GEM yield for every Pearl produced by this Clam">
+//                           <FontAwesomeIcon icon={faInfoCircle} />
+//                         </button>
+//                       </>
+//                     }
+//                     value={formatNumberToLocale(pearlBoost, 2) + "x"}
+// >>>>>>> origin/master
                   />
                   <SocialMediaButtons assetId={clamId} assetName="Clam" />
                 </div>
@@ -231,6 +408,7 @@ export default ({
                   
                     { remainingFormattedTime ? (
                       <>
+{/* <<<<<<< HEAD */}
                         {/* Progress Bar */}
                         <div className="progress-bar">
                           <div className={"base-bar " + (clam.progress < 100 ? "base-bar-animated" : "")}>
@@ -238,6 +416,12 @@ export default ({
                             <span>Producing {clam.progress}%</span>
                           </div>
                         </div>
+{/* =======
+                        Indicative GEM ROI / APR&nbsp;
+                        <button data-tip='<p class="mb-4">Indicative ROI is calculated based on an average GEM returns per Pearl without any regard for GEM price fluctuations, and assuming all Pearls are exchanged for max yield. Your actual ROI will vary.</p><p>Indicative APR represents annualised returns based on the indicative ROI and the average time it would take to farm all Pearls, exchange them for GEM and receive the 30-day stream for max yield.</p>'>
+                          <FontAwesomeIcon icon={faInfoCircle} />
+                        </button>
+>>>>>>> origin/master */}
                       </>
                     ) : "" }
                 </>
@@ -253,6 +437,7 @@ export default ({
                         ? "grid grid-cols-4 grid-rows-1 gap-3"
                         : "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3"
                     }
+// <<<<<<< HEAD
                   >
                     <CardStat
                       label="Pearls remaining / Lifespan"
@@ -320,6 +505,29 @@ export default ({
                       isTakingSnapshot
                         ? "grid grid-cols-4 grid-rows-1 gap-3"
                         : "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3"
+// =======
+//                     value={
+//                       roi + "% / " +
+
+//                       (!isNaN(roi) ?
+//                         formatNumberToLocale(
+//                           +roi / ((32 * +pearlProductionCapacity) / 24 + 18 + 30) * 365,
+//                         2)
+//                       :
+//                         "..."
+//                       ) +
+//                       "%"
+//                     }
+//                   />
+//                   <CardStat
+//                     label={
+//                       <>
+//                         Harvestable $SHELL&nbsp;
+//                         <button data-tip="Amount of $SHELL you will receive if you harvest this Clam in the Shop">
+//                           <FontAwesomeIcon icon={faInfoCircle} />
+//                         </button>
+//                       </>
+// >>>>>>> origin/master
                     }
                   >
                     <CardStat label="Shell Shape" value={get(dnaDecoded, "shellShape")} />

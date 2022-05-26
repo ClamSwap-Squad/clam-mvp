@@ -201,6 +201,13 @@ const PoolItem = ({
                 </p>
               </div>
 
+{/* <<<<<<< HEAD
+=======
+        {isAdditionalInfoVisible && (
+          <div className="flex items-start justify-between p-4 border-t-2 border-gray-700 h-96">
+            <div className="flex w-1/5">
+              <PoolData urlForExchange={urlForExchange} tvl={pool.tvl} tokenAddress={pool.lpToken} />
+>>>>>>> origin/master */}
             </div>
 
 

@@ -234,12 +234,11 @@ const Farms = ({
 
   useAsync(async () => {
     if (address) {
-      const priceForPearlInGem = await stakePrice();
-      const price = formatFromWei(priceForPearlInGem);
-      setPearlProductionPrice(Number(price).toFixed(2));
+      //const priceForPearlInGem = await stakePrice();
+      //const price = formatFromWei(priceForPearlInGem);
+      //setPearlProductionPrice(Number(price).toFixed(2));
       speechWelcome({ updateCharacter }, async () => {
-        //     [get Pearl production price in $GEM]
-        return speechWelcomeNext({ updateCharacter, gem: formatNumberToLocale(price, 2) });
+        return speechWelcomeNext({ updateCharacter });
       });
     } else {
       updateCharacter({

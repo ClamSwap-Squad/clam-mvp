@@ -144,7 +144,7 @@ export const CLAM_SHOP_SPEECH = {
     },
 
     harvest_warn: {
-      text: `WARNING!! Harvesting a Clam will allow you to receive $SHELL tokens, but it will destroy your Clam permanently. Are you sure you want to continue?`,
+      text: `WARNING!! Harvesting a Clam will allow you to receive SHELL tokens, but it will destroy your Clam permanently. Are you sure you want to continue?`,
       next: false,
       dismiss: true,
       skip: false,
@@ -152,7 +152,7 @@ export const CLAM_SHOP_SPEECH = {
 
     harvest_final_warn: {
       text: (shell) =>
-        `WARNING!! You are about to harvest this Clam for ${shell} $SHELL. This process will destroy your Clam and is not reversible. Do you want to continue?`,
+        `WARNING!! You are about to harvest this Clam for ${shell} SHELL. This process will destroy your Clam and is not reversible. Do you want to continue?`,
       next: false,
       dismiss: true,
       skip: false,
@@ -184,7 +184,7 @@ export const CLAM_SHOP_SPEECH = {
 
     harvest_congrats: {
       text: (shell) =>
-        `All done! Your Clam is no more. ${shell} $SHELL has been transferred to your wallet. Is there anything else that I can help you with?`,
+        `All done! Your Clam is no more. ${shell} SHELL has been transferred to your wallet. Is there anything else that I can help you with?`,
       next: false,
       dismiss: true,
       skip: false,
@@ -193,7 +193,7 @@ export const CLAM_SHOP_SPEECH = {
 
     can_use_vested: {
       text: (gem) =>
-        `You have ${gem} locked $GEM rewards, would you like to use these for buying your clam?`,
+        `You have ${gem} locked GEM rewards. Locked GEM rewards can be used to pay up to half of a Clam's purchase price. Would you like to use your locked GEM for buying your clam?`,
       next: false,
       dismiss: false,
       skip: false,

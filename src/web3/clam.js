@@ -1,6 +1,8 @@
 import clamNFTAbi from "./abi/Clam.json";
 import clamShopAbi from "./abi/ClamShop.json";
-import { clamNFTAddress, clamShopAddress } from "../constants/constants";
+import dnaDecoderAbi from "./abi/DNADecoder.json";
+import { getUpdatedPrice } from "./clamShop";
+import { clamNFTAddress, clamShopAddress, dnaDecoderAddress } from "../constants/constants";
 import { contractFactory } from "./index";
 import { getOracleFee } from "./rng";
 import { getRNGFromHashRequest } from "./rng";
@@ -59,7 +61,7 @@ export const getClamByIndex = async (account, index) => {
   return value;
 };
 
-export const buyClam = async (account) => {
+export const buyClam = async (account, grade) => {
   if (!account) {
     throw new Error("There is no account connected!");
   }
@@ -72,7 +74,7 @@ export const buyClam = async (account) => {
   const oracleFee = await getOracleFee();
   const amount = Number(oracleFee);
 
-  const method = clamShop.methods.buyClam();
+  const method = clamShop.methods.buyClam(grade);
 
   const gasEstimation = await method.estimateGas({
     from: account,
@@ -98,7 +100,7 @@ export const buyClam = async (account) => {
     });
 };
 
-export const buyClamWithVestedTokens = async (account) => {
+export const buyClamWithVestedTokens = async (account, grade) => {
   if (!account) {
     throw new Error("There is no account connected!");
   }
@@ -111,7 +113,7 @@ export const buyClamWithVestedTokens = async (account) => {
   const oracleFee = await getOracleFee();
   const amount = Number(oracleFee);
 
-  const method = clamShop.methods.buyClamWithVestedTokens();
+  const method = clamShop.methods.buyClamWithVestedTokens(grade);
 
   const gasEstimation = await method.estimateGas({
     from: account,
@@ -137,7 +139,7 @@ export const buyClamWithVestedTokens = async (account) => {
     });
 };
 
-export const buyClamWithBnb = async (account) => {
+export const buyClamWithBnb = async (account, grade) => {
   if (!account) {
     throw new Error("There is no account connected!");
   }
@@ -147,12 +149,12 @@ export const buyClamWithBnb = async (account) => {
     address: clamShopAddress,
   });
 
-  const price = await getPrice();
+  const price = await getUpdatedPrice(grade);
   const clamPriceBnb = await getClamPriceBnb(price);
   const oracleFee = await getOracleFee();
   const amount = new BigNumber(clamPriceBnb).plus(new BigNumber(oracleFee)).toString();
 
-  const method = clamShop.methods.buyClamWithBnb();
+  const method = clamShop.methods.buyClamWithBnb(grade);
 
   const gasEstimation = await method.estimateGas({
     from: account,
@@ -393,6 +395,8 @@ export const decodeClamDataFromMulticall = (values, tokenIds) => {
             producedPearlIds: "uint256[]",
             gemBoost: "uint256",
             pearlBoostM: "uint256",
+            grade: "string",
+            gemPrice: "uint256"
           },
         },
         values[index]
@@ -403,13 +407,21 @@ export const decodeClamDataFromMulticall = (values, tokenIds) => {
   return result;
 };
 
-export const getClamValueInShellToken = async () => {
+export const getClamValueInShellToken = async (grade) => {
   const clamNft = contractFactory({
     abi: clamNFTAbi,
     address: clamNFTAddress,
   });
 
-  return clamNft.methods.clamPriceForShell().call();
+  const dnaDecoder = contractFactory({
+    abi: dnaDecoderAbi,
+    address: dnaDecoderAddress,
+  });
+
+  if(grade) {
+    return await dnaDecoder.methods.getShellForClamGrade(grade).call();
+  }
+    return await clamNft.methods.clamPriceForShell().call();
 };
 
 export const getPearlValueInShellToken = async () => {

@@ -32,6 +32,7 @@ export const tokens =
       : mainnetTokens;
 
 
+export const zapAddress = "0x25AE8E764b0c8318c093d8eFdd03000b442bb56a";
 
 export const {
   shellTokenAddress,
@@ -57,7 +58,6 @@ export const {
   multicallAddress,
   wBNB,
   BUSD,
-  zapAddress,
 } = addresses;
 
 

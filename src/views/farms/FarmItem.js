@@ -22,6 +22,8 @@ import { canCurrentlyProducePearl, canStillProducePearls } from "web3/clam";
 import { tokenOfOwnerByIndex, accountPearlBalance } from "web3/pearl";
 import { formatFromWei, getOwnedPearls } from "web3/shared";
 import { pearlFarmAddress, zeroHash } from "constants/constants";
+import { getPriceForClamGrade, getPearlPriceForClamGrade } from "web3/dnaDecoder";
+import { getUpdatedPrice } from "web3/clamShop";
 
 import {
   pearlCollectSuccess,
@@ -35,6 +37,8 @@ import {
 import ActionButton from "views/bank/utils/ActionButton";
 import BigNumber from "bignumber.js";
 import { renderNumber } from "utils/number";
+
+BigNumber.config({ ROUNDING_MODE: BigNumber.ROUND_FLOOR });
 
 const FarmItem = ({
   clamId,
@@ -102,16 +106,26 @@ const FarmItem = ({
         const canStillProduce = await canStillProducePearls(clamId);
         setCanStillProducePearl(canStillProduce);
 
-        const pPrice = await stakePrice(); // price as string
-        setPearlPrice(pPrice);
+        if(parseFloat(clamDataValues.gemPrice)) {
+          console.log(clamDataValues);
+          const pearlPriceUSD = await getPearlPriceForClamGrade(clamDataValues.grade);
+          const clamPriceUSD = await getPriceForClamGrade(clamDataValues.grade);
+          const clamPriceAsBigNumber = new BigNumber(clamDataValues.gemPrice);
+          setPearlPrice(clamPriceAsBigNumber.times(+pearlPriceUSD).div(+clamPriceUSD).dp(0));
+        } else {
+          const updatedClamPrice = await getUpdatedPrice("d");
+          const clamPriceAsBigNumber = new BigNumber(updatedClamPrice);
+          console.log(updatedClamPrice);
+          setPearlPrice(clamPriceAsBigNumber.div(10).dp(0));
+        }
 
         // set up for GEM approval comparison check
-        const pPriceAsBigNumber = new BigNumber(pPrice);
+        //const pPriceAsBigNumber = new BigNumber(pearlPrice.toString());
         const gemAllowance = await getAllowance(address, pearlFarmAddress).then(
           (v) => new BigNumber(v)
         );
 
-        setGemApproved(pPriceAsBigNumber.lt(gemAllowance));
+        setGemApproved(new BigNumber(pearlPrice.toString()).lt(gemAllowance));
       } catch (err) {
         updateAccount({ error: err.message });
       }
@@ -177,7 +191,7 @@ const FarmItem = ({
       pearlGemPrompt(
         {
           updateCharacter,
-          pearlPrice: renderNumber(+formatFromWei(pearlPrice), 3),
+          pearlPriceFormatted: renderNumber(+formatFromWei(pearlPrice.toString()), 3),
           gems: isLegacyPearl ? renderNumber(+formatFromWei(gems), 3) : "",
         },
         async () => {
@@ -190,9 +204,9 @@ const FarmItem = ({
               const gemBalance = await getBalance(address).then((v) => new BigNumber(v)); // from string to BN
               if (gemBalance.lt(pearlPrice))
                 throw new Error(
-                  `You need at least ${formatFromWei(pearlPrice)} GEM to collect Pearl`
+                  `You need at least ${renderNumber(+formatFromWei(pearlPrice.toString()), 3)} GEM to collect Pearl`
                 );
-
+              console.log("gemBalance lt passed");
               if (!gemApproved) {
                 setButtonText("Approving GEM...");
                 await infiniteApproveSpending(address, pearlFarmAddress, pearlPrice);
@@ -240,11 +254,12 @@ const FarmItem = ({
             setInTx(false);
             setButtonText("Collect Pearl");
             setAction("collect");
-            const errorMsg = JSON.parse(err.message.split("\n").slice(1).join(""));
+            console.log(err);
+            //const errorMsg = JSON.parse(err.message.split("\n").slice(1).join(""));
             toast.error(
               <>
                 <p>There was an error collecting your pearl.</p>
-                <p>{errorMsg.message}</p>
+                <p>{err.message}</p>
               </>
             );
           }
