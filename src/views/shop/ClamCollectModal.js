@@ -71,13 +71,13 @@ const ClamCollectModal = ({
           </div>
         ) : (
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="bg-white flex-1 justify-center  md:flex items-center">
+            <div className="bg-white flex-1 justify-center md:flex items-center">
               <img src={ClamPic} width="300" />
             </div>
 
             <div className="py-2 flex flex-col">
               {isLoading ? (
-                <button disabled={isLoading} type="submit" className="flex sending-txn-btn">
+                <button disabled={isLoading} type="submit" className="flex sending-txn-btn text-sm md:text-xl">
                   <SVGSpinner />
                   Sending transaction...
                 </button>

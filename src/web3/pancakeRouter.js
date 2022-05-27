@@ -422,7 +422,7 @@ export const getGasEstimation = async (iToken, oToken, iAmount, oAmount, slippag
     const method = router().methods.swapExactETHForTokens( amountOutMin, path, account, deadline );
     const gasEstimation = await method.estimateGas({
       from: account,
-      value: parseEther(iAmount),
+      value: iAmount,
     });
     return gasEstimation;
   }
@@ -451,55 +451,29 @@ export const swap = async (iToken, oToken, iAmount, oAmount, slippage, _deadline
   const account = getAccount();
 
   let path = await getPath(iToken.address, oToken.address);
-  console.log('path', path);
-
+  
   const deadline = Math.floor(Date.now() / 1000) + 60 * _deadline // 20 minutes from the current Unix time
-
-  // const amountOutMin = parseEther( (oAmount * (100 - slippage)).toString() ) ;
-  const amountOutMin = parseEther((oAmount * (1 - (slippage / 100))).toString());
-
-  console.log('amountOutMin', amountOutMin);
+  const _tempOAmount = parseInt(oAmount * (1 - (slippage / 100)) * 10 ** 18) / (10 ** 18) 
+  const amountOutMin = parseEther(_tempOAmount.toString());
 
   const _iToken = new Token(iToken.chainId, iToken.address, iToken.decimals, iToken.symbol, iToken.name);
-  console.log('swap in router _iToken', _iToken);
-
   const _oTOken = new Token(iToken.chainId, oToken.address, oToken.decimals, oToken.symbol, oToken.name)
-  console.log('swap in router _oTOken', _oTOken);
-
-  console.log('swap in router _iAmount', iAmount);
-  console.log('swap in router oAmount', oAmount);
   const _pair = new Pair(new TokenAmount(_iToken, parseEther(iAmount) ), new TokenAmount(_oTOken, parseEther(oAmount)))
-  console.log('swap in router _pair', _pair);
-
   const _route = new Route([_pair], _iToken)
-  console.log('swap in router _route', _route);
-
   const trade = new Trade(_route, new TokenAmount(_iToken, parseEther(iAmount)), TradeType.EXACT_INPUT);
-  console.log('swap in router trade', trade);
-
   const {priceImpactWithoutFee, realizedLPFee } = computeTradePriceBreakdown(trade);
-  console.log("computeTradePriceBreakdown", priceImpactWithoutFee.toFixed(2));
-
   // const allowedPairs = useAllCommonPairs(_iToken, _oTOken)
   // console.log(allowedPairs, "Allowed Pairs");  
 
   // const dafasd = Trade.bestTradeExactIn(allowedPairs, parseEther(iAmount), _oTOken, { maxHops: 1, maxNumResults: 1 })[0] ?? null;  
-
-
-
   if(iToken.address == wBNB) {
     console.log("swapExactETHForTokens");
 
     const method = router().methods.swapExactETHForTokens( amountOutMin, path, account, deadline );
-    console.log('method', method);
-
     const gasEstimation = await method.estimateGas({
       from: account,
       value: parseEther(iAmount),
     });
-
-    console.log("gasEstimation", gasEstimation)
-    
     await method
       .send({
         from: account,

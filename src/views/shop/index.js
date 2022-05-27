@@ -108,7 +108,7 @@ const Shop = ({
         </div>
         {/* wallet is connected */}
         {address && userReady && (
-          <div className="flex relative z-20  justify-center items-start top-40 w-full">
+          <div className="flex relative z-9 justify-center items-start w-full">
             {/* step 1 */}
             {modalToShow === "buy" && <ClamBuyModal setModalToShow={setModalToShow} />}
             {/* step 2 */}
@@ -119,6 +119,10 @@ const Shop = ({
             {modalToShow === "harvest" && <ClamHarvestModal setModalToShow={setModalToShow} />}
           </div>
         )}
+
+        <div className="h-32" >
+
+        </div>
 
         <BottomMenu setModalToShow={setModalToShow} setUserReady={setUserReady} />
       </div>

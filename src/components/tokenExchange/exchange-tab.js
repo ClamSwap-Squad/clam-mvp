@@ -182,7 +182,9 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
     const setMax = async () => {
         // Get Estimation Gas Fee
         if(iToken.address == wBNB) {
-            const estimateGas = await getGasEstimation(iToken, oToken, "1", "1", slippage, deadline);
+            const _iAmount = await getTokenBalance(iToken.address);
+            const _oAmount = await getTokenAmountFromOtherToken( formatEther(_iAmount), iToken.address, oToken.address);
+            const estimateGas = await getGasEstimation(iToken, oToken, _iAmount, _oAmount, slippage, deadline);
             setIAmount( formatEther((iTokenBalance - estimateGas * 2 * 10 ** 10).toString()) );
         }
         else {
