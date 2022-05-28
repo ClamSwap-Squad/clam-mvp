@@ -121,7 +121,7 @@ const Shop = ({
         )}
 
         <div className="h-32" >
-
+            
         </div>
 
         <BottomMenu setModalToShow={setModalToShow} setUserReady={setUserReady} />
