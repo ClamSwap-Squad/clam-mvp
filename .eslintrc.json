@@ -15,7 +15,13 @@
     "browser": true
   },
   "rules": {
-    "prettier/prettier": "warn",
+    "prettier/prettier": [
+      "warn",
+      {
+        "endOfLine": "auto",
+        "useTabs": false
+      }
+    ],
     "react/react-in-jsx-scope": "off",
     "max-len": "off",
     "no-unused-vars": "warn",

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { connect } from "redux-zero/react";
 import "./index.scss";
 
@@ -11,10 +12,10 @@ import { TabContainer } from "./TabContainer";
 import { SaferoomNav } from "./SaferoomNav";
 import { ClamInspect } from "./ClamInspect";
 import { PearlInspect } from "./PearlInspect";
-
 import videoImage from "assets/locations/Saferoom.jpg";
 import videoMp4 from "assets/locations/Saferoom.mp4";
 import videoWebM from "assets/locations/Saferoom.webm";
+import clamIcon from "assets/img/clam_icon.png";
 import VideoBackground from "components/VideoBackground";
 import { PageTitle } from "components/PageTitle";
 import { useWeb3Modal } from "components/Web3ProvidersModal";
@@ -22,9 +23,21 @@ import { SAFEROOM_TABS as TABS } from "constants/ui";
 import { getSortedClams } from "utils/clamsSort";
 import { getSortedPearls } from "utils/pearlsSort";
 
+
+import { ClamsSorting } from "components/clamsSorting";
+import { PearlsSorting } from "components/pearlsSorting";
+
+import mobileClamIcon from "assets/img/bottommenu/clam-icon-outline.png";
+import mobilePearlsIcon from "assets/img/bottommenu/pearls-icon-outline.png";
+import mobileMapIcon from "assets/img/bottommenu/map.png";
+import mobileSearchIcon from "assets/img/bottommenu/search.png";
+
+
+import { get } from "lodash";
 import { actions } from "store/redux";
 
 import LoadingScreen from "components/LoadingScreen";
+import BottomMenu from "views/saferoom/BottomMenu";
 
 const Saferoom = ({
   ui,
@@ -47,6 +60,8 @@ const Saferoom = ({
   const isInspectPage = pathname.includes("inspect");
 
   const { isShowing, toggleModal } = useModal();
+  const [isClamShowing, toogleClamShowing] = useState(false);
+  const [isPearlShowing, tooglePearlShowing] = useState(false);
 
   const isPrevButtonShown = () => {
     if (TABS.clam === tab && selectedAsset) {
@@ -105,6 +120,26 @@ const Saferoom = ({
     setSelectedAsset(item);
     toggleModal();
   };
+
+
+  const mopenClamDetailedInfo = (item) => {
+    tooglePearlShowing(false);
+    setSelectedAsset(item);
+    console.log(item)
+    toogleClamShowing(true);
+  }
+
+  const mopenPearlDetailedInfo = (item) => {
+    toogleClamShowing(false);
+    setSelectedAsset(item);
+    console.log('pearl item data:', item);
+    tooglePearlShowing(true);
+  }
+
+  const showlists = () => {
+    tooglePearlShowing(false);
+    toogleClamShowing(false);
+  }
 
   useEffect(() => {
     if (!address) {
@@ -172,81 +207,222 @@ const Saferoom = ({
     }
   }, [pathname]);
 
+  
+  const onModalClose = async () => {
+    if(isShowing) {
+      alert("asdfasdf");
+      toggleModal();
+
+    }
+  };
+
   return (
     <>
       {ui.isFetching && <LoadingScreen />}
 
-      {/* container */}
-      <VideoBackground videoImage={videoImage} videoMp4={videoMp4} videoWebM={videoWebM} />
+      <div className={`saferoom_lg`}>
+        {/* container */}
+        <VideoBackground videoImage={videoImage} videoMp4={videoMp4} videoWebM={videoWebM} />
 
-      {/* chat character   */}
-      {!address && !isInspectPage && <Character name="tanja" />}
+        {/* chat character   */}
+        {!address && !isInspectPage && <Character name="tanja" />}
 
-      <Modal isShowing={isShowing} onClose={toggleModal}>
-        {tab === "Clam" && (
-          <ClamView
-            {...selectedAsset}
-            gemPriceUSD={gemPriceUSD}
-            {...boostParams}
-            view="saferoom"
-            onClickNext={isNextButtonShown() && onClickNext}
-            onClickPrev={isPrevButtonShown() && onClickPrev}
-          />
-        )}
-        {tab === "Pearl" && (
-          <PearlView
-            {...selectedAsset}
-            gemPriceUSD={Number(gemPriceUSD)}
-            {...boostParams}
-            view="saferoom"
-            onClickNext={isNextButtonShown() && onClickNext}
-            onClickPrev={isPrevButtonShown() && onClickPrev}
-          />
-        )}
-      </Modal>
-      <div className="flex-1 min-h-full min-w-full flex relative z-10 justify-center items-start">
-        <div className="w-4/5 flex flex-col relative pt-24">
-          <PageTitle title="My Saferoom" />
-          {address && (
-            <>
-              {/* navbar */}
-              <SaferoomNav
-                tab={tab}
-                url={url}
-                clamBalance={clamBalance}
-                pearlBalance={pearlBalance}
-              />
-
-              {/* clams and pears grid */}
-              <div className="w-full my-4 overflow-auto">
-                <Switch>
-                  <Route exact path={path}>
-                    <Redirect to={`${url}/pearl`} />;
-                  </Route>
-                  <Route path={`${path}/:tabId`}>
-                    <TabContainer
-                      clams={clams}
-                      pearls={pearls}
-                      openDetailedInfo={openDetailedInfo}
-                    />
-                  </Route>
-                </Switch>
-              </div>
-            </>
+        <Modal isShowing={isShowing} onClose={toggleModal}>
+          {tab === "Clam" && (
+            <ClamView
+              {...selectedAsset}
+              gemPriceUSD={gemPriceUSD}
+              {...boostParams}
+              view="saferoom"
+              onClickNext={isNextButtonShown() && onClickNext}
+              onClickPrev={isPrevButtonShown() && onClickPrev}
+            />
           )}
-          <Switch>
-            <Route path={`${path}/clam/inspect/:tokenId`}>
-              {!ui.isFetching && (
-                <ClamInspect gemPriceUSD={gemPriceUSD} address={address} {...boostParams} />
-              )}
-            </Route>
-            <Route path={`${path}/pearl/inspect/:tokenId`}>
-              {!ui.isFetching && (
-                <PearlInspect gemPriceUSD={gemPriceUSD} address={address} {...boostParams} />
-              )}
-            </Route>
-          </Switch>
+          {tab === "Pearl" && (
+            <PearlView
+              {...selectedAsset}
+              gemPriceUSD={Number(gemPriceUSD)}
+              {...boostParams}
+              view="saferoom"
+              onClickNext={isNextButtonShown() && onClickNext}
+              onClickPrev={isPrevButtonShown() && onClickPrev}
+            />
+          )}
+        </Modal>
+
+        <div className="flex-1 min-h-full min-w-full flex relative z-10 justify-center items-start">
+          <div className="w-4/5 flex flex-col relative pt-24">
+            <PageTitle title="My Saferoom" />
+            {address && (
+              <>
+                {/* navbar */}
+                <SaferoomNav
+                  tab={tab}
+                  url={url}
+                  clamBalance={clamBalance}
+                  pearlBalance={pearlBalance}
+                />
+
+                {/* clams and pears grid */}
+                <div className="w-full my-4 overflow-auto">
+                  <Switch>
+                    <Route exact path={path}>
+                      <Redirect to={`${url}/pearl`} />;
+                    </Route>
+                    <Route path={`${path}/:tabId`}>
+                      <TabContainer
+                        clams={clams}
+                        pearls={pearls}
+                        openDetailedInfo={openDetailedInfo}
+                      />
+                    </Route>
+                  </Switch>
+                </div>
+              </>
+            )}
+            <Switch>
+              <Route path={`${path}/clam/inspect/:tokenId`}>
+                {!ui.isFetching && (
+                  <ClamInspect gemPriceUSD={gemPriceUSD} address={address} {...boostParams} />
+                )}
+              </Route>
+              <Route path={`${path}/pearl/inspect/:tokenId`}>
+                {!ui.isFetching && (
+                  <PearlInspect gemPriceUSD={gemPriceUSD} address={address} {...boostParams} />
+                )}
+              </Route>
+            </Switch>
+
+          </div>
         </div>
+      </div>
+      <div className={`saferoom_sm ${ address ? '' : 'hiddden' }`} >
+
+        <VideoBackground videoImage={videoImage} videoMp4={videoMp4} videoWebM={videoWebM} />
+
+        {
+          isClamShowing ? (
+            <ClamView
+              {...selectedAsset}
+              gemPriceUSD={gemPriceUSD}
+              {...boostParams}
+              view="saferoom"
+              onClickNext={isNextButtonShown() && onClickNext}
+              onClickPrev={isPrevButtonShown() && onClickPrev}
+              mopenPearlDetailedInfo={mopenPearlDetailedInfo}
+              showlists={showlists}
+              onClose={onModalClose}
+            />
+          ) : (
+            <></>
+          )
+        }
+
+        {
+          isPearlShowing ? (
+            <PearlView
+              {...selectedAsset}
+              gemPriceUSD={Number(gemPriceUSD)}
+              {...boostParams}
+              view="saferoom"
+              onClickNext={isNextButtonShown() && onClickNext}
+              onClickPrev={isPrevButtonShown() && onClickPrev}
+              showlists={showlists}
+              onClose={onModalClose}
+            />
+          ) : (
+            <></>
+          )
+        }
+
+        <Switch>
+          <Route path={`/saferoom/clam`}>
+
+            <div className={`pearlDiv mb-3 ${isClamShowing ? 'hidden' : "block" }`}>
+              <h1 className="title">My Clams</h1>
+              <div className="mb-3">
+                <ClamsSorting page="saferoom" textSize="sm" />
+              </div>
+              <div className="pearlitems grid grid-cols-2 gap-4 mb-5">
+                {clams &&
+                  clams.map((clam, i) => {
+                    const rarity = get(clam.dnaDecoded, "rarity");
+
+                    let shape = get(clam.dnaDecoded, "shellShape");
+                    let lifespan = get(clam.dnaDecoded, "lifespan");
+                    let rarityValue = get(clam.dnaDecoded, "rarityValue");
+                    shape = shape.charAt(0).toUpperCase() + shape.slice(1);
+                    return (
+                      <div key={i} className="pearlitem text-center p-4">
+                        <div className="flex align-center items-center justify-center" style={{minHeight: "85px"}} >
+                          <img src={clam.img} alt="" className="h-auto" style={{ width: "60%" }}/>
+                        </div>
+
+                        <div className="">
+                          <p className="mt-1">#{clam.clamId}</p>
+                          <div className="flex items-center justify-center gap-2 py-2 w-100 m-auto">
+                            <div>
+                              <p className="lifeSpan">Lifespan</p>
+                              <p className="lifeSpanValue">{lifespan} Pearls</p>
+                            </div>
+                            <div>
+                              <p className="lifeRarity">Rarity</p>
+                              <p className="lifeRarityValue">{rarity}</p>
+                            </div>
+                          </div>
+                          <div>
+                            <button className="selectBtn" onClick={() => { mopenClamDetailedInfo(clam) }}>View Details</button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+          </Route>
+          <Route path={`/saferoom/pearl`}>
+            <div className={`pearlDiv mb-3 ${isPearlShowing ? 'hidden' : "block" }`}>
+              <h1 className="title">My Pearls</h1>
+              <div className="mb-3">
+                <PearlsSorting page="saferoom" textSize="sm" />
+              </div>
+              <div className="pearlitems grid grid-cols-2 gap-4 mb-5">
+                {pearls &&
+                  pearls.map((pearl, i) => {
+                    const rarity = get(pearl.dnaDecoded, "rarity");
+                    let shape = get(pearl.dnaDecoded, "shape");
+                    shape = shape.charAt(0).toUpperCase() + shape.slice(1);
+
+                    return (
+                      <div key={i} className="pearlitem text-center p-4">
+                        <div className="flex align-center items-center justify-center" style={{minHeight: "85px"}} >
+                          <img src={pearl.img} alt="" className="h-auto" style={{ width: "60%" }}/>
+                        </div>
+
+                        <p className="mt-1">#{pearl.pearlId}</p>
+                        <div className="flex items-center justify-center gap-2 py-2 w-100 m-auto">
+                          <div>
+                            <p className="lifeSpan">Rarity</p>
+                            <p className="lifeSpanValue">{rarity}</p>
+                          </div>
+                          <div>
+                            <p className="lifeRarity">Shape</p>
+                            <p className="lifeRarityValue">{shape}</p>
+                          </div>
+                        </div>
+                        <div>
+                          <button className="selectBtn" onClick={() => { mopenPearlDetailedInfo(pearl) }}>View Details</button>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+          </Route>
+        </Switch>
+
+        <BottomMenu tooglePearlShowing={tooglePearlShowing} toogleClamShowing={toogleClamShowing} />
+
       </div>
     </>
   );

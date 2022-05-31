@@ -21,6 +21,7 @@ import ClamCollectModal from "./ClamCollectModal";
 import ClamDisplayModal from "./ClamDisplayModal";
 import ClamHarvestModal from "./ClamHarvestModal";
 import { WelcomeUser } from "./character/WelcomeUser";
+import BottomMenu from "views/shop/BottomMenu";
 
 const Shop = ({
   account: { address, clamToCollect },
@@ -37,6 +38,9 @@ const Shop = ({
   const { onConnect } = useWeb3Modal({ ...state, updateAccount });
 
   useEffect(() => {
+
+    console.log('userReady', userReady);
+
     if (!userReady) {
       // character greets
       WelcomeUser({
@@ -79,22 +83,49 @@ const Shop = ({
       <VideoBackground videoImage={videoImage} videoMp4={videoMp4} videoWebM={videoWebM} />
       {/* chat character   */}
       <Character name="diego" />
-      <div className="absolute left-8 top-7">
-        <PageTitle title="Clam Shop" />
-      </div>
-      {/* wallet is connected */}
-      {address && userReady && (
-        <div className="flex relative z-20  justify-center items-start top-40 w-full">
-          {/* step 1 */}
-          {modalToShow === "buy" && <ClamBuyModal setModalToShow={setModalToShow} />}
-          {/* step 2 */}
-          {modalToShow === "collect" && <ClamCollectModal setModalToShow={setModalToShow} />}
-          {/* step 3 */}
-          {modalToShow === "display" && <ClamDisplayModal onClose={() => setModalToShow("")} />}
-          {/* step 4 */}
-          {modalToShow === "harvest" && <ClamHarvestModal setModalToShow={setModalToShow} />}
+
+      <div className="div_lg">
+        <div className="absolute left-8 top-7">
+          <PageTitle title="Clam Shop" />
         </div>
-      )}
+        {/* wallet is connected */}
+        {address && userReady && (
+          <div className="flex relative z-20  justify-center items-start top-40 w-full">
+            {/* step 1 */}
+            {modalToShow === "buy" && <ClamBuyModal setModalToShow={setModalToShow} />}
+            {/* step 2 */}
+            {modalToShow === "collect" && <ClamCollectModal setModalToShow={setModalToShow} />}
+            {/* step 3 */}
+            {modalToShow === "display" && <ClamDisplayModal onClose={() => setModalToShow("")} />}
+            {/* step 4 */}
+            {modalToShow === "harvest" && <ClamHarvestModal setModalToShow={setModalToShow} />}
+          </div>
+        )}
+      </div>
+      <div className="div_sm">
+        <div className="text-center" style={{paddingTop: "100px"}}>
+          <PageTitle title="Clam Shop"/>
+        </div>
+        {/* wallet is connected */}
+        {address && userReady && (
+          <div className="flex relative z-9 justify-center items-start w-full">
+            {/* step 1 */}
+            {modalToShow === "buy" && <ClamBuyModal setModalToShow={setModalToShow} />}
+            {/* step 2 */}
+            {modalToShow === "collect" && <ClamCollectModal setModalToShow={setModalToShow} />}
+            {/* step 3 */}
+            {modalToShow === "display" && <ClamDisplayModal onClose={() => setModalToShow("")} />}
+            {/* step 4 */}
+            {modalToShow === "harvest" && <ClamHarvestModal setModalToShow={setModalToShow} />}
+          </div>
+        )}
+
+        <div className="h-32" >
+            
+        </div>
+
+        <BottomMenu setModalToShow={setModalToShow} setUserReady={setUserReady} />
+      </div>
     </>
   );
 };

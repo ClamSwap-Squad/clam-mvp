@@ -20,6 +20,7 @@ export default {
   clamExchangeAddress: "0x4faaa3754330313351B41cD21BeEC4A9786b336f", // TODO: this is testnet address, add mainnet address here when deployed
   // third party addresses
   pancakeRouterAddress: "0x10ED43C718714eb63d5aA57B78B54704E256024E",
+  pancakeFactoryAddress: "0xca143ce32fe78f1f7019d7d551a6402fc5350c73",
   wBNB: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
   BUSD: "0xe9e7cea3dedca5984780bafc599bd69add087d56",
   multicallAddress: "0x0AD12d0cF5137e51e82B486381f4a6E4cbddE2F1",

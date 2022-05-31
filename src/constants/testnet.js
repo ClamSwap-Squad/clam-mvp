@@ -19,9 +19,11 @@ export default {
   gemOracleAddress: "0x364aF36F53089061cEB09db52CB63A2E6aAb6B3D",
   clamExchangeAddress: "0xCc706B214F7fD7c82E5D36B2e7116Beb9Be71745",
   // third party addresses
-  pancakeRouterAddress: "0x9ac64cc6e4415144c455bd8e4837fea55603e5c3",
+  pancakeRouterAddress: "0x9Ac64Cc6e4415144C455BD8E4837Fea55603e5c3",
+  pancakeFactoryAddress: "0xb7926c0430afb07aa7defde6da862ae0bde767bc",
   wBNB: "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
-  BUSD: "0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee",
+  // BUSD: "0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee",
+  BUSD: "0x78867bbeef44f2326bf8ddd1941a4439382ef2a7",
   multicallAddress: "0x28d387c0405Fb8eE7bBeB92A6D783A8436076487",
   zapAddress: "0x806f75608D4f1C39441ae696ed721a8e1dFd6712",
 };

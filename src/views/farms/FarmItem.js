@@ -54,6 +54,7 @@ const FarmItem = ({
   withdrawingClamId,
   updateClams,
   updateStakedClams,
+  viewTab
 }) => {
   const [inTx, setInTx] = useState(false);
   const [isInitLoading, setIsInitLoading] = useState(true);
@@ -84,6 +85,7 @@ const FarmItem = ({
         ).toFixed(2);
 
   useEffect(() => {
+    console.log('viewTabs', viewTab);
     const init = async () => {
       try {
         const _productionTimeTotal = await getRemainingPearlProductionTime(clamId);
@@ -135,6 +137,7 @@ const FarmItem = ({
   }, [inTx, address]);
 
   useEffect(() => {
+    console.log("viewTab", viewTab);
     if (!isInitLoading) {
       if (readyForPearl) {
         setButtonText("Collect Pearl");
@@ -274,102 +277,261 @@ const FarmItem = ({
   };
 
   return (
-    <div className="FarmItem bg-opacity-90">
-    <div className="flex justify-between px-4 pt-4">
-      <div className=" badge badge-success">#{clamId}</div>
-      <div className="text-green-400 text-bold">{dnaDecoded.rarity}</div>
-    </div>
-      <div className="flex-1 justify-center md:flex items-start p-4">
-        <button onClick={(e) => onViewDetails(e)}>
-          <img className="w-auto" src={img} />
-        </button>
-      </div>
-      {clam.processing && !isInitLoading ? (
-        <>
-          {/* Progress Bar */}
-          <div className="progress-bar">
-            <div className={"base-bar " + (clam.progress < 100 ? "base-bar-animated" : "")}>
-              <div style={{ width: clam.progress + "%" }} className="completion-bar"></div>
-              <span>Producing {clam.progress}%</span>
-            </div>
+    <>
+      <div className="div_lg">
+          
+        <div className="FarmItem bg-opacity-90">
+          <div className="flex justify-between px-4 pt-4">
+            <div className=" badge badge-success">#{clamId}</div>
+            <div className="text-green-400 text-bold">{dnaDecoded.rarity}</div>
           </div>
-
-          {/* Details */}
-          <div className="px-4 md:px-6 py-2">
-            <div className="text-sm flex flex-row justify-between">
-              <div className="text-sm block">
-                <p className="text-gray-500 font-semibold text-xs mb-1 leading-none">
-                  Remaining Time
-                </p>
-                <p className="font-bold text-black">{clam.remainingFormattedTime}</p>
-              </div>
-              <div className="text-sm block">
-                <p className="text-gray-500 font-semibold text-xs text-right mb-1 leading-none">
-                  Lifespan Remaining
-                </p>
-                <p className="font-bold text-black text-right">
-                  {clam.remainingLifeSpan + " Pearls"}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="px-4 py-2">
-            <button
-              className="btn btn-neutral btn-outline w-full"
-              onClick={(e) => onViewDetails(e)}
-            >
-              View Details
+          <div className="flex-1 justify-center md:flex items-start p-4">
+            <button onClick={(e) => onViewDetails(e)}>
+              <img className="w-auto" src={img} />
             </button>
           </div>
-
-          <div className="px-4 py-2">
-            <button
-              className="btn btn-secondary w-full"
-              onClick={onWithdrawClam}
-              disabled={isWithdrawing}
-            >
-              <Spinner show={isWithdrawing} color="#ff4b47" />
-              Withdraw
-            </button>
-          </div>
-        </>
-      ) : (
-        <div className="px-4 py-2">
-          {isInitLoading ? (
-            <ActionButton
-              onClick={getClamFunction}
-              style={action === "open" ? "btn btn-primary w-full" : "btn btn-secondary w-full"}
-              isDisabled={true}
-              isLoading={inTx}
-            >
-              <Spinner show="true" color="#333333" /> Loading...
-            </ActionButton>
-          ) : (
+          {clam.processing && !isInitLoading ? (
             <>
-              <ActionButton
-                onClick={getClamFunction}
-                style={action === "open" ? "btn btn-primary w-full" : "btn btn-secondary w-full"}
-                isDisabled={!canProducePearl || inTx || now <= pearlProductionTime}
-                isLoading={inTx}
-              >
-                {buttonText}
-              </ActionButton>
+              {/* Progress Bar */}
+              <div className="progress-bar">
+                <div className={"base-bar " + (clam.progress < 100 ? "base-bar-animated" : "")}>
+                  <div style={{ width: clam.progress + "%" }} className="completion-bar"></div>
+                  <span>Producing {clam.progress}%</span>
+                </div>
+              </div>
 
+              {/* Details */}
+              <div className="px-4 md:px-6 py-2">
+                <div className="text-sm flex flex-row justify-between">
+                  <div className="text-sm block">
+                    <p className="text-gray-500 font-semibold text-xs mb-1 leading-none">
+                      Remaining Time
+                    </p>
+                    <p className="font-bold text-black">{clam.remainingFormattedTime}</p>
+                  </div>
+                  <div className="text-sm block">
+                    <p className="text-gray-500 font-semibold text-xs text-right mb-1 leading-none">
+                      Lifespan Remaining
+                    </p>
+                    <p className="font-bold text-black text-right">
+                      {clam.remainingLifeSpan + " Pearls"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="px-4 py-2">
                 <button
-                  className="btn btn-secondary w-full mt-4"
+                  className="btn btn-neutral btn-outline w-full"
+                  onClick={(e) => onViewDetails(e)}
+                >
+                  View Details
+                </button>
+              </div>
+
+              <div className="px-4 py-2">
+                <button
+                  className="btn btn-secondary w-full"
                   onClick={onWithdrawClam}
-                  disabled={isWithdrawing || inTx || action === "collect"}
+                  disabled={isWithdrawing}
                 >
                   <Spinner show={isWithdrawing} color="#ff4b47" />
                   Withdraw
                 </button>
-
+              </div>
             </>
+          ) : (
+            <div className="px-4 py-2">
+              {isInitLoading ? (
+                <ActionButton
+                  onClick={getClamFunction}
+                  style={action === "open" ? "btn btn-primary w-full" : "btn btn-secondary w-full"}
+                  isDisabled={true}
+                  isLoading={inTx}
+                >
+                  <Spinner show="true" color="#333333" /> Loading...
+                </ActionButton>
+              ) : (
+                <>
+                  <ActionButton
+                    onClick={getClamFunction}
+                    style={action === "open" ? "btn btn-primary w-full" : "btn btn-secondary w-full"}
+                    isDisabled={!canProducePearl || inTx || now <= pearlProductionTime}
+                    isLoading={inTx}
+                  >
+                    {buttonText}
+                  </ActionButton>
+
+                  <button
+                    className="btn btn-secondary w-full mt-4"
+                    onClick={onWithdrawClam}
+                    disabled={isWithdrawing || inTx || action === "collect"}
+                  >
+                    <Spinner show={isWithdrawing} color="#ff4b47" />
+                    Withdraw
+                  </button>
+
+                </>
+              )}
+            </div>
           )}
         </div>
-      )}
-    </div>
+      </div>
+        
+        {
+          viewTab == "farms" ? (
+            <>
+               { viewTab == "farms" && clam.processing && !isInitLoading ? (
+                <>
+                <div className="div_sm">
+                  <div className={`mFarmItem bg-opacity-90`} >
+                    <div className="flex justify-between px-4 pt-4">
+                      <div className=" badge badge-success">#{clamId}</div>
+                      <div className="text-green-400 text-bold">{dnaDecoded.rarity}</div>
+                    </div>
+                    
+                    <div className="flex-1 justify-center md:flex items-start p-4">
+                      <button onClick={(e) => onViewDetails(e)}>
+                        <img className="w-auto" src={img} />
+                      </button>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="progress-bar">
+                      <div className={"base-bar " + (clam.progress < 100 ? "base-bar-animated" : "")}>
+                        <div style={{ width: clam.progress + "%" }} className="completion-bar"></div>
+                        <span>Producing {clam.progress}%</span>
+                      </div>
+                    </div>
+
+                    {/* Details */}
+                    <div className="px-4 md:px-6 py-1">
+                      <div className="text-sm flex flex-row justify-center">
+                        <div className="text-sm block">
+                          <p className="text-gray-500 font-semibold text-xs mb-1 leading-none">
+                            Remaining Time
+                          </p>
+                          <p className="font-bold text-black text-center">{clam.remainingFormattedTime}</p>
+                        </div>
+                      </div>
+                      {/* <div className="text-sm flex flex-row justify-center">
+                        <div className="text-sm block">
+                          <p className="text-gray-500 font-semibold text-xs mb-1 leading-none">
+                            Lifespan Remaining
+                          </p>
+                          <p className="font-bold text-black text-center">
+                            {clam.remainingLifeSpan + " Pearls"}
+                          </p>
+                        </div>
+                      </div> */}
+                    </div>
+                    
+                    <button
+                      className="selectBtn"
+                      onClick={(e) => onViewDetails(e)}
+                    >
+                      View Details
+                    </button>
+
+                    {/* <div className="px-4 py-1">
+                      <button
+                        className="btn btn-secondary w-full"
+                        onClick={onWithdrawClam}
+                        disabled={isWithdrawing}
+                      >
+                        <Spinner show={isWithdrawing} color="#ff4b47" />
+                        Withdraw
+                      </button>
+                    </div> */}
+                  </div>
+                </div>
+                </>
+                ) : "" }
+            </>
+          ) : ""
+        }
+
+        {
+          viewTab == "ready_claims" ? (
+            <>
+              {clam.processing && !isInitLoading ? "" : (
+                <div className="div_sm">
+                <div className="mFarmItem bg-opacity-90">
+                  <div className="flex justify-between px-4 pt-4">
+                    <div className=" badge badge-success">#{clamId}</div>
+                    <div className="text-green-400 text-bold">{dnaDecoded.rarity}</div>
+                  </div>
+
+                  <div className="flex-1 justify-center md:flex items-start py-1 px-4">
+                    <button onClick={(e) => onViewDetails(e)}>
+                      <img className="w-auto" src={img} />
+                    </button>
+                  </div>
+
+                  <div className="px-4 py-1">
+                    {isInitLoading ? (
+                      <ActionButton
+                        onClick={getClamFunction}
+                        style={action === "open" ? "btn btn-primary w-full" : "btn btn-secondary w-full"}
+                        isDisabled={true}
+                        isLoading={inTx}
+                      >
+                        <Spinner show="true" color="#333333" /> Loading...
+                      </ActionButton>
+                    ) : (
+                      <>
+                        <div className="text-center">
+                          <p className="text-xs text-neutral">Pearl is ready!</p>
+
+                          <p className="text-xs text-neutral mt-1">Remaining Time</p>
+                          <p className="text-sm text-neutral font-black mb-1">0:00</p>
+                        </div>
+                        <div className="text-center">
+                          <button
+                            className="selectBtn"
+                            onClick={(e) => onViewDetails(e)}
+                          >
+                            View Details
+                          </button>
+
+                        </div>
+
+                        {/* <button
+                          className={action === "open" ? "selectBtn btn-primary w-full" : "selectBtn btn-secondary w-full"}
+                          isDisabled={!canProducePearl || inTx || now <= pearlProductionTime}
+                          isLoading={inTx}
+                          onClick={getClamFunction}
+                        >
+                          {buttonText}
+                        </button> */}
+
+                        {/* <ActionButton
+                          style={action === "open" ? "btn btn-primary w-full" : "btn btn-secondary w-full"}
+                          isDisabled={!canProducePearl || inTx || now <= pearlProductionTime}
+                          isLoading={inTx}
+                        >
+                          {buttonText}
+                        </ActionButton> */}
+      
+                        {/* <button
+                          className="selectBtn"
+                          onClick={onWithdrawClam}
+                          disabled={isWithdrawing || inTx || action === "collect"}
+                        >
+                          <Spinner show={isWithdrawing} color="#ff4b47" />
+                          Withdraw
+                        </button> */}
+      
+                      </>
+                    )}
+                  </div>
+                </div>
+                </div>
+              )}
+            </>
+          ) : ""
+        }
+    </>
   );
 };
 

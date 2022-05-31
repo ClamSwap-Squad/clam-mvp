@@ -32,6 +32,7 @@ module.exports = {
       999: 999,
       9998: 9998,
       9999: 9999,
+      10000: 10000
     },
     borderColor: (theme) => ({
       ...theme("colors"),
@@ -53,9 +54,16 @@ module.exports = {
       aristotelica: ["AristotelicaBold"],
     },
     extend: {
+      screens: {
+        xs: '420px',
+        sm: '640px',
+        md: '768px',
+        lg: '1024px',
+        xl: '1280px'
+      },
       gridTemplateColumns: {
         // Simple 16 column grid
-        16: "repeat(16, minmax(0, 1fr))",
+        // 16: "repeat(16, minmax(0, 1fr))",
       },
       minWidth: {
         xs: "15rem",
@@ -70,6 +78,7 @@ module.exports = {
       },
       width: {
         "7/10": "70%",
+        canvas: "400px",
       },
       dropShadow: {
         center: "0 0 5px rgba(0, 0, 0, 0.5)",
@@ -85,6 +94,9 @@ module.exports = {
       },
       inset: {
         "1/10": "10%",
+      },
+      colors: {
+        'pri-color': '#0072E3',
       },
     },
   },

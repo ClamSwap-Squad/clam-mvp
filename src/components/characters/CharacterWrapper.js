@@ -137,13 +137,16 @@ const CharacterWrapper = ({
       <div
         className={
           showBubble
-            ? "character-bubble fixed z-999 bottom-8 pointer-events-none w-screen"
+            ? "character-bubble fixed z-999 bottom-15 pointer-events-none w-screen"
             : "character-bubble hide-bubble fixed justify-end"
         }
         style={{ zIndex: forceTop ? 9999 : speech ? undefined : 0 }}
       >
         {speech && (
-          <div className="text-bubble flex-col justify-end pointer-events-none">
+          <div className="text-bubble">
+            <div className="flex justify-end">
+              <img src={character.charImg} className="charactor_1_img" onClick={handleClickCharacter} style={{height: "200px", marginBottom: "-100px", marginRight: "30px", pointerEvents: "auto"}}/>
+            </div>
             <div className="text-wrapper">
               <div className="name px-10">{character.name}</div>
               <div className="speech">
@@ -184,7 +187,7 @@ const CharacterWrapper = ({
                   )}
                 </div>
               </Reveal>
-              <div className="absolute mt-4 right-8 text-white">
+              <div className="absolute mt-2 right-8 text-white">
                 {isDialogHideable && (
                   <button
                     data-tip="Hide"
@@ -223,8 +226,8 @@ const CharacterWrapper = ({
             onClick={handleClickCharacter}
           />
         </div>
-        <button className="btn character-container-round" onClick={handleClickCharacter}>
-          <img src={character.charImg} className="character" />
+        <button className="btn character-container-round" onClick={handleClickCharacter} style={{display: showBubble ? "none": "block"}}>
+          <img src={character.charImg} className="character"/>
         </button>
       </div>
     </div>

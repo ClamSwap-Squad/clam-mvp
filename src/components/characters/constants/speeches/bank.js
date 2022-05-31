@@ -47,10 +47,30 @@ export const BANK_SPEECH = {
       hideable: true,
     },
     process_transaction: {
-      text: "Please wait while we process your transaction. Please note, your wallet may ask you to approve two transactions one after the other - please approve both transactions if that occurs.",
+      text: "Please wait while we process your transaction.",
       next: false,
       dismiss: true,
       skip: false,
+    },
+    process_approve_transaction: {
+      text: "Please wait while we process your Approve transaction.",
+      next: false,
+      dismiss: true,
+      skip: false,
+    },
+    approve_error: {
+      text: "We’re sorry, something went wrong and your transaction could not be processed. Please try again later.",
+      next: false,
+      dismiss: true,
+      skip: false,
+      hideable: true,
+    },
+    approve_success: {
+      text: "Congratulations, your approve transaction was successful!",
+      next: false,
+      dismiss: true,
+      skip: true,
+      hideable: true,
     },
     transaction_error: {
       text: "We’re sorry, something went wrong and your transaction could not be processed. Funds have not been removed. Please try again later.",
@@ -123,6 +143,18 @@ export const BANK_SPEECH = {
     instant_burn_pearl_success: {
       text: ({ halfReward }) =>
         `Your pearl has been exchanged successfully for ${halfReward} GEM! The amount should be available in your wallet.`,
+      next: false,
+      dismiss: true,
+      skip: false,
+    },
+    swap_success: {
+      text: "Congratulations, your swap transaction was successful!",
+      next: false,
+      dismiss: true,
+      skip: false,
+    },
+    swap_error: {
+      text: "We’re sorry, something went wrong and your swap transaction could not be processed. Funds have not been removed. Please try again later.",
       next: false,
       dismiss: true,
       skip: false,

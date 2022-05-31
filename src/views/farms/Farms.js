@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "redux-zero/react";
 import { useAsync } from "react-use";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
 import moment from "moment";
 
@@ -19,12 +19,13 @@ import videoMp4 from "assets/locations/Farm.mp4";
 import videoWebM from "assets/locations/Farm.webm";
 
 import clamContract, { getMinPearlProductionDelay, getMaxPearlProductionDelay } from "web3/clam";
-import { getStakedClamIds, unstakeClam, collectPearl, stakePrice } from "web3/pearlFarm";
+import { getStakedClamIds, unstakeClam, collectPearl, stakePrice, getRemainingPearlProductionTime } from "web3/pearlFarm";
 import { formatFromWei, getClamsDataByIds } from "web3/shared";
 
 import "./index.scss";
 import FarmItem from "./FarmItem";
 import ClamDeposit from "./ClamDeposit";
+import BottomMenu from './BottomMenu';
 import { DepositClamCard } from "./depositClamCard";
 
 import PearlView from "../saferoom/PearlView";
@@ -36,11 +37,12 @@ import {
   speechWelcomeNext,
 } from "./character/WithdrawClam";
 import LoadingScreen from "components/LoadingScreen";
-import ClamView from "../saferoom/ClamView";
+import ClamView from "./ClamView";
 
 import { ifPearlSendSaferoom } from "./utils";
 import { getSortedClams } from "utils/clamsSort";
 import { ClamsSorting } from "components/clamsSorting";
+
 
 const Farms = ({
   account: { clamBalance, isBSChain, address, clams = [] },
@@ -72,6 +74,15 @@ const Farms = ({
   const [pearlProductionPrice, setPearlProductionPrice] = useState(0);
   const [minPearlProductionTime, setMinPearlProductionTime] = useState(0);
   const [maxPearlProductionTime, setMaxPearlProductionTime] = useState(0);
+  const [viewTab, setViewTab] = useState('farms');
+
+
+  const setViewTabF = (_viewTab) => {
+    // alert("_viewTab", _viewTab);
+    setViewTab(_viewTab);
+  }
+
+
 
   const isPrevButtonShown = selectedClam.clamId !== clamsStakedSorted[0]?.clamId;
   const isNextButtonShown =
@@ -216,6 +227,8 @@ const Farms = ({
       ...clamsReadyToCollect,
       ...getSortedClams(clamsNotReadyToCollect, clamsSortOrder.value, clamsSortOrder.order),
     ];
+    console.log("Ready To collect", clamsReadyToCollect);
+    console.log("Not Ready To collect", clamsNotReadyToCollect);
     setClamsStakedSorted(sortedClams);
   }, [clamsStaked, clamsSortOrder.value, clamsSortOrder.order]);
 
@@ -252,90 +265,157 @@ const Farms = ({
   }, []);
 
   return (
-    <div className="overflow-x-hidden">
-      {loading && <LoadingScreen />}
-      <VideoBackground videoImage={videoImage} videoMp4={videoMp4} videoWebM={videoWebM} />
+    <>
+      <div className="div_lg">
+        <div className="overflow-x-hidden">
+          {loading && <LoadingScreen />}
+          <VideoBackground videoImage={videoImage} videoMp4={videoMp4} videoWebM={videoWebM} />
 
-      <Modal
-        isShowing={isShowing}
-        onClose={onModalClose}
-        title={
-          modalSelected === MODAL_OPTS.CLAM_DETAILS ||
-          modalSelected === MODAL_OPTS.VIEW_PEARL ||
-          MODAL_OPTS.DEPOSIT_CLAM
-            ? ""
-            : "Choose a Clam"
-        }
-        modalClassName={
-          modalSelected === MODAL_OPTS.CLAM_DETAILS || modalSelected === MODAL_OPTS.VIEW_PEARL
-            ? "w-4/5 max-w-5xl"
-            : "w-full md:w-4/5"
-        }
-      >
-        {modalSelected === MODAL_OPTS.CLAM_DETAILS ? (
-          <ClamView
-            {...selectedClam}
-            {...boostParams}
-            gemPriceUSD={gemPriceUSD}
-            farmView={true}
-            view="farm"
-            onClickNext={isNextButtonShown && onClickNext}
-            onClickPrev={isPrevButtonShown && onClickPrev}
-          />
-        ) : modalSelected === MODAL_OPTS.DEPOSIT_CLAM ? (
-          <ClamDeposit
-            clams={availableClamsForDepositing}
-            updateCharacter={updateCharacter}
-            toggleModal={toggleModal}
-            setRefreshClams={setRefreshClams}
-          />
-        ) : (
-          <PearlView
-            {...boostParams}
-            {...selPearl}
-            gemPriceUSD={Number(gemPriceUSD)}
-            hideProduceButton={true}
-          />
-        )}
-      </Modal>
+          <Modal
+            isShowing={isShowing}
+            onClose={onModalClose}
+            title={
+              modalSelected === MODAL_OPTS.CLAM_DETAILS ||
+              modalSelected === MODAL_OPTS.VIEW_PEARL ||
+              MODAL_OPTS.DEPOSIT_CLAM
+                ? ""
+                : "Choose a Clam"
+            }
+            modalClassName={
+              modalSelected === MODAL_OPTS.CLAM_DETAILS || modalSelected === MODAL_OPTS.VIEW_PEARL
+                ? "w-4/5 max-w-5xl"
+                : "w-full md:w-4/5"
+            }
+          >
+            {modalSelected === MODAL_OPTS.CLAM_DETAILS ? (
+              <ClamView
+                {...selectedClam}
+                {...boostParams}
+                gemPriceUSD={gemPriceUSD}
+                farmView={true}
+                view="farm"
+                onClickNext={isNextButtonShown && onClickNext}
+                onClickPrev={isPrevButtonShown && onClickPrev}
+                onClose={onModalClose}
+                address={address}
+                updateAccount={updateAccount}
+                onWithdrawClam={() => onWithdrawClam(selectedClam.clamId)}
+                onViewPearl={onViewPearl}
+                updateCharacter={updateCharacter}
+                withdrawingClamId={withdrawingClamId}
+                updateStakedClams={() => setRefreshClams(true)}
+                viewTab={viewTab}
+                updateClams={updateClams}
+              />
+            ) : modalSelected === MODAL_OPTS.DEPOSIT_CLAM ? (
+              <ClamDeposit
+                clams={availableClamsForDepositing}
+                updateCharacter={updateCharacter}
+                toggleModal={toggleModal}
+                setRefreshClams={setRefreshClams}
+                onClose={onModalClose}
+              />
+            ) : (
+              <PearlView
+                {...boostParams}
+                {...selPearl}
+                gemPriceUSD={Number(gemPriceUSD)}
+                hideProduceButton={true}
+              />
+            )}
+          </Modal>
 
-      {address && (
-        <div className="w-full lg:w-4/5 mx-auto relative z-10">
-          <div className="px-2 md:px-8 py-4 mt-24 flex flex-col items-start">
-            <div className="flex flex-row gap-8 mb-8">
-              <PageTitle title="Clam Farms" />
-              <ClamsSorting page="farm" />
-            </div>
-            {/* clams and pears grid */}
-            <div className="w-full my-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 2xl:grid-cols-4 gap-20">
-                <DepositClamCard
-                  pearlProductionPrice={pearlProductionPrice}
-                  minPearlProductionTime={minPearlProductionTime}
-                  maxPearlProductionTime={maxPearlProductionTime}
-                  onClick={onDepositClam}
-                />
-                {clamsStakedSorted &&
-                  clamsStakedSorted.map((clam, i) => (
-                    <FarmItem
-                      key={clam.clamId}
-                      {...clam}
-                      onViewDetails={() => onViewDetails(clam)}
-                      onWithdrawClam={() => onWithdrawClam(clam.clamId)}
-                      onViewPearl={onViewPearl}
-                      updateCharacter={updateCharacter}
-                      withdrawingClamId={withdrawingClamId}
-                      updateStakedClams={() => setRefreshClams(true)}
+          {address && (
+            <div className="w-full lg:w-4/5 mx-auto relative z-10">
+              <div className="px-2 md:px-8 py-4 mt-24 flex flex-col items-start">
+                <div className="flex flex-row gap-8 mb-8">
+                  <PageTitle title="Clam Farms" />
+                  <ClamsSorting page="farm" />
+                </div>
+                {/* clams and pears grid */}
+                <div className="w-full my-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 2xl:grid-cols-4 gap-20">
+                    <DepositClamCard
+                      pearlProductionPrice={pearlProductionPrice}
+                      minPearlProductionTime={minPearlProductionTime}
+                      maxPearlProductionTime={maxPearlProductionTime}
+                      onClick={onDepositClam}
                     />
-                  ))}
+                    {clamsStakedSorted &&
+                      clamsStakedSorted.map((clam, i) => (
+                        <FarmItem
+                          key={clam.clamId}
+                          {...clam}
+                          onViewDetails={() => onViewDetails(clam)}
+                          onWithdrawClam={() => onWithdrawClam(clam.clamId)}
+                          onViewPearl={onViewPearl}
+                          updateCharacter={updateCharacter}
+                          withdrawingClamId={withdrawingClamId}
+                          updateStakedClams={() => setRefreshClams(true)}
+                        />
+                      ))}
+                  </div>
+                </div>
               </div>
             </div>
+          )}
+
+          <Character name="al" loading={loading} />
+        </div>
+      </div>
+      <div className={`saferoom_sm ${ address ? '' : 'hiddden' }`} >
+
+        {loading && <LoadingScreen />}
+        <VideoBackground videoImage={videoImage} videoMp4={videoMp4} videoWebM={videoWebM} />
+          
+        <div className="w-full lg:w-4/5 mx-auto relative z-5">
+          <div className="px-2 md:px-3 py-5 mb-5 mt-8 sm:mt-12 flex flex-col items-start">
+            <div className="mb-2 text-center w-full"> 
+
+              <PageTitle title="Clam Farms" />
+              <ClamsSorting page="farm" textSize="sm" />
+
+            </div>
+            {address && (
+              
+              <div className="w-full my-4">
+                <div className="grid grid-cols-2 md:grid-cols-2 2xl:grid-cols-2 gap-4">
+                  {clamsStakedSorted &&
+                    clamsStakedSorted.map( (clam, i) => { 
+                      console.log('clam data', clam);
+                      console.log('viewTab viewTab', viewTab);
+                      return (
+                        <FarmItem
+                          key={clam.clamId}
+                          {...clam}
+                          onViewDetails={() => onViewDetails(clam)}
+                          onWithdrawClam={() => onWithdrawClam(clam.clamId)}
+                          onViewPearl={onViewPearl}
+                          updateCharacter={updateCharacter}
+                          withdrawingClamId={withdrawingClamId}
+                          updateStakedClams={() => setRefreshClams(true)}
+                          viewTab={viewTab}
+                        />
+                      )
+                    // }
+                    }
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      )}
 
-      <Character name="al" loading={loading} />
-    </div>
+        <Character name="al" loading={loading} />
+        
+        <BottomMenu 
+          isShowing={isShowing}
+          toggleModal={toggleModal}
+          setViewTabF={setViewTabF}
+          onDepositClam={onDepositClam}
+        />
+      </div>
+    </>
   );
 };
 

@@ -20,6 +20,44 @@ export const totalSupply = async (address) => {
   return token.methods.totalSupply().call();
 };
 
+export const allowance = async (address, owner, spender) => {
+  const token = contractFactory({ abi: BEP20ABI, address });
+  return token.methods.allowance(owner, spender).call();
+}
+
+export const approve = async (address, spender, amount) => {
+  const account = getAccount();
+  const token = contractFactory({ abi: BEP20ABI, address });
+  
+  const method = token.methods.approve(spender, amount);
+
+  const gasEstimation = await method.estimateGas({
+    from: account,
+  });
+
+  await method.send({
+    from: account,
+    gas: gasEstimation,
+  });
+}
+
+export const getTokenInfo = async (address) => {
+  const token = contractFactory({ abi: BEP20ABI, address });
+  
+  const name = await token.methods.name().call();
+  const symbol = await token.methods.symbol().call();
+  const decimals = await token.methods.decimals().call();
+
+  const tokenInfo = {
+    name: name,
+    symbol: symbol,
+    address: address,
+    decimals: decimals
+  }
+
+  return tokenInfo;
+}
+
 export const approveContractForMaxUintErc721 = async (tokenAddress, contractAddress) => {
   const account = getAccount();
   const token = contractFactory({ abi: ERC721ABI, address: tokenAddress });

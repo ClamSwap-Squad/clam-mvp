@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import BigNumber from "bignumber.js";
 import { connect } from "redux-zero/react";
 import { actions, store } from "store/redux";
@@ -16,9 +17,22 @@ import Navbar from "components/Navbar";
 import { color, periodInSeconds, periodStart, shape } from "../web3/pearlBurner";
 import { getClamValueInShellToken, getPearlValueInShellToken } from "../web3/clam";
 
+// <<<<<<< HEAD
+import clamIcon from "assets/clam-icon.png";
+import open from "assets/m-open.png";
+import close from "assets/m-close.png";
+
+
+import _ from "lodash";
+import ROUTES from "../router";
+// =======
 import BnbIcon from "assets/bnb-icon.png";
+// >>>>>>> origin/master
 
 let web3;
+
+const IMG_LOC = "/nav_icons/";
+
 const web3Modal = new Web3Modal({
   network: "binance",
   cacheProvider: true, // maybe use true on production
@@ -273,6 +287,15 @@ const Web3ProvidersModal = ({
   updateUI,
   dispatchFetchAccountAssets,
 }) => {
+
+  const NAV_ROUTES = _.chain(ROUTES)
+  .filter((k) => k.icon)
+  .sortBy((k) => k.order)
+  .map(({ title, icon, url }) => ({ title, icon, url }))
+  .value();
+
+  // console.log("NAV_ROUTES1", NAV_ROUTES);
+
   const { onConnect, onDisconnect } = useWeb3Modal({
     resetAccount,
     updateAccount,
@@ -280,34 +303,156 @@ const Web3ProvidersModal = ({
     updateUI,
     dispatchFetchAccountAssets,
   });
+  const [mStatus, setMStatus] = useState(false);
 
   useAsync(async () => {
-    console.log("on init check for web3");
+    // console.log("on init check for web3");
     // only auto connect if web3modal has been selected and wallet is unlocked
     if (window.ethereum.selectedAddress && web3Modal.cachedProvider) {
       onConnect();
     }
   });
 
+  const toggle = () => {
+    setMStatus(!mStatus);
+  }
+
+  const icons = NAV_ROUTES.map((k, i) => {
+    return (
+      <div key={i}>
+        <Link to={k.url}>
+          {k.title}
+        </Link>
+      </div>
+    );
+  });
+
   return (
     <>
-      {address ? (
+      {/* {address ? (
         <Navbar onDisconnect={onDisconnect} />
-      ) : (
-        <nav className="flex min-h-48 min-w-full justify-end fixed px-6 py-4 bg-transparent mt-2 z-20">
-          <div className="w-full lg:flex lg:items-center lg:w-auto lg:px-3 px-8">
-            <div className="flex">
-              <button
-                type="button"
-                className="focus:outline-none block text-md px-4 ml-2 py-2 rounded-xl bg-gray-800 text-white font-bold hover:text-white hover:bg-gray-700"
-                onClick={onConnect}
-              >
-                Connect Wallet
-              </button>
+      ) : ( */}
+      <>
+        <nav className="mNavbar flex min-h-48 min-w-full justify-end fixed px-6 py-4 bg-transparent z-20">
+          <div className="w-full lg:flex lg:items-center lg:w-auto lg:px-3 px-8 web3providermodal">
+            {address ? (
+              <Navbar onDisconnect={onDisconnect} />
+            ) : (
+              <div className="flex">
+                <button
+                  type="button"
+                  className="focus:outline-none block text-md px-4 ml-2 py-2 rounded-xl bg-gray-800 text-white font-bold hover:text-white hover:bg-gray-700"
+                  onClick={onConnect}
+                >
+                  Connect Wallet
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="hidden mNavbarItems w-full flex items-center">
+            <div className="flex items-center">
+              <img src={clamIcon} className="max-h-48" />
+              <p>Clam Island</p>
             </div>
+            <img src={ mStatus ? close : open } onClick={toggle} />
           </div>
         </nav>
-      )}
+        
+        <div className={`overlay_m_items ${ mStatus ? 'h-full' : 'h-0' } `}>
+          <div className="overlay_m_container px-6 py-4 w-full h-full">
+            <div className="flex justify-between">
+              <p></p>
+              <img src={ mStatus ? close : open } onClick={toggle} />
+            </div>
+            <div className="text-center items-center pt-5">
+              {address ? (
+                <>
+                  {/* <Navbar onDisconnect={onDisconnect} /> */}
+                </>
+              ) : (
+                <button type="button" className="connect_btn" onClick={onConnect}>
+                  Connect Wallet
+                </button>
+              )}
+
+              <div className="mt-5">
+                {
+                  NAV_ROUTES.map((item, index) => {
+                    return (
+                      <>
+                        <div className="mt-3">
+                          <Link to={item.url} onClick={toggle}>{item.title}</Link>
+                        </div>
+                      </>
+                    );
+                  })
+                }
+              </div>
+
+              
+              {address ? (
+                <>
+                  <Navbar onDisconnect={onDisconnect} />
+                </>
+              ) : (
+                <>
+                  {/* <button type="button" className="connect_btn" onClick={onConnect}>
+                    Connect Wallet
+                  </button> */}
+                </>
+              )}
+
+              <div className={`justify-center w-full left-0 bottom-0 absolute ${ mStatus ? 'flex' : 'hidden' }`}>
+              <a
+                  className="social-btn m-0"
+                  href="https://twitter.com/clam_island"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <button className="nav-icon sm-nav-icon">
+                    <img src={IMG_LOC + "twitter-32.png"} />
+                  </button>
+                </a>
+                <a
+                  className="social-btn"
+                  href="https://discord.gg/F4ak27n8Sh"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <button className="nav-icon sm-nav-icon">
+                    <img src={IMG_LOC + "discord_gray.png"} />
+                  </button>
+                </a>
+                <a
+                  className="social-btn"
+                  href="https://t.me/clamisland"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <button className="nav-icon sm-nav-icon">
+                    <img src={IMG_LOC + "telegram_gray.png"} />
+                  </button>
+                </a>
+                <a
+                  className="social-btn"
+                  href="https://clamisland.medium.com/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <button className="nav-icon sm-nav-icon">
+                    <img src={IMG_LOC + "medium_gray.png"} />
+                  </button>
+                </a>
+              </div>
+
+
+            </div>
+
+          </div>
+        </div>
+      </>
+      {/* )} */}
     </>
   );
 };

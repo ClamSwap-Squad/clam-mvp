@@ -1,5 +1,6 @@
 .exchange-tabs-content {
-    width: 440px;
+    max-width: 440px;
+    width: 100%;
     height: 595px;
     margin: auto;
 }
