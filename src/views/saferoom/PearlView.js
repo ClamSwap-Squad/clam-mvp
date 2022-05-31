@@ -300,7 +300,7 @@ export default (props) => {
       <div className="div_sm">
 
         <ReactTooltip html={true} className="max-w-xl" />
-        <div className="flex flex-col justify-between relative bg-white">
+        <div className="relative bg-white min-h-screen" style={{paddingBottom: "50px", minHeight: "100vh"}} >
           {isTakingSnapshot && (
             <div className="absolute w-full h-full z-10 min-w-[1024px]">
               <Skeleton animation="waves" variant="rect" height="100%" />

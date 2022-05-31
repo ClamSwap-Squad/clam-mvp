@@ -92,17 +92,24 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
         if( iAmount && iToken && oToken ) {
             // Set oAmount from iAmount
             const _oAmount = await getTokenAmountFromOtherToken(iAmount, iToken.address, oToken.address);
-            setOAmount(_oAmount);
 
-            // Get Price Impact
-            const { priceImpactWithoutFee } = await getPriceImpactWithoutFee(iToken, oToken, iAmount, _oAmount);
-            if(priceImpactWithoutFee) {
-                console.log('priceImpactWithoutFee',  priceImpactWithoutFee.toFixed(2));
+            if(_oAmount < 1 / (10 ** 18 )) {
+                setOAmount(0);
             }
             else {
-                console.log('priceImpactWithoutFee______');
+                setOAmount(_oAmount);
             }
-            setPriceImpact( priceImpactWithoutFee );
+
+
+            // Get Price Impact
+            // const { priceImpactWithoutFee } = await getPriceImpactWithoutFee(iToken, oToken, iAmount, _oAmount);
+            // if(priceImpactWithoutFee) {
+            //     console.log('priceImpactWithoutFee',  priceImpactWithoutFee.toFixed(2));
+            // }
+            // else {
+            //     console.log('priceImpactWithoutFee______');
+            // }
+            // setPriceImpact( priceImpactWithoutFee );
         }
         else {
             setOAmount(0)
@@ -193,21 +200,21 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
     }
 
     const exchange = async () => {
-        // setLoading(true);
-        // onSwapTxn(updateCharacter);
-        // try {
+        setLoading(true);
+        onSwapTxn(updateCharacter);
+        try {
             await swap(iToken, oToken, iAmount, oAmount, slippage, deadline);
-        //     onSwapSuccess(updateCharacter);
+            onSwapSuccess(updateCharacter);
 
-        //     setIAmount(0);
-        //     setOAmount(0);
+            setIAmount(0);
+            setOAmount(0);
 
-        //     setITokenBalance(await getTokenBalance(iToken.address));
-        //     setOTokenBalance(await getTokenBalance(oToken.address));
-        // } catch (error) {
-        //     updateAccount({ error: error.message });
-        //     onSwapError(updateCharacter);
-        // }
+            setITokenBalance(await getTokenBalance(iToken.address));
+            setOTokenBalance(await getTokenBalance(oToken.address));
+        } catch (error) {
+            updateAccount({ error: error.message });
+            onSwapError(updateCharacter);
+        }
 
         setLoading(false);
     }
@@ -328,7 +335,7 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
                                 type='number' 
                                 className='h-8 bg-transparent px-3 outline-0 w-full' 
                                 style={{outline: "none"}} 
-                                value={ oAmount > 0 ? parseFloat(oAmount).toFixed(5) : 0 }
+                                value={ oAmount }
                                 onChange={(e) => setOAmount(e.target.value)}
                                 disabled={'true'}
                             />
@@ -361,7 +368,7 @@ const Exchange = ({account: { address, isBSChain, isWeb3Installed, isConnected }
                                 className='btn btn-primary w-full mt-2' 
                                 onClick={exchange}
                                 disabled={
-                                    isLoading || !address || iAmount <=0 
+                                    isLoading || !address || iAmount <=0 || oAmount <= 0
                                     // || !priceImpact || priceImpact.toFixed(2) > 15  
                                 }
                             >
