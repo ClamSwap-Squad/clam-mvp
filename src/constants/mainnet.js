@@ -10,7 +10,7 @@ export default {
   pearlBurnerAddress: "0x49e3ceADdD501A7e558821e4633015B651FC9d9e",
   rngAddress: "0xbacdF6F20DC405574C7c1e1a7cbAB06107d94DEc",
   dnaDecoderAddress: "0xb9cCd96b2D6B9733b97Ad17BA4395Ee37ef0312f",
-  communityRewardsAddress: "0x5A11EEcee855B172aD0F4AdbB3b4505Be29ECCba",
+  communityRewardsAddress: "0xd3dCeabEc33C405398B8cBafCa66a0f4D9f80CfC",
   // clamBonusAddress: "0x15b540771a373c0e8a082d0dF4cDBaDddBc106cc", // deprecated
   clamLotteryAddress: "0x5b9d7dCC720f6B1bE1c8f8fAd54e89DBa57B2036",
   clamShopAddress: "0xb073dD56EDc93Ea80Bd3cBbB62eB2093aDAa5903",

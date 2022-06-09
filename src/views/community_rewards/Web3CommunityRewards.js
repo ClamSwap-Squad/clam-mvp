@@ -49,7 +49,7 @@ const Web3CommunityRewards = ({ updateCommunityRewards }) => {
   useAsync(async () => {
     setInterval(async () => {
       await fetchPresaleData();
-    }, 2500); // 2.5s
+    }, 5000); // 5s
   });
   return <div></div>;
 };

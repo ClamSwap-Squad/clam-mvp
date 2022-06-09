@@ -22,7 +22,11 @@ export const clamClaimersAddress = "0xDaF219f41931B4833A71B9D08881491010246691";
 
 export const zeroHash = "0x0000000000000000000000000000000000000000000000000000000000000000";
 
-export const communityRewardsAddress = "0x6684C3Fb0a85cE9B05187c770c4aa6A824Ed590C";
+export const tokens =
+    process.env.NODE_ENV === "development" || window.location.hostname === "clam-island-beta.web.app"
+      ? testnetTokens
+      : mainnetTokens;
+
 
 export const zapAddress = "0x25AE8E764b0c8318c093d8eFdd03000b442bb56a";
 
@@ -37,6 +41,7 @@ export const {
   pearlDnaDecoderAddress,
   pearlNFTAddress,
   pearlBurnerAddress,
+  communityRewardsAddress,
   rngAddress,
   dnaDecoderAddress,
   clamLotteryAddress,
@@ -50,3 +55,32 @@ export const {
   wBNB,
   BUSD,
 } = addresses;
+
+
+
+export const serializeTokens = [
+  {
+    address: wBNB,
+    decimals: 18,
+    logoURI: "https://pancake.kiemtienonline360.com/images/coins/0xae13d989dac2f0debff460ac112a837c89baa7cd.png",
+    name: "BNB",
+    symbol: "BNB",
+    chainId: ClamIslandChain.BSC_TESTNET
+  },
+  {
+    address: gemTokenAddress,
+    decimals: 18,
+    logoURI: `${process.env.PUBLIC_URL}/favicon/android-chrome-192x192.png`,
+    name: "GEM",
+    symbol: "GEM",
+    chainId: ClamIslandChain.BSC_TESTNET
+  },
+  {
+    address: shellTokenAddress,
+    decimals: 18,
+    logoURI: `${process.env.PUBLIC_URL}/favicon/android-chrome-192x192.png`,
+    name: "SHELL",
+    symbol: "SHELL",
+    chainId: ClamIslandChain.BSC_TESTNET
+  }
+];
