@@ -20,6 +20,7 @@ const RewardCollectModal = ({
   account: { address },
   updateCharacter,
   updateAccount,
+  isPearlAwardee,
 }) => {
   const { handleSubmit } = useForm();
   const [isLoading, setIsLoading] = useState(false);

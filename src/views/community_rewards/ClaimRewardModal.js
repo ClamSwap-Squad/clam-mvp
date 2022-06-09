@@ -5,7 +5,8 @@ import { connect } from "redux-zero/react";
 import "./index.scss";
 
 import Card from "../../components/Card";
-import RewardUnknown from "../../assets/img/pearl_unknown.png";
+import ClamUnknown from "../../assets/img/clam_unknown.png";
+import PearlUnknown from "../../assets/img/pearl_unknown.png";
 
 import { claimReward } from "../../web3/communityRewards";
 import { communityRewardsAddress } from "../../constants/constants";
@@ -16,6 +17,7 @@ const ClaimRewardModal = ({
   updateCharacter,
   updateAccount,
   communityRewardsData: { userRewards },
+  isPearlAwardee,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const disableButton = Number(userRewards) === 0;
@@ -98,7 +100,7 @@ const ClaimRewardModal = ({
           </div>
 
           <div className="flex mb-4 justify-center">
-            <img className="w-2/3" src={RewardUnknown} />
+            <img className="w-2/3" src={isPearlAwardee ? PearlUnknown : ClamUnknown} />
           </div>
 
           <div className="py-2 flex flex-col">

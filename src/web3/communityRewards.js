@@ -86,6 +86,16 @@ export const isAwardee = async (account) => {
   return isClaimer;
 };
 
+export const isPearlAwardee = async (account) => {
+  const CommunityAwardee = contractFactory({
+    abi: communityRewardsAbi,
+    address: communityRewardsAddress,
+  });
+  const isPearlClaimer = await CommunityAwardee.methods.isPearlAwardee(account).call();
+
+  return isPearlClaimer;
+};
+
 export const userRewards = async (address) => {
   if (address) {
     const CommunityAwardee = contractFactory({
@@ -116,6 +126,7 @@ export default {
   claimReward,
   collectReward,
   isAwardee,
+  isPearlAwardee,
   userRewards,
   rngRequestHashFromRewardBeneficiary,
 };

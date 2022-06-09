@@ -13,7 +13,7 @@ import {
 import { getStakedClamIds, rngRequestHashForProducedPearl } from "web3/pearlFarm";
 import { EmptyBytes, getOwnedClams, getOwnedPearls, formatFromWei } from "web3/shared";
 import { balanceOf } from "web3/bep20";
-import { color, periodInSeconds, periodStart, shape } from "web3/pearlBurner";
+import { getCurrentShapeAndColour, periodInSeconds, periodStart } from "web3/pearlBurner";
 import { getTraitsBeforeMaxYield } from "utils/getTraitsBeforeMaxYield";
 
 const initialState = {
@@ -129,7 +129,7 @@ export const actions = (store) => ({
     /** If we get error from contract, we need to parse it */
     if (error) {
       try {
-        errorObj.error = error.match(/"message":\s?"(.+)"/)[1].replace(/\\n/g, " ");
+        errorObjccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc = error.match(/"message":\s?"(.+)"/)[1].replace(/\\n/g, " ");
       } catch {
         errorObj.error = error;
       }
@@ -279,21 +279,21 @@ export const actions = (store) => ({
       });
 
       const [
-        boostColor,
-        boostShape,
+        boostColorShape,
         boostPeriodStart,
         boostPeriodInSeconds,
         clamValueInShellToken,
         pearlValueInShellToken,
       ] = await Promise.all([
-        color(),
-        shape(),
+        getCurrentShapeAndColour(),
         periodStart(),
         periodInSeconds(),
         getClamValueInShellToken(),
         getPearlValueInShellToken(),
       ]);
-
+      const [boostColor, boostShape] = [boostColorShape[1], boostColorShape[0]];
+      console.log(boostColor);
+      console.log(boostShape);
       const boostParams = {
         boostColor,
         boostShape,

@@ -23,8 +23,9 @@ const Web3CommunityRewards = ({ updateCommunityRewards }) => {
           address,
           communityRewardsData,
         });
-        const [isAwardee, userRewards, hashRequest] = await Promise.all([
+        const [isAwardee, isPearlAwardee, userRewards, hashRequest] = await Promise.all([
           communityRewardsContract.isAwardee(address),
+          communityRewardsContract.isPearlAwardee(address),
           communityRewardsContract.userRewards(address),
           communityRewardsContract.rngRequestHashFromRewardBeneficiary(address),
         ]);
@@ -36,6 +37,7 @@ const Web3CommunityRewards = ({ updateCommunityRewards }) => {
 
         updateCommunityRewards({
           isAwardee,
+          isPearlAwardee,
           userRewards,
           hashRequest,
           rng,

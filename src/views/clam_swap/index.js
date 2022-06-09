@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { connect } from "redux-zero/react";
 import "./index.scss";
 import CharacterWrapper from "../../components/characters/CharacterWrapper";
-import RewardUnknown from "../../assets/img/pearl_unknown.png";
+import RewardUnknown from "../../assets/img/clam_unknown.png";
 import Card from "../../components/Card";
 
 import { actions } from "../../store/redux";
@@ -44,7 +44,7 @@ const WaitingOracle = () => (
     <div className="py-2 flex flex-col">
       <button
         type="button"
-        className="flex justify-content-center items-center block uppercase text-center shadow bg-yellow-200 text-yellow-600 text-xl py-3 px-10 rounded-xl cursor-not-allowed"
+        className="flex justify-center items-center block uppercase text-center shadow bg-yellow-200 text-yellow-600 text-xl py-3 px-10 rounded-xl cursor-not-allowed"
       >
         <svg
           className="animate-spin -ml-1 mr-3 h-5 w-5 text-yellow-600"

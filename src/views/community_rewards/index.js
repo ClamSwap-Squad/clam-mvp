@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react";
 import { connect } from "redux-zero/react";
 import "./index.scss";
 import CharacterWrapper from "../../components/characters/CharacterWrapper";
-import RewardUnknown from "../../assets/img/pearl_unknown.png";
+import ClamUnknown from "../../assets/img/clam_unknown.png";
+import PearlUnknown from "../../assets/img/pearl_unknown.png";
 import Card from "../../components/Card";
 
 import { actions } from "../../store/redux";
 import ClaimRewardModal from "./ClaimRewardModal";
 import RewardCollectModal from "./RewardCollectModal";
 import Web3ClamClaimers from "./Web3CommunityRewards";
+import { isPearlAwardee } from "../../web3/communityRewards";
 
 const WaitingOracle = () => (
   <Card>
@@ -36,7 +38,7 @@ const WaitingOracle = () => (
     </div>
 
     <div className="bg-white flex-1 justify-center  md:flex items-center">
-      <img src={RewardUnknown} />
+      <img src={isPearlAwardee ? PearlUnknown : ClamUnknown} />
     </div>
 
     <div className="py-2 flex flex-col">
@@ -72,7 +74,7 @@ const WaitingOracle = () => (
 
 const CommunityReward = ({
   account: { address },
-  communityRewardsData: { hashRequest, rng, isAwardee },
+  communityRewardsData: { hashRequest, rng, isAwardee, isPearlAwardee },
   updateCharacter,
 }) => {
   const [showMintModal, setShowMintModal] = useState(false);
@@ -80,6 +82,7 @@ const CommunityReward = ({
   useEffect(() => {
     console.log({
       isAwardee,
+      isPearlAwardee,
       address,
     });
 
@@ -184,7 +187,7 @@ const CommunityReward = ({
         }
       }
     }
-  }, [address, isAwardee, rng]);
+  }, [address, isAwardee, isPearlAwardee, rng]);
 
   return (
     <>
@@ -217,12 +220,12 @@ const CommunityReward = ({
           {address && // wallet is connected
             showMintModal && // user has agreed clicked Yes
             !hashRequest &&
-            !rng && <ClaimRewardModal setShowMintModal={setShowMintModal} />}
+            !rng && <ClaimRewardModal setShowMintModal={setShowMintModal} isPearlAwardee={isPearlAwardee} />}
           {/* !rng = did not have clams to collect */}
 
           {hashRequest && rng && rng === "0" && <WaitingOracle />}
           {hashRequest && rng && Number(rng) > 0 && (
-            <RewardCollectModal setShowMintModal={setShowMintModal} />
+            <RewardCollectModal setShowMintModal={setShowMintModal} isPearlAwardee={isPearlAwardee} />
           )}
         </div>
       </div>
