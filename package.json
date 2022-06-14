@@ -59,10 +59,10 @@
     "web3modal": "^1.9.4"
   },
   "scripts": {
-    "start": "craco start",
+    "start": "craco --max_old_space_size=4096 start",
     "start:local": "export REACT_APP_BSC_TESTNET_FORK=true && craco start",
     "local": "NODE_ENV=local craco start",
-    "build": "craco build",
+    "build": "craco --max_old_space_size=4096 build",
     "test": "craco test",
     "serve": "HOST=0.0.0.0 npm start",
     "eject": "react-scripts eject",
